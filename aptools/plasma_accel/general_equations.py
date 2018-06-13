@@ -1,3 +1,6 @@
+"""This module defines methods performing common operations and
+equations for plasma-based accelerators"""
+
 import scipy.constants as ct
 import numpy as np
 
