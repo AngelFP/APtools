@@ -263,3 +263,6 @@ __pycache__/
 # Project files
 *.sln
 *.pyproj
+/APtools.egg-info
+/build/lib/aptools
+/dist
