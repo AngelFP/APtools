@@ -18,20 +18,6 @@ def plasma_frequency(plasma_dens):
     """
     return np.sqrt(ct.e**2 * plasma_dens*1e6 / (ct.m_e*ct.epsilon_0))
 
-def laser_frequency(l_lambda):
-    """Calculate the laser frequency from its wavelength
-
-    Parameters:
-    -----------
-    l_lambda : float
-        The laser wavelength in meters
-
-    Returns:
-    --------
-    A float with laser frequency in units of 1/s
-    """
-    return 2*ct.pi*ct.c / l_lambda
-
 def plasma_skin_depth(plasma_dens):
     """Calculate the plasma skin depth from its densiy
 
@@ -46,6 +32,20 @@ def plasma_skin_depth(plasma_dens):
     """
     return ct.c / plasma_frequency(plasma_dens)
 
+def plasma_wavelength(plasma_dens):
+    """Calculate the plasma wavelength from its densiy
+
+    Parameters:
+    -----------
+    plasma_dens : float
+        The plasma density in units of cm-3
+
+    Returns:
+    --------
+    A float with the plasma wavelength in meters
+    """
+    return 2*ct.pi*ct.c / plasma_frequency(plasma_dens)
+
 def plasma_focusing_gradient_blowout(n_p):
     """Calculate the plasma focusing gradient assuming blowout regime
 
@@ -59,6 +59,20 @@ def plasma_focusing_gradient_blowout(n_p):
     A float with the focusing gradient value in T/m
     """
     return ct.m_e*plasma_frequency(n_p)**2 / (2*ct.e*ct.c)
+
+def laser_frequency(l_lambda):
+    """Calculate the laser frequency from its wavelength
+
+    Parameters:
+    -----------
+    l_lambda : float
+        The laser wavelength in meters
+
+    Returns:
+    --------
+    A float with laser frequency in units of 1/s
+    """
+    return 2*ct.pi*ct.c / l_lambda
 
 def self_guiding_threshold_a0_blowout(plasma_dens, l_lambda):
     """Get minimum a0 to fulfill self-guiding condition in the blowout regime.
