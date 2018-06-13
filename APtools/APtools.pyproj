@@ -22,24 +22,23 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="aptools\beam_dynamics\__init__.py">
+    <Compile Include="beam_dynamics\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="aptools\plasma_accel\general_equations.py">
+    <Compile Include="plasma_accel\general_equations.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="aptools\plasma_accel\__init__.py" />
-    <Compile Include="aptools\__version__.py">
+    <Compile Include="plasma_accel\__init__.py" />
+    <Compile Include="__version__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="aptools\__init__.py">
+    <Compile Include="__init__.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="aptools\beam_dynamics\" />
-    <Folder Include="aptools\" />
-    <Folder Include="aptools\plasma_accel\" />
+    <Folder Include="beam_dynamics\" />
+    <Folder Include="plasma_accel\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
