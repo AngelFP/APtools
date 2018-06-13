@@ -4,7 +4,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>7d48632c-49cc-48ed-bd48-7815f39e56f9</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>APtools.py</StartupFile>
+    <StartupFile>
+    </StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -21,7 +22,24 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="APtools.py" />
+    <Compile Include="aptools\beam_dynamics\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="aptools\plasma_accel\general_equations.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="aptools\plasma_accel\__init__.py" />
+    <Compile Include="aptools\__version__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="aptools\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="aptools\beam_dynamics\" />
+    <Folder Include="aptools\" />
+    <Folder Include="aptools\plasma_accel\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
