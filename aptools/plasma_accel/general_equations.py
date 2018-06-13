@@ -3,7 +3,7 @@ import numpy as np
 
 def plasma_frequency(plasma_dens):
     """Calculate the plasma frequency from its densiy
-    
+
     Parameters:
     -----------
     plasma_dens : float
@@ -17,8 +17,9 @@ def plasma_frequency(plasma_dens):
 
 def laser_frequency(l_lambda):
     """Calculate the laser frequency from its wavelength
-    
+
     Parameters:
+    -----------
     l_lambda : float
         The laser wavelength in meters
 
@@ -28,8 +29,22 @@ def laser_frequency(l_lambda):
     """
     return 2*ct.pi*ct.c / l_lambda
 
-def self_guiding_threshold_a0(plasma_dens, l_lambda):
-    """Get the minimum a0 to fulfill the self-guiding condition.
+def plasma_skin_depth(plasma_dens):
+    """Calculate the plasma skin depth from its densiy
+
+    Parameters:
+    -----------
+    plasma_dens : float
+        The plasma density in units of cm-3
+
+    Returns:
+    --------
+    A float with the plasma skin depth in meters
+    """
+    return ct.c / plasma_frequency(plasma_dens)
+
+def self_guiding_threshold_a0_blowout(plasma_dens, l_lambda):
+    """Get minimum a0 to fulfill self-guiding condition in the blowout regime.
 
     For more details see W. Lu - 2007 - Designing LWFA in the blowout regime
     (https://ieeexplore.ieee.org/iel5/4439904/4439905/04440664.pdf).
@@ -51,8 +66,8 @@ def self_guiding_threshold_a0(plasma_dens, l_lambda):
     a_0 = (w_0/w_p)**(2/5)
     return a_0
 
-def plasma_density_for_self_guiding(w_0, a_0, l_0=None):
-    """Get the plasma density to fulfill the self-guiding condition.
+def plasma_density_for_self_guiding_blowout(w_0, a_0, l_0=None):
+    """Get plasma density fulfilling self-guiding condition in blowout regime.
 
     For more inforation see W. Lu - 2007 - Generating multi-GeVelectron bunches
     using single stage laser wakeﬁeld acceleration in a 3D nonlinear regime
@@ -79,7 +94,7 @@ def plasma_density_for_self_guiding(w_0, a_0, l_0=None):
     k_p = 2 * np.sqrt(a_0)/w_0
     n_p = k_p**2 * ct.m_e*ct.epsilon_0*ct.c**2/ct.e**2 * 1e-6
     if l_0 is not None:
-        a_0_thres = self_guiding_threshold_a0(n_p, l_0)
+        a_0_thres = self_guiding_threshold_a0_blowout(n_p, l_0)
         if a_0 < a_0_thres:
             print("Warning, laser a0 does not meet self-guiding conditions.")
             print("Value provided: {}, threshold value: {}".format(a_0,
