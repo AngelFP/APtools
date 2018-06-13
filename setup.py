@@ -25,7 +25,7 @@ setup(name='APtools',
       install_requires=read_requirements(),
       platforms='any',
       classifiers=(
-          "Development Status :: 3 - Alpha",
+          "Development Status :: 1 - Planning",
           "Programming Language :: Python :: 3",
           "Intended Audience :: Science/Research",
           "Topic :: Scientific/Engineering :: Physics",
