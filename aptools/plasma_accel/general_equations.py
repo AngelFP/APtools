@@ -54,6 +54,11 @@ def self_guiding_threshold_a0(plasma_dens, l_lambda):
 def plasma_density_for_self_guiding(w_0, a_0, l_0=None):
     """Get the plasma density to fulfill the self-guiding condition.
 
+    For more inforation see W. Lu - 2007 - Generating multi-GeVelectron bunches
+    using single stage laser wakeﬁeld acceleration in a 3D nonlinear regime
+    (https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.10.061301)
+
+
     Parameters:
     -----------
     w_0 : float
