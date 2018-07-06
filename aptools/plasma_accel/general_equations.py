@@ -132,7 +132,7 @@ def plasma_density_for_self_guiding_blowout(w_0, a_0, l_0=None):
     return n_p
 
 def laser_w0_for_self_guiding_blowout(n_p, a_0, l_0=None):
-    """Get plasma density fulfilling self-guiding condition in blowout regime.
+    """Get laser spot size fulfilling self-guiding condition in blowout regime.
 
     For more inforation see W. Lu - 2007 - Generating multi-GeVelectron bunches
     using single stage laser wakeﬁeld acceleration in a 3D nonlinear regime
@@ -163,6 +163,28 @@ def laser_w0_for_self_guiding_blowout(n_p, a_0, l_0=None):
             print("Value provided: {}, threshold value: {}".format(a_0,
                                                                    a_0_thres))
     return w_0
+
+def matched_laser_pulse_duration_blowout(n_p, a_0):
+    """Get maximum matched laser pulse duration in the blowout regime.
+
+    For more details see W. Lu - 2007 - Designing LWFA in the blowout regime
+    (https://ieeexplore.ieee.org/iel5/4439904/4439905/04440664.pdf).
+
+    Parameters:
+    -----------
+    n_p : float
+        The plasma density in units of cm-3
+
+    a_0 : float
+        The laser a_0
+
+    Returns:
+    --------
+    A float with the value of t_FWHM in seconds
+    """
+    k_p = plasma_frequency(n_p) / ct.c
+    t_FWHM = 2/ct.c * np.sqrt(a_0)/k_p
+    return t_FWHM
 
 def matched_beam_size(beam_ene, beam_em, n_p=None, k_x=None):
     """Get matched beam size for the plasma focusing fields.
