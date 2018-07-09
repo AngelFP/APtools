@@ -142,7 +142,7 @@ def longitudinal_energy_chirp(z, px, py, pz, w=1):
     K = p[0]
     return K
 
-def correlated_energy_spread(z, px, py, pz, w=1):
+def rms_correlated_energy_spread(z, px, py, pz, w=1):
     """Calculate the correlated energy spread of the provided particle
     distribution
 
