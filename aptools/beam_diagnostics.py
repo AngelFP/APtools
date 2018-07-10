@@ -173,3 +173,58 @@ def rms_correlated_energy_spread(z, px, py, pz, w=1):
     corr_ene = K*dz
     corr_ene_sp = weighted_std(corr_ene, w)
     return corr_ene_sp
+
+def relative_rms_slice_energy_spread(z, px, py, pz, w=1, n_slices=10, len_slice=None):
+    """Calculate the relative RMS slice energy spread of the provided particle
+    distribution
+
+    Parameters:
+    -----------
+    z : array
+        Contains the longitudinal position of the particles in units of meters
+    px : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+    py : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+    pz : array
+        Contains the longitudonal momentum of the beam particles in
+        non-dimmensional units (beta*gamma)
+    w : array or single value
+        Statistical weight of the particles.
+    n_slices : array
+        Number of longitudinal slices in which to divite the particle
+        distribution. Not used if len_slice is specified.
+    len_slice : array
+        Length of the longitudinal slices. If not None, replaces n_slices.
+
+    Returns:
+    --------
+    An array with the energy spread value in each slice. Values are in
+    non-dimmensional units, i.e. [1/(m_e c**2)]
+    """
+    max_z = np.max(z)
+    min_z = np.min(z)
+    if len_slice is None:
+        slice_lims = np.linspace(min_z, max_z, n_slices+1)
+    else:
+        slice_lims = np.arange(min_z, max_z, len_slice)
+        slice_lims = np.append(slice_lims, max_z)
+        n_slices = len(slice_lims)-1
+    slice_ene_sp = np.zeros(n_slices)
+    for i in np.arange(0, n_slices):
+        a = slice_lims[i]
+        b = slice_lims[i+1]
+        slice_particle_filter = (z > a) & (z <= b)
+        if slice_particle_filter.any():
+            z_slice = z[slice_particle_filter]
+            px_slice = px[slice_particle_filter]
+            py_slice = py[slice_particle_filter]
+            pz_slice = pz[slice_particle_filter]
+            if hasattr(w, '__iter__'):
+                w_slice = w[slice_particle_filter]
+            else:
+                w_slice = w
+            slice_ene_sp[i] = relative_rms_energy_spread(px_slice, py_slice, pz_slice, w_slice)
+    return slice_ene_sp
