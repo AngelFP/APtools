@@ -7,7 +7,7 @@ def read_csrtrack_data_fmt1(file_path):
 
     Parameters:
     -----------
-    file_path : std
+    file_path : str
         Path to the file with particle data
 
     Returns:
