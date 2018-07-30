@@ -1,5 +1,9 @@
-"""This module contains methods for raeding beam data from different particle
+"""This module contains methods for reading beam data from different particle
 tracking codes"""
+
+import numpy as np
+import scipy.constants as ct
+
 
 def read_csrtrack_data_fmt1(file_path):
     """Reads particle data from CSRtrack in fmt1 format and returns it in the
@@ -29,4 +33,30 @@ def read_csrtrack_data_fmt1(file_path):
     px[1:] += px[0]
     py[1:] += py[0]
     pz[1:] += pz[0]
+    return x, y, z, px, py, pz, q
+
+def read_astra_data(file_path):
+    """Reads particle data from ASTRA and returns it in the unis used by
+    APtools.
+
+    Parameters:
+    -----------
+    file_path : str
+        Path to the file with particle data
+
+    Returns:
+    --------
+    A tuple with 7 arrays containing the 6D phase space and charge of the
+    particles.
+    """
+    data = np.loadtxt(file_path)
+    x = data[:,0]
+    y = data[:,1]
+    z = data[:,2]
+    px = data[:,3] / (ct.m_e*ct.c**2/ct.e)
+    py = data[:,4] / (ct.m_e*ct.c**2/ct.e)
+    pz = data[:,5] / (ct.m_e*ct.c**2/ct.e)
+    z[1:] += z[0]
+    pz[1:] += pz[0]
+    q = data[:,7] * 1e-9
     return x, y, z, px, py, pz, q
