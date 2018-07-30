@@ -114,8 +114,8 @@ def plasma_density_for_self_guiding_blowout(w_0, a_0, l_0=None):
         The laser a_0
 
     l_0 : float
-        The laser wavelength. Only necessary to check that the self-guiding
-        threshold is met.
+        The laser wavelength in meters. Only necessary to check that the
+        self-guiding threshold is met.
 
     Returns:
     --------
@@ -131,12 +131,66 @@ def plasma_density_for_self_guiding_blowout(w_0, a_0, l_0=None):
                                                                    a_0_thres))
     return n_p
 
+def laser_energy(a_0, l_0, lon_fwhm, w_0):
+    """Calculate laser pulse energy assuming Gaussian profile.
+
+    Parameters:
+    -----------
+    a_0 : float
+        The laser a_0
+
+    l_0 : float
+        The laser wavelength in meters. Only necessary to check that the
+        self-guiding threshold is met.
+
+    lon_fwhm : float
+        Longitudinal FWHM of the intensity in seconds.
+
+    w_0 : float
+        The laser beam waist in meters, i. e., 1/e in field or 1/e^2 in
+        intesity. Calculate from FWHM as FWHM/sqrt(2*log(2)).
+
+    Returns:
+    --------
+    A float with the value of the energy in Joules
+    """
+    i_peak = 2*np.pi**2*ct.epsilon_0*ct.m_e**2*ct.c**5 * a_0**2 / (ct.e*l_0)**2
+    s_x = w_0 / 2
+    s_y = s_x
+    s_z = lon_fwhm / (2*np.sqrt(2*np.log(2)))
+    l_ene = (2*np.pi)**(3/2) * s_x * s_y * s_z * i_peak
+    return l_ene
+
+def laser_peak_power(a_0, l_0, w_0):
+    """Calculate laser pulse peak power assuming Gaussian profile.
+
+    Parameters:
+    -----------
+    a_0 : float
+        The laser a_0
+
+    l_0 : float
+        The laser wavelength in meters. Only necessary to check that the
+        self-guiding threshold is met.
+
+    w_0 : float
+        The laser beam waist in meters, i. e., 1/e in field or 1/e^2 in
+        intesity. Calculate from FWHM as FWHM/sqrt(2*log(2)).
+
+    Returns:
+    --------
+    A float with the value of the oeak power in Watts
+    """
+    i_peak = 2*np.pi**2*ct.epsilon_0*ct.m_e**2*ct.c**5 * a_0**2 / (ct.e*l_0)**2
+    p_peak = np.pi * w_0**2 * i_peak / 2
+    return p_peak
+
 def laser_w0_for_self_guiding_blowout(n_p, a_0, l_0=None):
     """Get laser spot size fulfilling self-guiding condition in blowout regime.
 
-    For more inforation see W. Lu - 2007 - Generating multi-GeVelectron bunches
-    using single stage laser wakeﬁeld acceleration in a 3D nonlinear regime
-    (https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.10.061301)
+    For more inforation see W. Lu - 2007 - Generating multi-GeV electron
+    bunches using single stage laser wakeﬁeld acceleration in a 3D nonlinear
+    regime (https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.10.061301)
 
     Parameters:
     -----------
@@ -147,8 +201,8 @@ def laser_w0_for_self_guiding_blowout(n_p, a_0, l_0=None):
         The laser a_0
 
     l_0 : float
-        The laser wavelength. Only necessary to check that the self-guiding
-        threshold is met.
+        The laser wavelength in meters. Only necessary to check that the
+        self-guiding threshold is met.
 
     Returns:
     --------
@@ -210,6 +264,32 @@ def matched_beam_size(beam_ene, beam_em, n_p=None, k_x=None):
     --------
     A float with the value of beam size in meters
     """
+    # matched beta function
+    b_x = matched_plasma_beta_function(beam_ene, n_p, k_x)
+    # matched beam size
+    s_x = np.sqrt(b_x*beam_em/beam_ene)
+    return s_x
+
+def matched_plasma_beta_function(beam_ene, n_p=None, k_x=None):
+    """Get beta function from the plasma focusing fields.
+
+    The focusing gradient, k_x, can be provided or calculated from the plasma
+    density, n_p.
+
+    Parameters:
+    -----------
+    beam_ene : float
+        Unitless electron beam mean energy (beta*gamma)
+    n_p : float
+        The plasma density in units of cm-3
+
+    k_x : float
+        The plasma transverse focusing gradient in T/m
+
+    Returns:
+    --------
+    A float with the value of the beta function in meters
+    """
     if k_x == None:
         if n_p == None:
             raise ValueError("No values for the plasma density and focusing"
@@ -218,8 +298,6 @@ def matched_beam_size(beam_ene, beam_em, n_p=None, k_x=None):
             k_x = plasma_focusing_gradient_blowout(n_p)
     # betatron frequency
     w_x = np.sqrt(ct.c*ct.e/ct.m_e * k_x/beam_ene)
-    # matched beta function
+    # beta function
     b_x = ct.c/w_x
-    # matched beam size
-    s_x = np.sqrt(b_x*beam_em/beam_ene)
-    return s_x
+    return b_x
