@@ -34,6 +34,42 @@ def twiss_parameters(x, px, pz, w=1):
     a_x = -cov_x[0, 1]/em_x
     return (a_x, b_x)
 
+def rms_length(z, w=1):
+    """Calculate the RMS bunch length of the provided particle
+    distribution
+
+    Parameters:
+    -----------
+    z : array
+        Contains the longitudinal position of the particles in units of meters
+    w : array or single value
+        Statistical weight of the particles.
+
+    Returns:
+    --------
+    A float with the RMS length value in meters.
+    """
+    s_z = weighted_std(z, weights=w)
+    return s_z
+
+def rms_size(x, w=1):
+    """Calculate the RMS bunch size of the provided particle
+    distribution
+
+    Parameters:
+    -----------
+    x : array
+        Contains the transverse position of the particles in units of meters
+    w : array or single value
+        Statistical weight of the particles.
+
+    Returns:
+    --------
+    A float with the RMS length value in meters.
+    """
+    s_x = weighted_std(x, weights=w)
+    return s_x
+
 def mean_kinetic_energy(px, py, pz, w=1):
     """Calculate the mean kinetic energy of the provided particle distribution
 
@@ -226,6 +262,35 @@ def normalized_transverse_rms_emittance(x, px, w=1):
     em_x = np.sqrt(np.linalg.det(cov_x))
     return em_x
 
+def longitudinal_rms_emittance(z, px, py, pz, w=1):
+    """Calculate the longitudinal RMS emittance of the particle
+    distribution in a given plane.
+
+    Parameters:
+    -----------
+    z : array
+        Contains the longitudinal position of the particles in units of meters
+    px : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+    py : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+    pz : array
+        Contains the longitudonal momentum of the beam particles in
+        non-dimmensional units (beta*gamma)
+    w : array or single value
+        Statistical weight of the particles.
+
+    Returns:
+    --------
+    A float with the emmitance value in units of m
+    """
+    g = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
+    cov_l = np.cov(z, g, aweights=np.abs(w))
+    em_l = np.sqrt(np.linalg.det(cov_l))
+    return em_l
+
 def relative_rms_slice_energy_spread(z, px, py, pz, w=1, n_slices=10,
                                      len_slice=None):
     """Calculate the relative RMS slice energy spread of the provided particle
@@ -258,6 +323,7 @@ def relative_rms_slice_energy_spread(z, px, py, pz, w=1, n_slices=10,
     - An array with the energy spread value in each slice. Values are in
     non-dimmensional units, i.e. [1/(m_e c**2)]
     - An array with the statistical weight of each slice.
+    - An array with the slice edges.
     """
     max_z = np.max(z)
     min_z = np.min(z)
@@ -285,7 +351,7 @@ def relative_rms_slice_energy_spread(z, px, py, pz, w=1, n_slices=10,
             slice_ene_sp[i] = relative_rms_energy_spread(px_slice, py_slice,
                                                          pz_slice, w_slice)
             slice_weight[i] = np.sum(w_slice)
-    return slice_ene_sp, slice_weight
+    return slice_ene_sp, slice_weight, slice_lims
 
 def normalized_transverse_rms_slice_emittance(z, x, px, w=1, n_slices=10,
                                      len_slice=None):
@@ -315,6 +381,7 @@ def normalized_transverse_rms_slice_emittance(z, x, px, w=1, n_slices=10,
     A tuple containing:
     - An array with the emmitance value in each slice in units of m * rad.
     - An array with the statistical weight of each slice.
+    - An array with the slice edges.
     """
     max_z = np.max(z)
     min_z = np.min(z)
@@ -340,7 +407,7 @@ def normalized_transverse_rms_slice_emittance(z, x, px, w=1, n_slices=10,
             slice_em[i] = normalized_transverse_rms_emittance(
                 x_slice, px_slice, w_slice)
             slice_weight[i] = np.sum(w_slice)
-    return slice_em, slice_weight
+    return slice_em, slice_weight, slice_lims
 
 def current_profile(z, q, n_slices=10, len_slice=None):
     """Calculate the current profile of the given particle distribution.
