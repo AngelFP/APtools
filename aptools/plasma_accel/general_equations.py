@@ -301,3 +301,33 @@ def matched_plasma_beta_function(beam_ene, n_p=None, k_x=None):
     # beta function
     b_x = ct.c/w_x
     return b_x
+
+def maximum_wakefield_plasma_lens(q_tot, s_z, s_r, n_p):
+    """Calculates the maximum focusing gradient induced by beam wakefields in
+    an active plasma lens using linear theory.
+
+    Formula obtained from https://arxiv.org/pdf/1802.02750.pdf
+
+    Parameters:
+    -----------
+    q_tot : float
+        Total beam charge in C
+
+    s_z : float
+        RMS beam length in m
+
+    s_r : float
+        RMS beam size in m
+
+    n_p : float
+        The plasma density in units of cm-3
+
+    Returns:
+    --------
+    A float with the value of the focusing gradient in T/m
+    """
+    k_p = 1 / plasma_skin_depth(n_p)
+    a = 1 + k_p**2 * s_r**2 / 2
+    b = 1 + np.sqrt(8*ct.pi) * k_p**2 * s_z**2
+    g_max = q_tot * ct.mu_0 * ct.c * k_p**2 * s_z / (2*ct.pi * s_r**2 * a * b)
+    return g_max
