@@ -104,6 +104,5 @@ def read_openpmd_beam(file_path, species_name):
     pz = beam_species['momentum/z'][:] / (m*ct.c)
     w = beam_species['weighting'][:]
     q *= w
-    print(q.sum())
     return x, y, z, px, py, pz, q
 
