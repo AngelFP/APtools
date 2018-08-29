@@ -1,5 +1,5 @@
 """This module contains methods for reading beam data from different particle
-tracking codes"""
+tracking and PIC codes"""
 
 import numpy as np
 import scipy.constants as ct
@@ -74,7 +74,7 @@ def read_openpmd_beam(file_path, species_name):
         Path to the file with particle data
 
     species_name : str
-        Path to the file with particle data
+        Name of the particle species
 
     Returns:
     --------
