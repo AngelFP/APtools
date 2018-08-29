@@ -105,4 +105,3 @@ def read_openpmd_beam(file_path, species_name):
     w = beam_species['weighting'][:]
     q *= w
     return x, y, z, px, py, pz, q
-
