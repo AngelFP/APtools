@@ -6,7 +6,11 @@ import matplotlib.pyplot as plt
 import scipy.constants as ct
 
 import aptools.data_analysis.beam_diagnostics as bd
+from aptools.data_handling.reading import read_beam
 
+def phase_space_overview_from_file(code_name, file_path, species_name=None):
+    x, y, z, px, py, pz, q = read_beam(code_name, file_path, species_name)
+    phase_space_overview(x, y, z, px, py, pz, q)
 
 def phase_space_overview(x, y, z, px, py, pz, q):
     em_x = bd.normalized_transverse_rms_emittance(x, px, q) * 1e6
@@ -36,7 +40,7 @@ def phase_space_overview(x, y, z, px, py, pz, q):
              + 'm', transform=ax_1.transAxes, fontsize=8)
     plt.text(0.1, 0.7, '$\\alpha_{x} = $' + '{}'.format(np.around(a_x, 3)),
              transform=ax_1.transAxes, fontsize=8)
-    plt.text(0.1, 0.6, '$s_{x} = $' + '{}'.format(np.around(s_x*1e6, 3))
+    plt.text(0.1, 0.6, '$\\sigma_{x} = $' + '{}'.format(np.around(s_x*1e6, 3))
              + '$\\ \\mathrm{\\mu m}$', transform=ax_1.transAxes, fontsize=8)
     # y - py
     ax_2 = plt.subplot(132)
@@ -50,7 +54,7 @@ def phase_space_overview(x, y, z, px, py, pz, q):
              + 'm', transform=ax_2.transAxes, fontsize=8)
     plt.text(0.1, 0.7, '$\\alpha_{y} = $' + '{}'.format(np.around(a_y, 3)),
              transform=ax_2.transAxes, fontsize=8)
-    plt.text(0.1, 0.6, '$s_{y} = $' + '{}'.format(np.around(s_y*1e6, 3))
+    plt.text(0.1, 0.6, '$\\sigma_{y} = $' + '{}'.format(np.around(s_y*1e6, 3))
              + '$\\ \\mathrm{\\mu m}$', transform=ax_2.transAxes, fontsize=8)
     # z - pz
     ax_3 = plt.subplot(133)
