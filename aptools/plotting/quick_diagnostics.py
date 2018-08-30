@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.constants as ct
 
-import aptools.beam_diagnostics as bd
+import aptools.data_analysis.beam_diagnostics as bd
 
 
 def phase_space_overview(x, y, z, px, py, pz, q):
