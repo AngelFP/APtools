@@ -40,7 +40,7 @@ def save_beam(code_name, beam_data, folder_path, file_name, reposition=False,
     save_beam_for = {'csrtrack': save_for_csrtrack_fmt1,
                      'astra': save_for_astra,
                      'fbpic': save_for_fbpic}
-    save_beam_for[final_code](beam_data, folder_path, file_name, reposition,
+    save_beam_for[code_name](beam_data, folder_path, file_name, reposition,
                           avg_pos, n_part)
 
 def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
