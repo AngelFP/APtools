@@ -1,8 +1,8 @@
 """This module contains methods for converting beam data between different
 particle tracking and PIC codes"""
 
-import aptools.data_handling.reading as rdng
-import aptools.data_handling.saving as svgn
+from aptools.data_handling.reading import read_beam
+from aptools.data_handling.saving import save_beam
 
 
 def convert_beam(orig_code, final_code, orig_path, final_path, final_file_name,
@@ -47,16 +47,7 @@ def convert_beam(orig_code, final_code, orig_path, final_path, final_file_name,
         Only required for reading data from PIC codes. Name of the particle
         species.
     """
-    read_beam = {'csrtrack': rdng.read_csrtrack_data_fmt1,
-                 'astra': rdng.read_astra_data,
-                 'openpmd': rdng.read_openpmd_beam}
-    save_beam = {'csrtrack': svgn.save_for_csrtrack_fmt1,
-                 'astra': svgn.save_for_astra,
-                 'fbpic': svgn.save_for_fbpic}
-    if species_name is None:
-        x, y, z, px, py, pz, q = read_beam[orig_code](orig_path)
-    else:
-        x, y, z, px, py, pz, q = read_beam[orig_code](orig_path, species_name)
+    x, y, z, px, py, pz, q = read_beam(orig_code, orig_path, species_name)
     beam_data = [x, y, z, px, py, pz, q]
-    save_beam[final_code](beam_data, final_path, final_file_name, reposition,
+    save_beam(final_code, beam_data, final_path, final_file_name, reposition,
                           avg_pos, n_part)

@@ -8,6 +8,31 @@ from h5py import File as H5F
 from aptools.helper_functions import join_infile_path
 
 
+def read_beam(code_name, file_path, species_name=None):
+    """Reads particle data from the specified code.
+
+    Parameters:
+    -----------
+    code_name : str
+        Name of the tracking or PIC code of the data to read. Possible values
+        are 'csrtrack', 'astra' and 'openpmd'
+
+    file_path : str
+        Path of the file containing the data
+
+    species_name : std
+        Only required for reading data from PIC codes. Name of the particle
+        species.
+    """
+    read_beam_from = {'csrtrack': read_csrtrack_data_fmt1,
+                      'astra': read_astra_data,
+                      'openpmd': read_openpmd_beam}
+    if species_name is None:
+        return read_beam_from[code_name](file_path)
+    else:
+        return read_beam_from[code_name](file_path, species_name)
+
+
 def read_csrtrack_data_fmt1(file_path):
     """Reads particle data from CSRtrack in fmt1 format and returns it in the
     unis used by APtools.

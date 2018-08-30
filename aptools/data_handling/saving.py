@@ -6,6 +6,43 @@ from os import path
 import numpy as np
 import scipy.constants as ct
 
+
+def save_beam(code_name, beam_data, folder_path, file_name, reposition=False,
+                           avg_pos=[None, None, None], n_part=None):
+    """Converts particle data from one code to another.
+
+    Parameters:
+    -----------
+    code_name : str
+        Name of the target tracking or PIC code. Possible values are
+        'csrtrack', 'astra' and 'fbpic'
+
+    folder_path : str
+        Path to the folder in which to save the data
+
+    file_name : str
+        Name of the file to save, without extension
+
+    reposition : bool
+        Optional. Whether to reposition de particle distribution in space
+        centered in the coordinates specified in avg_pos
+
+    avg_pos : list
+        Optional, only used it reposition=True. Contains the new average
+        positions of the beam after repositioning. Should be specified as
+        [x_avg, y_avg, z_avg] in meters. Setting a component as None prevents
+        repositioning in that coordinate.
+
+    n_part : int
+        Optional. Number of particles to save. Must be lower than the original
+        number of particles. Particles to save are chosen randomly.
+    """
+    save_beam_for = {'csrtrack': save_for_csrtrack_fmt1,
+                     'astra': save_for_astra,
+                     'fbpic': save_for_fbpic}
+    save_beam_for[final_code](beam_data, folder_path, file_name, reposition,
+                          avg_pos, n_part)
+
 def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
                            avg_pos=[None, None, None], n_part=None):
     """Saves particle data for CSRtrack in fmt1 format.
