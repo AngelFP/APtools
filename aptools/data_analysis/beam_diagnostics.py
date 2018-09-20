@@ -25,14 +25,15 @@ def twiss_parameters(x, px, pz, w=1):
 
     Returns:
     --------
-    A tuple with the value of the alpha and beta functions [m]
+    A tuple with the value of the alpha, beta [m] and gamma [m^-1] functions
     """
     xp = px/pz
     cov_x = np.cov(x, xp, aweights=np.abs(w))
     em_x = np.sqrt(np.linalg.det(cov_x))
     b_x = cov_x[0, 0]/em_x
     a_x = -cov_x[0, 1]/em_x
-    return (a_x, b_x)
+    g_x = (1 + a_x**2)/b_x
+    return (a_x, b_x, g_x)
 
 def rms_length(z, w=1):
     """Calculate the RMS bunch length of the provided particle
