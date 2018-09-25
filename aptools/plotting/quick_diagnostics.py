@@ -15,8 +15,8 @@ def phase_space_overview_from_file(code_name, file_path, species_name=None):
 def phase_space_overview(x, y, z, px, py, pz, q):
     em_x = bd.normalized_transverse_rms_emittance(x, px, q) * 1e6
     em_y = bd.normalized_transverse_rms_emittance(y, py, q) * 1e6
-    a_x, b_x = bd.twiss_parameters(x, px, pz, q)
-    a_y, b_y = bd.twiss_parameters(y, py, pz, q)
+    a_x, b_x, g_x = bd.twiss_parameters(x, px, pz, q)
+    a_y, b_y, g_y = bd.twiss_parameters(y, py, pz, q)
     s_x = bd.rms_size(x, q)
     s_y = bd.rms_size(y, q)
     em_l = bd.longitudinal_rms_emittance(z, px, py, pz, w=q) * 1e6
