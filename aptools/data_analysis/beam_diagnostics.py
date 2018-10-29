@@ -449,6 +449,12 @@ def normalized_corrected_transverse_rms_slice_emittance(
     px : array
         Contains the transverse momentum of the beam particles in the same
         plane as x in non-dimmensional units (beta*gamma)
+    py : array
+        Contains the transverse momentum of the beam particles in the opposite
+        plane as as x in non-dimmensional units (beta*gamma)
+    pz : array
+        Contains the longitudinal momentum of the beam particles in
+        non-dimmensional units (beta*gamma)
     w : array or single value
         Statistical weight of the particles.
     n_slices : array
