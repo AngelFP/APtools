@@ -35,6 +35,44 @@ def twiss_parameters(x, px, pz, w=1):
     g_x = (1 + a_x**2)/b_x
     return (a_x, b_x, g_x)
 
+def twiss_parameters_corrected(x, px, py, pz, w=1):
+    """Calculate the alpha and beta functions of the beam in a certain
+    transverse plane removing contributions from dispersion.
+
+    Parameters:
+    -----------
+    x : array
+        Contains the transverse position of the particles in one of the
+        transverse planes in units of meters
+    px : array
+        Contains the transverse momentum of the beam particles in the same
+        plane as x in non-dimmensional units (beta*gamma)
+    py : array
+        Contains the transverse momentum of the beam particles in the opposite
+        plane as as x in non-dimmensional units (beta*gamma)
+    pz : array
+        Contains the longitudonal momentum of the beam particles in
+        non-dimmensional units (beta*gamma)
+    w : array or single value
+        Statistical weight of the particles.
+
+    Returns:
+    --------
+    A tuple with the value of the alpha, beta [m] and gamma [m^-1] functions
+    """
+    # remove x-gamma correlation
+    gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+    gamma_avg = np.average(gamma, weights=w)
+    x_avg = np.average(x, weights=w)
+    dgamma = gamma - gamma_avg
+    dx = x - x_avg
+    p = np.polyfit(dgamma, dx, 1, w=w)
+    slope = p[0]
+    x = x - slope*dgamma
+    # calculate Twiss
+    a_x, b_x, g_x = twiss_parameters(x, px, pz, w)
+    return (a_x, b_x, g_x)
+
 def rms_length(z, w=1):
     """Calculate the RMS bunch length of the provided particle
     distribution
