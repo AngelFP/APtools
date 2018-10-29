@@ -3,7 +3,7 @@
 import scipy.constants as ct
 import numpy as np
 
-from aptools.helper_functions import weighted_std
+from aptools.helper_functions import weighted_std, create_beam_slices
 
 def twiss_parameters(x, px, pz, w=1):
     """Calculate the alpha and beta functions of the beam in a certain
@@ -263,6 +263,44 @@ def normalized_transverse_rms_emittance(x, px, w=1):
     em_x = np.sqrt(np.linalg.det(cov_x))
     return em_x
 
+def normalized_corrected_transverse_rms_emittance(x, px, py, pz, w=1):
+    """Calculate the normalized transverse RMS emittance without dispersion
+    contributions of the particle distribution in a given plane.
+
+    Parameters:
+    -----------
+    x : array
+        Contains the transverse position of the particles in one of the
+        transverse planes in units of meters
+    px : array
+        Contains the transverse momentum of the beam particles in the same
+        plane as x in non-dimmensional units (beta*gamma)
+    py : array
+        Contains the transverse momentum of the beam particles in the opposite
+        plane as as x in non-dimmensional units (beta*gamma)
+    pz : array
+        Contains the longitudinal momentum of the beam particles in
+        non-dimmensional units (beta*gamma)
+    w : array or single value
+        Statistical weight of the particles.
+
+    Returns:
+    --------
+    A float with the emmitance value in units of m * rad
+    """
+    # remove x-gamma correlation
+    gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+    gamma_avg = np.average(gamma, weights=w)
+    x_avg = np.average(x, weights=w)
+    dgamma = gamma - gamma_avg
+    dx = x - x_avg
+    p = np.polyfit(dgamma, dx, 1, w=w)
+    slope = p[0]
+    x = x - slope*dgamma
+    # compute emittance
+    em_x = normalized_transverse_rms_emittance(x, px, w)
+    return em_x
+
 def longitudinal_rms_emittance(z, px, py, pz, w=1):
     """Calculate the longitudinal RMS emittance of the particle
     distribution in a given plane.
@@ -326,14 +364,7 @@ def relative_rms_slice_energy_spread(z, px, py, pz, w=1, n_slices=10,
     - An array with the statistical weight of each slice.
     - An array with the slice edges.
     """
-    max_z = np.max(z)
-    min_z = np.min(z)
-    if len_slice is None:
-        slice_lims = np.linspace(min_z, max_z, n_slices+1)
-    else:
-        slice_lims = np.arange(min_z, max_z, len_slice)
-        slice_lims = np.append(slice_lims, max_z)
-        n_slices = len(slice_lims)-1
+    slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
     slice_ene_sp = np.zeros(n_slices)
     slice_weight = np.zeros(n_slices)
     for i in np.arange(0, n_slices):
@@ -384,14 +415,7 @@ def normalized_transverse_rms_slice_emittance(z, x, px, w=1, n_slices=10,
     - An array with the statistical weight of each slice.
     - An array with the slice edges.
     """
-    max_z = np.max(z)
-    min_z = np.min(z)
-    if len_slice is None:
-        slice_lims = np.linspace(min_z, max_z, n_slices+1)
-    else:
-        slice_lims = np.arange(min_z, max_z, len_slice)
-        slice_lims = np.append(slice_lims, max_z)
-        n_slices = len(slice_lims)-1
+    slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
     slice_em = np.zeros(n_slices)
     slice_weight = np.zeros(n_slices)
     for i in np.arange(0, n_slices):
@@ -407,6 +431,58 @@ def normalized_transverse_rms_slice_emittance(z, x, px, w=1, n_slices=10,
                 w_slice = w
             slice_em[i] = normalized_transverse_rms_emittance(
                 x_slice, px_slice, w_slice)
+            slice_weight[i] = np.sum(w_slice)
+    return slice_em, slice_weight, slice_lims
+
+def normalized_corrected_transverse_rms_slice_emittance(
+        z, x, px, py, pz, w=1, n_slices=10, len_slice=None):
+    """Calculate the normalized transverse RMS slice emittance of the particle
+    distribution in a given plane.
+
+    Parameters:
+    -----------
+    z : array
+        Contains the longitudinal position of the particles in units of meters
+    x : array
+        Contains the transverse position of the particles in one of the
+        transverse planes in units of meters
+    px : array
+        Contains the transverse momentum of the beam particles in the same
+        plane as x in non-dimmensional units (beta*gamma)
+    w : array or single value
+        Statistical weight of the particles.
+    n_slices : array
+        Number of longitudinal slices in which to divite the particle
+        distribution. Not used if len_slice is specified.
+    len_slice : array
+        Length of the longitudinal slices. If not None, replaces n_slices.
+
+    Returns:
+    --------
+    A tuple containing:
+    - An array with the emmitance value in each slice in units of m * rad.
+    - An array with the statistical weight of each slice.
+    - An array with the slice edges.
+    """
+    slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
+    print(n_slices)
+    slice_em = np.zeros(n_slices)
+    slice_weight = np.zeros(n_slices)
+    for i in np.arange(0, n_slices):
+        a = slice_lims[i]
+        b = slice_lims[i+1]
+        slice_particle_filter = (z > a) & (z <= b)
+        if slice_particle_filter.any():
+            x_slice = x[slice_particle_filter]
+            px_slice = px[slice_particle_filter]
+            py_slice = py[slice_particle_filter]
+            pz_slice = pz[slice_particle_filter]
+            if hasattr(w, '__iter__'):
+                w_slice = w[slice_particle_filter]
+            else:
+                w_slice = w
+            slice_em[i] = normalized_corrected_transverse_rms_emittance(
+                x_slice, px_slice, py_slice, pz_slice, w_slice)
             slice_weight[i] = np.sum(w_slice)
     return slice_em, slice_weight, slice_lims
 
