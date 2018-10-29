@@ -29,7 +29,6 @@ def create_beam_slices(z, n_slices, len_slice=None):
         slice_lims = np.arange(min_z, max_z, len_slice)
         slice_lims = np.append(slice_lims, max_z)
         n_slices = len(slice_lims)-1
-        print(n_slices)
     return slice_lims, n_slices
 
 def weighted_std(values, weights=1):

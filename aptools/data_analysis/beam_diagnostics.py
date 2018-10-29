@@ -471,7 +471,6 @@ def normalized_corrected_transverse_rms_slice_emittance(
     - An array with the slice edges.
     """
     slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
-    print(n_slices)
     slice_em = np.zeros(n_slices)
     slice_weight = np.zeros(n_slices)
     for i in np.arange(0, n_slices):
