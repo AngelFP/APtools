@@ -259,8 +259,11 @@ def normalized_transverse_rms_emittance(x, px, w=1):
     --------
     A float with the emmitance value in units of m * rad
     """
-    cov_x = np.cov(x, px, aweights=np.abs(w))
-    em_x = np.sqrt(np.linalg.det(cov_x))
+    if len(x) > 1:
+        cov_x = np.cov(x, px, aweights=np.abs(w))
+        em_x = np.sqrt(np.linalg.det(cov_x))
+    else:
+        em_x = 0
     return em_x
 
 def normalized_corrected_transverse_rms_emittance(x, px, py, pz, w=1):
@@ -297,7 +300,6 @@ def normalized_corrected_transverse_rms_emittance(x, px, py, pz, w=1):
     p = np.polyfit(dgamma, dx, 1, w=w)
     slope = p[0]
     x = x - slope*dgamma
-    # compute emittance
     em_x = normalized_transverse_rms_emittance(x, px, w)
     return em_x
 
