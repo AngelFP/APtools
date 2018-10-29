@@ -2,6 +2,36 @@
 
 import numpy as np
 
+def create_beam_slices(z, n_slices, len_slice=None):
+    """Calculates the slice limits along z of a partile distribution for a
+    given number of slices or slice length.
+
+    Parameters:
+    -----------
+    z : array
+        Contains the longitudinal position of the particles in units of meters
+    n_slices : array
+        Number of longitudinal slices in which to divite the particle
+        distribution. Not used if len_slice is specified.
+    len_slice : array
+        Length of the longitudinal slices. If not None, replaces n_slices.
+
+    Returns:
+    --------
+    A tuple containing an array with the slice limits and integer with the
+    number of slices, which might have been redefined.
+    """
+    max_z = np.max(z)
+    min_z = np.min(z)
+    if len_slice is None:
+        slice_lims = np.linspace(min_z, max_z, n_slices+1)
+    else:
+        slice_lims = np.arange(min_z, max_z, len_slice)
+        slice_lims = np.append(slice_lims, max_z)
+        n_slices = len(slice_lims)-1
+        print(n_slices)
+    return slice_lims, n_slices
+
 def weighted_std(values, weights=1):
     """Calculates the weighted standard deviation of the given values
 
