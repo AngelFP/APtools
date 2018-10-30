@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 from aptools.helper_functions import (weighted_std, create_beam_slices,
                                       slope_of_correlation)
 
-def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr', disp_corrected=False):
+def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
+                     disp_corrected=False):
     """Calculate the alpha and beta functions of the beam in a certain
     transverse plane
 
@@ -40,7 +41,8 @@ def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr', disp_corrected=False):
     A tuple with the value of the alpha, beta [m] and gamma [m^-1] functions
     """
     if emitt == 'ph':
-        em_x = normalized_transverse_rms_emittance(x, px, py, pz, w, disp_corrected)
+        em_x = normalized_transverse_rms_emittance(x, px, py, pz, w,
+                                                   disp_corrected)
         gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
         gamma_avg = np.average(gamma, weights=w)
         x_avg = np.average(x, weights=w)
@@ -56,7 +58,8 @@ def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr', disp_corrected=False):
         b_x = np.average(x**2, weights=w)*gamma_avg/em_x
         a_x = -np.average(x*px, weights=w)/em_x
     elif emitt == 'tr':
-        em_x = transverse_trace_space_rms_emittance(x, px, py, pz, w, disp_corrected)
+        em_x = transverse_trace_space_rms_emittance(x, px, py, pz, w,
+                                                    disp_corrected)
         xp = px/pz
         # center x and xp
         x_avg = np.average(x, weights=w)
