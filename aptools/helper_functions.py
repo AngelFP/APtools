@@ -49,6 +49,29 @@ def weighted_std(values, weights=1):
     std = np.sqrt(np.average((values-mean_val)**2, weights=np.abs(weights)))
     return std
 
+def slope_of_correlation(y, x, w=None):
+    """Calculates the slope of the correlation between two variables x and y
+    according to y = slope*x
+
+    Parameters:
+    -----------
+    y: array
+        Contains the x values
+    y: array
+        Contains the y values
+    w : array
+        Contains the weights of the values
+
+    Returns:
+    --------
+    A float with the value of the slope
+    """
+    a = np.average(y*x, weights=w)
+    b = np.average(y, weights=w)
+    c = np.average(x, weights=w)
+    d = np.average(x**2, weights=w)
+    return (a-b*c) / (d-c**2)
+
 def join_infile_path(*paths):
     """
     Join path components using '/' as separator.
