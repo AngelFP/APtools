@@ -4,9 +4,10 @@ import scipy.constants as ct
 import numpy as np
 import matplotlib.pyplot as plt
 
-from aptools.helper_functions import weighted_std, create_beam_slices
+from aptools.helper_functions import (weighted_std, create_beam_slices,
+                                      slope_of_correlation)
 
-def twiss_parameters(x, px, pz, w=1):
+def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr', disp_corrected=False):
     """Calculate the alpha and beta functions of the beam in a certain
     transverse plane
 
@@ -18,21 +19,62 @@ def twiss_parameters(x, px, pz, w=1):
     px : array
         Contains the transverse momentum of the beam particles in the same
         plane as x in non-dimmensional units (beta*gamma)
+    py : array
+        Contains the transverse momentum of the beam particles in the opposite
+        plane as as x in non-dimmensional units (beta*gamma). Necessary if 
+        disp_corrected=True or emitt='ph'.
     pz : array
-        Contains the longitudonal momentum of the beam particles in
-        non-dimmensional units (beta*gamma)
+        Contains the longitudinal momentum of the beam particles in
+        non-dimmensional units (beta*gamma).
     w : array or single value
         Statistical weight of the particles.
+    emitt : str
+        Determined which emittance to use to calculate the Twiss parameters.
+        Possible values are 'tr' for trace-space emittance and 'ph' for
+        phase-space emittance 
+    disp_corrected : bool
+        Whether ot not to correct for dispersion contributions.
 
     Returns:
     --------
     A tuple with the value of the alpha, beta [m] and gamma [m^-1] functions
     """
-    xp = px/pz
-    cov_x = np.cov(x, xp, aweights=np.abs(w))
-    em_x = np.sqrt(np.linalg.det(cov_x))
-    b_x = cov_x[0, 0]/em_x
-    a_x = -cov_x[0, 1]/em_x
+    if emitt == 'ph':
+        em_x = normalized_transverse_rms_emittance(x, px, py, pz, w, disp_corrected)
+        gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+        gamma_avg = np.average(gamma, weights=w)
+        x_avg = np.average(x, weights=w)
+        px_avg = np.average(px, weights=w)
+        # center x and x
+        x -= x_avg
+        px -= px_avg
+        if disp_corrected:
+            # remove x-gamma correlation
+            dgamma = (gamma - gamma_avg)/gamma_avg
+            slope = slope_of_correlation(x, dgamma, w)
+            x -= slope*dgamma
+        b_x = np.average(x**2, weights=w)*gamma_avg/em_x
+        a_x = -np.average(x*px, weights=w)/em_x
+    elif emitt == 'tr':
+        em_x = transverse_trace_space_rms_emittance(x, px, py, pz, w, disp_corrected)
+        xp = px/pz
+        # center x and xp
+        x_avg = np.average(x, weights=w)
+        xp_avg = np.average(xp, weights=w)
+        x -= x_avg
+        xp -= xp_avg
+        if disp_corrected:
+            # remove x-gamma correlation
+            gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+            gamma_avg = np.average(gamma, weights=w)
+            dgamma = (gamma - gamma_avg)/gamma_avg
+            slope = slope_of_correlation(x, dgamma, w)
+            x -= slope*dgamma
+            # remove xp-gamma correlation
+            slope = slope_of_correlation(xp, dgamma, w)
+            xp -= slope*dgamma
+        b_x = np.average(x**2, weights=w)/em_x
+        a_x = -np.average(x*xp, weights=w)/em_x
     g_x = (1 + a_x**2)/b_x
     return (a_x, b_x, g_x)
 
@@ -284,30 +326,8 @@ def rms_correlated_energy_spread(z, px, py, pz, w=1):
     corr_ene_sp = weighted_std(corr_ene, w)
     return corr_ene_sp
 
-def normalized_transverse_rms_emittance(x, px, w=1):
-    """Calculate the normalized transverse RMS emittance of the particle
-    distribution in a given plane.
-
-    Parameters:
-    -----------
-    x : array
-        Contains the transverse position of the particles in one of the
-        transverse planes in units of meters
-    px : array
-        Contains the transverse momentum of the beam particles in the same
-        plane as x in non-dimmensional units (beta*gamma)
-    w : array or single value
-        Statistical weight of the particles.
-
-    Returns:
-    --------
-    A float with the emmitance value in units of m * rad
-    """
-    cov_x = np.cov(x, px, aweights=np.abs(w))
-    em_x = np.sqrt(np.linalg.det(cov_x))
-    return em_x
-
-def normalized_corrected_transverse_rms_emittance(x, px, py, pz, w=1):
+def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=1,
+                                                  disp_corrected=False):
     """Calculate the normalized transverse RMS emittance without dispersion
     contributions of the particle distribution in a given plane.
 
@@ -321,28 +341,147 @@ def normalized_corrected_transverse_rms_emittance(x, px, py, pz, w=1):
         plane as x in non-dimmensional units (beta*gamma)
     py : array
         Contains the transverse momentum of the beam particles in the opposite
-        plane as as x in non-dimmensional units (beta*gamma)
+        plane as as x in non-dimmensional units (beta*gamma). Necessary if 
+        disp_corrected=True.
     pz : array
         Contains the longitudinal momentum of the beam particles in
-        non-dimmensional units (beta*gamma)
+        non-dimmensional units (beta*gamma). Necessary if disp_corrected=True.
     w : array or single value
         Statistical weight of the particles.
+    disp_corrected : bool
+        Whether ot not to correct for dispersion contributions.
 
     Returns:
     --------
     A float with the emmitance value in units of m * rad
     """
-    # remove x-gamma correlation
     if len(x) > 1:
-        gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
-        gamma_avg = np.average(gamma, weights=w)
-        x_avg = np.average(x, weights=w)
-        dgamma = gamma - gamma_avg
-        dx = x - x_avg
-        p = np.polyfit(dgamma, dx, 1, w=w)
-        slope = p[0]
-        x = x - slope*dgamma
-        em_x = normalized_transverse_rms_emittance(x, px, w)
+        if disp_corrected:
+            # remove x-gamma correlation
+            gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+            gamma_avg = np.average(gamma, weights=w)
+            x_avg = np.average(x, weights=w)
+            dgamma = (gamma - gamma_avg)/gamma_avg
+            p = np.polyfit(dgamma, x, 1, w=w)
+            slope = slope_of_correlation(x, dgamma)
+            x = x - slope*dgamma
+        cov_x = np.cov(x, px, aweights=np.abs(w))
+        em_x = np.sqrt(np.linalg.det(cov_x))
+    else:
+        em_x = 0
+    return em_x
+
+def geometric_transverse_rms_emittance(x, px, py, pz, w=1,
+                                       disp_corrected=False):
+    """Calculate the geometric transverse RMS emittance without dispersion
+    contributions of the particle distribution in a given plane.
+
+    Parameters:
+    -----------
+    x : array
+        Contains the transverse position of the particles in one of the
+        transverse planes in units of meters
+    px : array
+        Contains the transverse momentum of the beam particles in the same
+        plane as x in non-dimmensional units (beta*gamma)
+    py : array
+        Contains the transverse momentum of the beam particles in the opposite
+        plane as as x in non-dimmensional units (beta*gamma).
+    pz : array
+        Contains the longitudinal momentum of the beam particles in
+        non-dimmensional units (beta*gamma).
+    w : array or single value
+        Statistical weight of the particles.
+    disp_corrected : bool
+        Whether ot not to correct for dispersion contributions.
+
+    Returns:
+    --------
+    A float with the emmitance value in units of m * rad
+    """
+    gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+    gamma_avg = np.average(gamma, weights=w)
+    em_x = normalized_transverse_rms_emittance(x, px, py, pz, w,
+                                                disp_corrected)
+    return em_x / gamma_avg
+
+def normalized_transverse_trace_space_rms_emittance(x, px, py, pz, w=1,
+                                                    disp_corrected=False):
+    """Calculate the normalized trasnverse trace-space RMS emittance of the
+    particle distribution in a given plane. 
+
+    Parameters:
+    -----------
+    x : array
+        Contains the transverse position of the particles in one of the
+        transverse planes in units of meters
+    px : array
+        Contains the transverse momentum of the beam particles in the same
+        plane as x in non-dimmensional units (beta*gamma)
+    py : array
+        Contains the transverse momentum of the beam particles in the opposite
+        plane as as x in non-dimmensional units (beta*gamma).
+    pz : array
+        Contains the longitudinal momentum of the beam particles in
+        non-dimmensional units (beta*gamma).
+    w : array or single value
+        Statistical weight of the particles.
+    disp_corrected : bool
+        Whether ot not to correct for dispersion contributions.
+
+    Returns:
+    --------
+    A float with the emmitance value in units of m * rad
+    """
+    gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+    gamma_avg = np.average(gamma, weights=w)
+    em_x = transverse_trace_space_rms_emittance(x, px, py, pz, w,
+                                                disp_corrected)
+    return em_x * gamma_avg
+
+def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=1,
+                                         disp_corrected=False):
+    """Calculate the trasnverse trace-space RMS emittance of the
+    particle distribution in a given plane. 
+
+    Parameters:
+    -----------
+    x : array
+        Contains the transverse position of the particles in one of the
+        transverse planes in units of meters
+    px : array
+        Contains the transverse momentum of the beam particles in the same
+        plane as x in non-dimmensional units (beta*gamma)
+    py : array
+        Contains the transverse momentum of the beam particles in the opposite
+        plane as as x in non-dimmensional units (beta*gamma). Necessary if 
+        disp_corrected=True.
+    pz : array
+        Contains the longitudinal momentum of the beam particles in
+        non-dimmensional units (beta*gamma). Necessary if disp_corrected=True.
+    w : array or single value
+        Statistical weight of the particles.
+    disp_corrected : bool
+        Whether ot not to correct for dispersion contributions.
+
+    Returns:
+    --------
+    A float with the emmitance value in units of m * rad
+    """
+    if len(x) > 1:
+        xp = px/pz
+        if disp_corrected:
+            # remove x-gamma correlation
+            gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+            gamma_avg = np.average(gamma, weights=w)
+            dgamma = (gamma - gamma_avg)/gamma_avg
+            sl = slope_of_correlation(x, dgamma, w)
+            x = x - sl*dgamma
+            # remove xp-gamma correlation
+            sl = slope_of_correlation(xp, dgamma, w)
+            xp = xp - sl*dgamma
+        cov_x = np.cov(x, xp, aweights=np.abs(w))
+        em_x = np.sqrt(np.linalg.det(cov_x))
     else:
         em_x = 0
     return em_x
@@ -431,57 +570,9 @@ def relative_rms_slice_energy_spread(z, px, py, pz, w=1, n_slices=10,
             slice_weight[i] = np.sum(w_slice)
     return slice_ene_sp, slice_weight, slice_lims
 
-def normalized_transverse_rms_slice_emittance(z, x, px, w=1, n_slices=10,
-                                     len_slice=None):
-    """Calculate the normalized transverse RMS slice emittance of the particle
-    distribution in a given plane.
-
-    Parameters:
-    -----------
-    z : array
-        Contains the longitudinal position of the particles in units of meters
-    x : array
-        Contains the transverse position of the particles in one of the
-        transverse planes in units of meters
-    px : array
-        Contains the transverse momentum of the beam particles in the same
-        plane as x in non-dimmensional units (beta*gamma)
-    w : array or single value
-        Statistical weight of the particles.
-    n_slices : array
-        Number of longitudinal slices in which to divite the particle
-        distribution. Not used if len_slice is specified.
-    len_slice : array
-        Length of the longitudinal slices. If not None, replaces n_slices.
-
-    Returns:
-    --------
-    A tuple containing:
-    - An array with the emmitance value in each slice in units of m * rad.
-    - An array with the statistical weight of each slice.
-    - An array with the slice edges.
-    """
-    slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
-    slice_em = np.zeros(n_slices)
-    slice_weight = np.zeros(n_slices)
-    for i in np.arange(0, n_slices):
-        a = slice_lims[i]
-        b = slice_lims[i+1]
-        slice_particle_filter = (z > a) & (z <= b)
-        if slice_particle_filter.any():
-            x_slice = x[slice_particle_filter]
-            px_slice = px[slice_particle_filter]
-            if hasattr(w, '__iter__'):
-                w_slice = w[slice_particle_filter]
-            else:
-                w_slice = w
-            slice_em[i] = normalized_transverse_rms_emittance(
-                x_slice, px_slice, w_slice)
-            slice_weight[i] = np.sum(w_slice)
-    return slice_em, slice_weight, slice_lims
-
-def normalized_corrected_transverse_rms_slice_emittance(
-        z, x, px, py, pz, w=1, n_slices=10, len_slice=None):
+def normalized_transverse_rms_slice_emittance(z, x, px, py=None, pz=None, w=1,
+                                              disp_corrected=False,
+                                              n_slices=10, len_slice=None):
     """Calculate the normalized transverse RMS slice emittance of the particle
     distribution in a given plane.
 
@@ -497,12 +588,15 @@ def normalized_corrected_transverse_rms_slice_emittance(
         plane as x in non-dimmensional units (beta*gamma)
     py : array
         Contains the transverse momentum of the beam particles in the opposite
-        plane as as x in non-dimmensional units (beta*gamma)
+        plane as as x in non-dimmensional units (beta*gamma). Necessary if 
+        disp_corrected=True.
     pz : array
         Contains the longitudinal momentum of the beam particles in
-        non-dimmensional units (beta*gamma)
+        non-dimmensional units (beta*gamma). Necessary if disp_corrected=True.
     w : array or single value
         Statistical weight of the particles.
+    disp_corrected : bool
+        Whether ot not to correct for dispersion contributions.
     n_slices : array
         Number of longitudinal slices in which to divite the particle
         distribution. Not used if len_slice is specified.
@@ -526,14 +620,20 @@ def normalized_corrected_transverse_rms_slice_emittance(
         if slice_particle_filter.any():
             x_slice = x[slice_particle_filter]
             px_slice = px[slice_particle_filter]
-            py_slice = py[slice_particle_filter]
-            pz_slice = pz[slice_particle_filter]
+            if py is not None:
+                py_slice = py[slice_particle_filter]
+            else:
+                py_slice=None
+            if pz is not None:
+                pz_slice = pz[slice_particle_filter]
+            else:
+                pz_slice=None
             if hasattr(w, '__iter__'):
                 w_slice = w[slice_particle_filter]
             else:
                 w_slice = w
-            slice_em[i] = normalized_corrected_transverse_rms_emittance(
-                x_slice, px_slice, py_slice, pz_slice, w_slice)
+            slice_em[i] = normalized_transverse_rms_emittance(
+                x_slice, px_slice, py_slice, pz_slice, w_slice, disp_corrected)
             slice_weight[i] = np.sum(w_slice)
     return slice_em, slice_weight, slice_lims
 
