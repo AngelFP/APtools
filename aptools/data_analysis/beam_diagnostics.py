@@ -2,6 +2,7 @@
 
 import scipy.constants as ct
 import numpy as np
+import matplotlib.pyplot as plt
 
 from aptools.helper_functions import weighted_std, create_beam_slices
 
@@ -64,13 +65,16 @@ def twiss_parameters_corrected(x, px, py, pz, w=1):
     gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
     gamma_avg = np.average(gamma, weights=w)
     x_avg = np.average(x, weights=w)
-    px_avg = np.average(px, weights=w)
-    dgamma = gamma - gamma_avg
-    dx = x - x_avg
-    p = np.polyfit(dgamma, dx, 1, w=w)
+    dgamma = (gamma - gamma_avg)/gamma_avg
+    p = np.polyfit(dgamma, x, 1, w=w)
     slope = p[0]
     x = x - slope*dgamma
-    px = px - px_avg
+    # remove xp-gamma correlation
+    xp = px/pz
+    p = np.polyfit(dgamma, xp, 1, w=w)
+    slope = p[0]
+    xp = xp - slope*dgamma
+    px = xp*pz
     # calculate Twiss
     a_x, b_x, g_x = twiss_parameters(x, px, pz, w)
     return (a_x, b_x, g_x)
