@@ -72,6 +72,30 @@ def slope_of_correlation(y, x, w=None):
     d = np.average(x**2, weights=w)
     return (a-b*c) / (d-c**2)
 
+def remove_correlation(x, y, w=None, order=1):
+    """Removes the correlation between two variables x and y, where y=y(x), up
+    to the desired order.
+
+    Parameters:
+    -----------
+    y: array
+        Contains the x values
+    y: array
+        Contains the y values
+    w : array
+        Contains the weights of the values
+    order : int
+        Determines the order of the polynomial fit and, thus, the higher
+        correlaton order to remove.
+    Returns:
+    --------
+    An array containing the new values of y
+    """
+    fit_coefs = np.polyfit(x, y, order, w=w)
+    for i, coef in enumerate(reversed(fit_coefs[:-1])):
+        y = y - coef * x**(i+1)
+    return y
+
 def join_infile_path(*paths):
     """
     Join path components using '/' as separator.
