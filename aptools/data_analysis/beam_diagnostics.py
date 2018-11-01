@@ -5,10 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from aptools.helper_functions import (weighted_std, create_beam_slices,
-                                      slope_of_correlation)
+                                      slope_of_correlation, remove_correlation)
 
 def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
-                     disp_corrected=False):
+                     disp_corrected=False, corr_order=1):
     """Calculate the alpha and beta functions of the beam in a certain
     transverse plane
 
@@ -42,40 +42,37 @@ def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
     """
     if emitt == 'ph':
         em_x = normalized_transverse_rms_emittance(x, px, py, pz, w,
-                                                   disp_corrected)
+                                                   disp_corrected, corr_order)
         gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
         gamma_avg = np.average(gamma, weights=w)
         x_avg = np.average(x, weights=w)
         px_avg = np.average(px, weights=w)
         # center x and x
-        x -= x_avg
-        px -= px_avg
+        x = x - x_avg
+        px = px - px_avg
         if disp_corrected:
             # remove x-gamma correlation
             dgamma = (gamma - gamma_avg)/gamma_avg
-            slope = slope_of_correlation(x, dgamma, w)
-            x -= slope*dgamma
+            x = remove_correlation(dgamma, x, w, corr_order)
         b_x = np.average(x**2, weights=w)*gamma_avg/em_x
         a_x = -np.average(x*px, weights=w)/em_x
     elif emitt == 'tr':
         em_x = transverse_trace_space_rms_emittance(x, px, py, pz, w,
-                                                    disp_corrected)
+                                                    disp_corrected, corr_order)
         xp = px/pz
         # center x and xp
         x_avg = np.average(x, weights=w)
         xp_avg = np.average(xp, weights=w)
-        x -= x_avg
-        xp -= xp_avg
+        x = x - x_avg
+        xp = xp - xp_avg
         if disp_corrected:
             # remove x-gamma correlation
             gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
             gamma_avg = np.average(gamma, weights=w)
             dgamma = (gamma - gamma_avg)/gamma_avg
-            slope = slope_of_correlation(x, dgamma, w)
-            x -= slope*dgamma
+            x = remove_correlation(dgamma, x, w, corr_order)
             # remove xp-gamma correlation
-            slope = slope_of_correlation(xp, dgamma, w)
-            xp -= slope*dgamma
+            xp = remove_correlation(dgamma, xp, w, corr_order)
         b_x = np.average(x**2, weights=w)/em_x
         a_x = -np.average(x*xp, weights=w)/em_x
     g_x = (1 + a_x**2)/b_x
@@ -330,7 +327,7 @@ def rms_correlated_energy_spread(z, px, py, pz, w=1):
     return corr_ene_sp
 
 def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=1,
-                                                  disp_corrected=False):
+                                        disp_corrected=False, corr_order=1):
     """Calculate the normalized transverse RMS emittance without dispersion
     contributions of the particle distribution in a given plane.
 
@@ -365,13 +362,7 @@ def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=1,
             gamma_avg = np.average(gamma, weights=w)
             x_avg = np.average(x, weights=w)
             dgamma = (gamma - gamma_avg)/gamma_avg
-            p = np.polyfit(dgamma, x, 2, w=w)
-            s1 = p[1]
-            s2 = p[0]
-            slope = slope_of_correlation(x, dgamma)
-            x = x - s1*dgamma - s2*dgamma**2
-            #plt.hist2d(x, px, bins=1000)
-            #plt.show()
+            x = remove_correlation(dgamma, x, w, corr_order)
         cov_x = np.cov(x, px, aweights=np.abs(w))
         em_x = np.sqrt(np.linalg.det(cov_x))
     else:
@@ -379,7 +370,7 @@ def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=1,
     return em_x
 
 def geometric_transverse_rms_emittance(x, px, py, pz, w=1,
-                                       disp_corrected=False):
+                                       disp_corrected=False, corr_order=1):
     """Calculate the geometric transverse RMS emittance without dispersion
     contributions of the particle distribution in a given plane.
 
@@ -409,11 +400,11 @@ def geometric_transverse_rms_emittance(x, px, py, pz, w=1,
     gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
     gamma_avg = np.average(gamma, weights=w)
     em_x = normalized_transverse_rms_emittance(x, px, py, pz, w,
-                                                disp_corrected)
+                                               disp_corrected, corr_order)
     return em_x / gamma_avg
 
-def normalized_transverse_trace_space_rms_emittance(x, px, py, pz, w=1,
-                                                    disp_corrected=False):
+def normalized_transverse_trace_space_rms_emittance(
+        x, px, py, pz, w=1, disp_corrected=False, corr_order=1):
     """Calculate the normalized trasnverse trace-space RMS emittance of the
     particle distribution in a given plane. 
 
@@ -443,11 +434,11 @@ def normalized_transverse_trace_space_rms_emittance(x, px, py, pz, w=1,
     gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
     gamma_avg = np.average(gamma, weights=w)
     em_x = transverse_trace_space_rms_emittance(x, px, py, pz, w,
-                                                disp_corrected)
+                                                disp_corrected, corr_order)
     return em_x * gamma_avg
 
 def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=1,
-                                         disp_corrected=False):
+                                         disp_corrected=False, corr_order=1):
     """Calculate the trasnverse trace-space RMS emittance of the
     particle distribution in a given plane. 
 
@@ -482,11 +473,9 @@ def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=1,
             gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
             gamma_avg = np.average(gamma, weights=w)
             dgamma = (gamma - gamma_avg)/gamma_avg
-            sl = slope_of_correlation(x, dgamma, w)
-            x = x - sl*dgamma
+            x = remove_correlation(dgamma, x, w, corr_order)
             # remove xp-gamma correlation
-            sl = slope_of_correlation(xp, dgamma, w)
-            xp = xp - sl*dgamma
+            xp = remove_correlation(dgamma, xp, w, corr_order)
         cov_x = np.cov(x, xp, aweights=np.abs(w))
         em_x = np.sqrt(np.linalg.det(cov_x))
     else:
@@ -577,9 +566,9 @@ def relative_rms_slice_energy_spread(z, px, py, pz, w=1, n_slices=10,
             slice_weight[i] = np.sum(w_slice)
     return slice_ene_sp, slice_weight, slice_lims
 
-def normalized_transverse_rms_slice_emittance(z, x, px, py=None, pz=None, w=1,
-                                              disp_corrected=False,
-                                              n_slices=10, len_slice=None):
+def normalized_transverse_rms_slice_emittance(
+        z, x, px, py=None, pz=None, w=1, disp_corrected=False, corr_order=1,
+        n_slices=10, len_slice=None):
     """Calculate the normalized transverse RMS slice emittance of the particle
     distribution in a given plane.
 
@@ -640,7 +629,8 @@ def normalized_transverse_rms_slice_emittance(z, x, px, py=None, pz=None, w=1,
             else:
                 w_slice = w
             slice_em[i] = normalized_transverse_rms_emittance(
-                x_slice, px_slice, py_slice, pz_slice, w_slice, disp_corrected)
+                x_slice, px_slice, py_slice, pz_slice, w_slice, disp_corrected,
+                corr_order)
             slice_weight[i] = np.sum(w_slice)
     return slice_em, slice_weight, slice_lims
 
