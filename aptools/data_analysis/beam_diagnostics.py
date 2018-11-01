@@ -365,9 +365,13 @@ def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=1,
             gamma_avg = np.average(gamma, weights=w)
             x_avg = np.average(x, weights=w)
             dgamma = (gamma - gamma_avg)/gamma_avg
-            p = np.polyfit(dgamma, x, 1, w=w)
+            p = np.polyfit(dgamma, x, 2, w=w)
+            s1 = p[1]
+            s2 = p[0]
             slope = slope_of_correlation(x, dgamma)
-            x = x - slope*dgamma
+            x = x - s1*dgamma - s2*dgamma**2
+            #plt.hist2d(x, px, bins=1000)
+            #plt.show()
         cov_x = np.cov(x, px, aweights=np.abs(w))
         em_x = np.sqrt(np.linalg.det(cov_x))
     else:
