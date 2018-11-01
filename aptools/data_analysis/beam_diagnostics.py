@@ -35,6 +35,8 @@ def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
         phase-space emittance 
     disp_corrected : bool
         Whether ot not to correct for dispersion contributions.
+    corr_order : int
+        Highest order up to which dispersion effects should be corrected.
 
     Returns:
     --------
@@ -350,6 +352,8 @@ def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=1,
         Statistical weight of the particles.
     disp_corrected : bool
         Whether ot not to correct for dispersion contributions.
+    corr_order : int
+        Highest order up to which dispersion effects should be corrected.
 
     Returns:
     --------
@@ -392,6 +396,8 @@ def geometric_transverse_rms_emittance(x, px, py, pz, w=1,
         Statistical weight of the particles.
     disp_corrected : bool
         Whether ot not to correct for dispersion contributions.
+    corr_order : int
+        Highest order up to which dispersion effects should be corrected.
 
     Returns:
     --------
@@ -426,6 +432,8 @@ def normalized_transverse_trace_space_rms_emittance(
         Statistical weight of the particles.
     disp_corrected : bool
         Whether ot not to correct for dispersion contributions.
+    corr_order : int
+        Highest order up to which dispersion effects should be corrected.
 
     Returns:
     --------
@@ -461,6 +469,8 @@ def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=1,
         Statistical weight of the particles.
     disp_corrected : bool
         Whether ot not to correct for dispersion contributions.
+    corr_order : int
+        Highest order up to which dispersion effects should be corrected.
 
     Returns:
     --------
@@ -593,6 +603,8 @@ def normalized_transverse_rms_slice_emittance(
         Statistical weight of the particles.
     disp_corrected : bool
         Whether ot not to correct for dispersion contributions.
+    corr_order : int
+        Highest order up to which dispersion effects should be corrected.
     n_slices : array
         Number of longitudinal slices in which to divite the particle
         distribution. Not used if len_slice is specified.
