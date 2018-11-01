@@ -32,7 +32,6 @@ def read_beam(code_name, file_path, species_name=None):
     else:
         return read_beam_from[code_name](file_path, species_name)
 
-
 def read_csrtrack_data_fmt1(file_path):
     """Reads particle data from CSRtrack in fmt1 format and returns it in the
     unis used by APtools.
@@ -47,7 +46,7 @@ def read_csrtrack_data_fmt1(file_path):
     A tuple with 7 arrays containing the 6D phase space and charge of the
     particles.
     """
-    data = np.loadtxt(file_path)
+    data = np.genfromtxt(file_path)
     z = data[1:,0]
     x = data[1:,1]
     y = data[1:,2]
@@ -77,7 +76,7 @@ def read_astra_data(file_path):
     A tuple with 7 arrays containing the 6D phase space and charge of the
     particles.
     """
-    data = np.loadtxt(file_path)
+    data = np.genfromtxt(file_path)
     x = data[:,0]
     y = data[:,1]
     z = data[:,2]
