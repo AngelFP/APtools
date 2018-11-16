@@ -13,18 +13,18 @@ def phase_space_overview_from_file(code_name, file_path, species_name=None):
     phase_space_overview(x, y, z, px, py, pz, q)
 
 def phase_space_overview(x, y, z, px, py, pz, q):
-    em_x = bd.normalized_transverse_rms_emittance(x, px, q) * 1e6
-    em_y = bd.normalized_transverse_rms_emittance(y, py, q) * 1e6
-    a_x, b_x, g_x = bd.twiss_parameters(x, px, pz, q)
-    a_y, b_y, g_y = bd.twiss_parameters(y, py, pz, q)
-    s_x = bd.rms_size(x, q)
-    s_y = bd.rms_size(y, q)
+    em_x = bd.normalized_transverse_rms_emittance(x, px, w=q) * 1e6
+    em_y = bd.normalized_transverse_rms_emittance(y, py, w=q) * 1e6
+    a_x, b_x, g_x = bd.twiss_parameters(x, px, pz, w=q)
+    a_y, b_y, g_y = bd.twiss_parameters(y, py, pz, w=q)
+    s_x = bd.rms_size(x, w=q)
+    s_y = bd.rms_size(y, w=q)
     em_l = bd.longitudinal_rms_emittance(z, px, py, pz, w=q) * 1e6
     dz = z - np.average(z, weights=q)
-    s_z = bd.rms_length(z, q)
-    s_g = bd.relative_rms_energy_spread(pz, py, pz, q)
-    s_g_sl, w_sl, sl_ed = bd.relative_rms_slice_energy_spread(z, px, py, pz, q,
-                                                              10)
+    s_z = bd.rms_length(z, w=q)
+    s_g = bd.relative_rms_energy_spread(pz, py, pz, w=q)
+    s_g_sl, w_sl, sl_ed = bd.relative_rms_slice_energy_spread(z, px, py, pz,
+                                                              w=q, n_slices=10)
     s_g_sl_av = np.average(s_g_sl, weights=w_sl)
     #s_g_sl_c = s_g_sl[int(len(s_g_sl)/2)]
     plt.figure(figsize=(8,3))
