@@ -30,7 +30,7 @@ def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
     w : array or single value
         Statistical weight of the particles.
     emitt : str
-        Determined which emittance to use to calculate the Twiss parameters.
+        Determines which emittance to use to calculate the Twiss parameters.
         Possible values are 'tr' for trace-space emittance and 'ph' for
         phase-space emittance 
     disp_corrected : bool
