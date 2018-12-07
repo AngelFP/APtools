@@ -310,6 +310,7 @@ def matched_plasma_beta_function(beam_ene, n_p=None, k_x=None,
     -----------
     beam_ene : float
         Unitless electron beam mean energy (beta*gamma)
+
     n_p : float
         The plasma density in units of cm-3
 
@@ -335,6 +336,7 @@ def matched_plasma_beta_function(beam_ene, n_p=None, k_x=None,
     Returns:
     --------
     A float with the value of the beta function in meters
+
     """
     if k_x == None:
         if n_p == None:
