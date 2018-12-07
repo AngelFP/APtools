@@ -60,8 +60,36 @@ def plasma_focusing_gradient_blowout(n_p):
     """
     return ct.m_e*plasma_frequency(n_p)**2 / (2*ct.e*ct.c)
 
+def plasma_focusing_gradient_linear(n_p, dist_from_driver, a_0, w_0):
+    """Calculate the plasma focusing gradient assuming linear regime.
+
+    Parameters:
+    -----------
+    plasma_dens : float
+        The plasma density in units of cm-3
+
+    dist_from_driver : string
+        Distance from the driver center in units of m.
+
+    a_0 : float
+        Peak normalized vector potential of the laser.
+
+    w_0 : float
+        Spot size (w_0) of the laser pulse in units of m.
+
+    Returns:
+    --------
+    A float with the focusing gradient value in T/m.
+
+    """
+    w_p = plasma_frequency(n_p)
+    k_p = w_p/ct.c
+    E_0 = ct.m_e*ct.c*w_p/ct.e
+    K = (8*np.pi/np.e)**(1/4)*a_0/(k_p*w_0)
+    return -E0*K**2*k_p*np.sin(k_p*dist_from_driver)/ct.c
+
 def laser_frequency(l_lambda):
-    """Calculate the laser frequency from its wavelength
+    """Calculate the laser frequency from its wavelength.
 
     Parameters:
     -----------
@@ -270,7 +298,9 @@ def matched_beam_size(beam_ene, beam_em, n_p=None, k_x=None):
     s_x = np.sqrt(b_x*beam_em/beam_ene)
     return s_x
 
-def matched_plasma_beta_function(beam_ene, n_p=None, k_x=None):
+def matched_plasma_beta_function(beam_ene, n_p=None, k_x=None,
+                                 regime='Blowout', dist_from_driver=None,
+                                 a_0=None, w_0=None):
     """Get beta function from the plasma focusing fields.
 
     The focusing gradient, k_x, can be provided or calculated from the plasma
@@ -286,6 +316,22 @@ def matched_plasma_beta_function(beam_ene, n_p=None, k_x=None):
     k_x : float
         The plasma transverse focusing gradient in T/m
 
+    regime : string
+        Specify the accelation regime ('Linear' or 'Blowout') for which to
+        calculate the focusing fields. Only used if k_x is not provided.
+
+    dist_from_driver : string
+        Distance from the driver center in units of m. Only needed for Linear 
+        regime.
+
+    a_0 : float
+        Peak normalized vector potential of the laser. Only needed for Linear 
+        regime.
+
+    w_0 : float
+        Spot size (w_0) of the laser pulse in units of m. Only needed for 
+        Linear regime.
+
     Returns:
     --------
     A float with the value of the beta function in meters
@@ -295,7 +341,13 @@ def matched_plasma_beta_function(beam_ene, n_p=None, k_x=None):
             raise ValueError("No values for the plasma density and focusing"
                              " gradient have been provided.")
         else:
-            k_x = plasma_focusing_gradient_blowout(n_p)
+            if regime == 'Blowout':
+                k_x = plasma_focusing_gradient_blowout(n_p)
+            elif regime == 'Linear':
+                k_x = plasma_focusing_gradient_linear(n_p, dist_from_driver,
+                                                      a_0, w_0)
+            else:
+                raise ValueError("Unrecognized acceleration regime")
     # betatron frequency
     w_x = np.sqrt(ct.c*ct.e/ct.m_e * k_x/beam_ene)
     # beta function
