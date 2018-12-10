@@ -6,6 +6,8 @@ from os import path
 import numpy as np
 import scipy.constants as ct
 
+from aptools.helper_functions import reposition_bunch
+
 
 def save_beam(code_name, beam_data, folder_path, file_name, reposition=False,
                            avg_pos=[None, None, None], n_part=None):
@@ -76,7 +78,7 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
     """
     # Perform repositioning of original distribution
     if reposition:
-        _reposition_beam(beam_data, avg_pos)
+        reposition_bunch(beam_data, avg_pos)
 
     # Get beam data
     x_orig = beam_data[0]
@@ -168,7 +170,7 @@ def save_for_astra(beam_data, folder_path, file_name, reposition=False,
     """
     # Perform repositioning of original distribution
     if reposition:
-        _reposition_beam(beam_data, avg_pos)
+        reposition_bunch(beam_data, avg_pos)
 
     # Get beam data
     x_orig = beam_data[0]
@@ -267,7 +269,7 @@ def save_for_fbpic(beam_data, folder_path, file_name, reposition=False,
     """
     # Perform repositioning of original distribution
     if reposition:
-        _reposition_beam(beam_data, avg_pos)
+        reposition_bunch(beam_data, avg_pos)
 
     # Get beam data
     x = beam_data[0]
@@ -282,11 +284,3 @@ def save_for_fbpic(beam_data, folder_path, file_name, reposition=False,
     file_name += '.txt'
     np.savetxt(path.join(folder_path, file_name), data,
                '%1.12e %1.12e %1.12e %1.12e %1.12e %1.12e\r\n')
-
-def _reposition_beam(beam_data, avg_pos):
-    """Reposition beam with the specified averages"""
-    q = beam_data[6]
-    for i, new_avg in enumerate(avg_pos):
-        if new_avg is not None:
-            current_avg = np.average(beam_data[i], weights=q)
-            beam_data[i] += new_avg - current_avg

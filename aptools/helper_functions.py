@@ -96,6 +96,14 @@ def remove_correlation(x, y, w=None, order=1):
         y = y - coef * x**(i+1)
     return y
 
+def reposition_bunch(beam_data, avg_pos):
+    """Reposition bunch with the specified averages"""
+    q = beam_data[6]
+    for i, new_avg in enumerate(avg_pos):
+        if new_avg is not None:
+            current_avg = np.average(beam_data[i], weights=q)
+            beam_data[i] += new_avg - current_avg
+
 def join_infile_path(*paths):
     """
     Join path components using '/' as separator.

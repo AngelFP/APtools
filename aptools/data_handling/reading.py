@@ -5,10 +5,11 @@ import numpy as np
 import scipy.constants as ct
 from h5py import File as H5F
 
-from aptools.helper_functions import join_infile_path
+from aptools.helper_functions import join_infile_path, reposition_bunch
 
 
-def read_beam(code_name, file_path, species_name=None):
+def read_beam(code_name, file_path, species_name=None, reposition=False,
+                           avg_pos=[None, None, None]):
     """Reads particle data from the specified code.
 
     Parameters:
@@ -28,11 +29,13 @@ def read_beam(code_name, file_path, species_name=None):
                       'astra': read_astra_data,
                       'openpmd': read_openpmd_beam}
     if species_name is None:
-        return read_beam_from[code_name](file_path)
+        return read_beam_from[code_name](file_path, reposition, avg_pos)
     else:
-        return read_beam_from[code_name](file_path, species_name)
+        return read_beam_from[code_name](file_path, species_name, reposition,
+                                         avg_pos)
 
-def read_csrtrack_data_fmt1(file_path):
+def read_csrtrack_data_fmt1(file_path, reposition=False,
+                            avg_pos=[None, None, None]):
     """Reads particle data from CSRtrack in fmt1 format and returns it in the
     unis used by APtools.
 
@@ -60,9 +63,12 @@ def read_csrtrack_data_fmt1(file_path):
     px[1:] += px[0]
     py[1:] += py[0]
     pz[1:] += pz[0]
+    # Perform repositioning of original distribution
+    if reposition:
+        reposition_bunch([x, y, z, px, py, pz, q], avg_pos)
     return x, y, z, px, py, pz, q
 
-def read_astra_data(file_path):
+def read_astra_data(file_path, reposition=False, avg_pos=[None, None, None]):
     """Reads particle data from ASTRA and returns it in the unis used by
     APtools.
 
@@ -86,9 +92,13 @@ def read_astra_data(file_path):
     z[1:] += z[0]
     pz[1:] += pz[0]
     q = data[:,7] * 1e-9
+    # Perform repositioning of original distribution
+    if reposition:
+        reposition_bunch([x, y, z, px, py, pz, q], avg_pos)
     return x, y, z, px, py, pz, q
 
-def read_openpmd_beam(file_path, species_name):
+def read_openpmd_beam(file_path, species_name, reposition=False,
+                      avg_pos=[None, None, None]):
     """Reads particle data from a h5 file following the openPMD standard and
     returns it in the unis used by APtools.
 
@@ -128,4 +138,7 @@ def read_openpmd_beam(file_path, species_name):
     pz = beam_species['momentum/z'][:] / (m*ct.c)
     w = beam_species['weighting'][:]
     q *= w
+    # Perform repositioning of original distribution
+    if reposition:
+        reposition_bunch([x, y, z, px, py, pz, q], avg_pos)
     return x, y, z, px, py, pz, q
