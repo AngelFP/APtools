@@ -212,8 +212,7 @@ def relative_rms_energy_spread(px, py, pz, w=1):
 
     Returns:
     --------
-    A float with the energy spread value in non-dimmensional units,
-    i.e. [1/(m_e c**2)]
+    A float with the relative energy spread value.
     """
     abs_spread = rms_energy_spread(px, py, pz, w)
     mean_ene = mean_energy(px, py, pz, w)
@@ -507,8 +506,7 @@ def relative_rms_slice_energy_spread(z, px, py, pz, w=1, n_slices=10,
     Returns:
     --------
     A tuple containing:
-    - An array with the energy spread value in each slice. Values are in
-    non-dimmensional units, i.e. [1/(m_e c**2)]
+    - An array with the relative energy spread value in each slice.
     - An array with the statistical weight of each slice.
     - An array with the slice edges.
     """
