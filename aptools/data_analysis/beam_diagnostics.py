@@ -2,7 +2,6 @@
 
 import scipy.constants as ct
 import numpy as np
-import matplotlib.pyplot as plt
 
 from aptools.helper_functions import (weighted_std, create_beam_slices,
                                       slope_of_correlation, remove_correlation)
