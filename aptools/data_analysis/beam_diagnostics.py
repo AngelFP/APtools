@@ -79,6 +79,43 @@ def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
     g_x = (1 + a_x**2)/b_x
     return (a_x, b_x, g_x)
 
+def dispersion(x, px, py, pz, gamma_ref=None, w=1):
+    """Calculate the first-order dispersion from the beam distribution
+
+    Parameters:
+    -----------
+    x : array
+        Contains the transverse position of the particles in one of the
+        transverse planes in units of meters
+    px : array
+        Contains the transverse momentum of the beam particles in the same
+        plane as x in non-dimmensional units (beta*gamma)
+    py : array
+        Contains the transverse momentum of the beam particles in the opposite
+        plane as as x in non-dimmensional units (beta*gamma).
+    pz : array
+        Contains the longitudinal momentum of the beam particles in
+        non-dimmensional units (beta*gamma).
+    gamma_ref : float
+        Reference energy for the dispersive element. If 'None' this will be the
+        beam average energy.
+    w : array or single value
+        Statistical weight of the particles.
+
+    Returns:
+    --------
+    A float with the value of the dispersion in m.
+    """
+    gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+    if gamma_ref is None:
+        gamma_ref = np.average(gamma, weights=w)
+    x_avg = np.average(x, weights=w)
+    dgamma = (gamma - gamma_ref)/gamma_ref
+    fit_coefs = np.polyfit(x, dgamma, 1, w=w)
+    disp = fit_coefs[0]
+    return disp
+
+
 def rms_length(z, w=1):
     """Calculate the RMS bunch length of the provided particle
     distribution
