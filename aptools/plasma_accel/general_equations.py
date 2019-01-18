@@ -102,6 +102,24 @@ def laser_frequency(l_lambda):
     """
     return 2*ct.pi*ct.c / l_lambda
 
+def laser_rayleigh_length(w_0, l_lambda):
+    """Calculate the Rayleigh length of the laser assuming a Gaussian profile.
+
+    Parameters:
+    -----------
+    w_0 : float
+        The laser beam waist in meters, i. e., 1/e in field or 1/e^2 in
+        intesity. Calculate from FWHM as FWHM/sqrt(2*log(2)).
+
+    l_lambda : float
+        The laser wavelength in meters
+
+    Returns:
+    --------
+    A float with Rayleigh length in m
+    """
+    return ct.pi* w_0**2 / l_lambda
+
 def self_guiding_threshold_a0_blowout(plasma_dens, l_lambda):
     """Get minimum a0 to fulfill self-guiding condition in the blowout regime.
 
