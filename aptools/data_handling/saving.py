@@ -10,7 +10,8 @@ from aptools.helper_functions import reposition_bunch
 
 
 def save_beam(code_name, beam_data, folder_path, file_name, reposition=False,
-                           avg_pos=[None, None, None], n_part=None):
+              avg_pos=[None, None, None], avg_mom=[None, None, None],
+              n_part=None):
     """Converts particle data from one code to another.
 
     Parameters:
@@ -27,13 +28,20 @@ def save_beam(code_name, beam_data, folder_path, file_name, reposition=False,
 
     reposition : bool
         Optional. Whether to reposition de particle distribution in space
-        centered in the coordinates specified in avg_pos
+        and/or momentum centered in the coordinates specified in avg_pos and
+        avg_mom
 
     avg_pos : list
         Optional, only used it reposition=True. Contains the new average
         positions of the beam after repositioning. Should be specified as
         [x_avg, y_avg, z_avg] in meters. Setting a component as None prevents
         repositioning in that coordinate.
+
+    avg_mom : list
+        Optional, only used it reposition=True. Contains the new
+        average momentum of the beam after repositioning. Should be specified
+        as [px_avg, py_avg, pz_avg] in non-dimmesional units (beta*gamma).
+        Setting a component as None prevents repositioning in that coordinate.
 
     n_part : int
         Optional. Number of particles to save. Must be lower than the original
@@ -43,10 +51,11 @@ def save_beam(code_name, beam_data, folder_path, file_name, reposition=False,
                      'astra': save_for_astra,
                      'fbpic': save_for_fbpic}
     save_beam_for[code_name](beam_data, folder_path, file_name, reposition,
-                          avg_pos, n_part)
+                          avg_pos, avg_mom, n_part)
 
 def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
-                           avg_pos=[None, None, None], n_part=None):
+                           avg_pos=[None, None, None],
+                           avg_mom=[None, None, None], n_part=None):
     """Saves particle data for CSRtrack in fmt1 format.
 
     Parameters:
@@ -64,7 +73,8 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
 
     reposition : bool
         Optional. Whether to reposition de particle distribution in space
-        centered in the coordinates specified in avg_pos
+        and/or momentum centered in the coordinates specified in avg_pos and
+        avg_mom
 
     avg_pos : list
         Optional, only used it reposition=True. Contains the new average
@@ -72,13 +82,19 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
         [x_avg, y_avg, z_avg] in meters. Setting a component as None prevents
         repositioning in that coordinate.
 
+    avg_mom : list
+        Optional, only used it reposition=True. Contains the new
+        average momentum of the beam after repositioning. Should be specified
+        as [px_avg, py_avg, pz_avg] in non-dimmesional units (beta*gamma).
+        Setting a component as None prevents repositioning in that coordinate.
+
     n_part : int
         Optional. Number of particles to save. Must be lower than the original
         number of particles. Particles to save are chosen randomly.
     """
     # Perform repositioning of original distribution
     if reposition:
-        reposition_bunch(beam_data, avg_pos)
+        reposition_bunch(beam_data, avg_pos+avg_mom)
 
     # Get beam data
     x_orig = beam_data[0]
@@ -138,7 +154,8 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
                 '%1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %1.12e \r\n')
 
 def save_for_astra(beam_data, folder_path, file_name, reposition=False,
-                   avg_pos=[None, None, None], n_part=None):
+                   avg_pos=[None, None, None], avg_mom=[None, None, None],
+                   n_part=None):
     """Saves particle data in ASTRA format.
 
     Parameters:
@@ -156,7 +173,8 @@ def save_for_astra(beam_data, folder_path, file_name, reposition=False,
 
     reposition : bool
         Optional. Whether to reposition de particle distribution in space
-        centered in the coordinates specified in avg_pos
+        and/or momentum centered in the coordinates specified in avg_pos and
+        avg_mom
 
     avg_pos : list
         Optional, only used it reposition=True. Contains the new average
@@ -164,13 +182,19 @@ def save_for_astra(beam_data, folder_path, file_name, reposition=False,
         [x_avg, y_avg, z_avg] in meters. Setting a component as None prevents
         repositioning in that coordinate.
 
+    avg_mom : list
+        Optional, only used it reposition=True. Contains the new
+        average momentum of the beam after repositioning. Should be specified
+        as [px_avg, py_avg, pz_avg] in non-dimmesional units (beta*gamma).
+        Setting a component as None prevents repositioning in that coordinate.
+
     n_part : int
         Optional. Number of particles to save. Must be lower than the original
         number of particles. Particles to save are chosen randomly.
     """
     # Perform repositioning of original distribution
     if reposition:
-        reposition_bunch(beam_data, avg_pos)
+        reposition_bunch(beam_data, avg_pos+avg_mom)
 
     # Get beam data
     x_orig = beam_data[0]
@@ -237,7 +261,8 @@ def save_for_astra(beam_data, folder_path, file_name, reposition=False,
         '%1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %i %i\r\n')
 
 def save_for_fbpic(beam_data, folder_path, file_name, reposition=False,
-                   avg_pos=[None, None, None], n_part=None):
+                   avg_pos=[None, None, None], avg_mom=[None, None, None],
+                   n_part=None):
     """Saves particle data in in a format that can be read by FBPIC.
 
     Parameters:
@@ -255,7 +280,8 @@ def save_for_fbpic(beam_data, folder_path, file_name, reposition=False,
 
     reposition : bool
         Optional. Whether to reposition de particle distribution in space
-        centered in the coordinates specified in avg_pos
+        and/or momentum centered in the coordinates specified in avg_pos and
+        avg_mom
 
     avg_pos : list
         Optional, only used it reposition=True. Contains the new average
@@ -263,13 +289,19 @@ def save_for_fbpic(beam_data, folder_path, file_name, reposition=False,
         [x_avg, y_avg, z_avg] in meters. Setting a component as None prevents
         repositioning in that coordinate.
 
+    avg_mom : list
+        Optional, only used it reposition=True. Contains the new
+        average momentum of the beam after repositioning. Should be specified
+        as [px_avg, py_avg, pz_avg] in non-dimmesional units (beta*gamma).
+        Setting a component as None prevents repositioning in that coordinate.
+
     n_part : int
         Optional. Number of particles to save. Must be lower than the original
         number of particles. Particles to save are chosen randomly.
     """
     # Perform repositioning of original distribution
     if reposition:
-        reposition_bunch(beam_data, avg_pos)
+        reposition_bunch(beam_data, avg_pos+avg_mom)
 
     # Get beam data
     x = beam_data[0]

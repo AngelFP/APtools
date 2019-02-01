@@ -6,8 +6,8 @@ from aptools.data_handling.saving import save_beam
 
 
 def convert_beam(orig_code, final_code, orig_path, final_path, final_file_name,
-                 reposition=False, avg_pos=[None, None, None], n_part=None,
-                 species_name=None):
+                 reposition=False, avg_pos=[None, None, None],
+                 avg_mom=[None, None, None], n_part=None, species_name=None):
     """Converts particle data from one code to another.
 
     Parameters:
@@ -31,13 +31,20 @@ def convert_beam(orig_code, final_code, orig_path, final_path, final_file_name,
 
     reposition : bool
         Optional. Whether to reposition de particle distribution in space
-        centered in the coordinates specified in avg_pos
+        and/or momentum centered in the coordinates specified in avg_pos and
+        avg_mom
 
     avg_pos : list
         Optional, only used it reposition=True. Contains the new average
         positions of the beam after repositioning. Should be specified as
         [x_avg, y_avg, z_avg] in meters. Setting a component as None prevents
         repositioning in that coordinate.
+
+    avg_mom : list
+        Optional, only used it reposition=True. Contains the new
+        average momentum of the beam after repositioning. Should be specified
+        as [px_avg, py_avg, pz_avg] in non-dimmesional units (beta*gamma).
+        Setting a component as None prevents repositioning in that coordinate.
 
     n_part : int
         Optional. Number of particles to save. Must be lower than the original
@@ -50,4 +57,4 @@ def convert_beam(orig_code, final_code, orig_path, final_path, final_file_name,
     x, y, z, px, py, pz, q = read_beam(orig_code, orig_path, species_name)
     beam_data = [x, y, z, px, py, pz, q]
     save_beam(final_code, beam_data, final_path, final_file_name, reposition,
-                          avg_pos, n_part)
+                          avg_pos, avg_mom, n_part)
