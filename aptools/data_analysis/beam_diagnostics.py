@@ -609,6 +609,13 @@ def normalized_transverse_rms_slice_emittance(
     - An array with the statistical weight of each slice.
     - An array with the slice edges.
     """
+    if disp_corrected:
+        # remove x-gamma correlation
+        gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+        gamma_avg = np.average(gamma, weights=w)
+        x_avg = np.average(x, weights=w)
+        dgamma = (gamma - gamma_avg)/gamma_avg
+        x = remove_correlation(dgamma, x, w, corr_order)
     slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
     slice_em = np.zeros(n_slices)
     slice_weight = np.zeros(n_slices)
@@ -619,20 +626,20 @@ def normalized_transverse_rms_slice_emittance(
         if slice_particle_filter.any():
             x_slice = x[slice_particle_filter]
             px_slice = px[slice_particle_filter]
-            if py is not None:
-                py_slice = py[slice_particle_filter]
-            else:
-                py_slice=None
-            if pz is not None:
-                pz_slice = pz[slice_particle_filter]
-            else:
-                pz_slice=None
+            #if py is not None:
+            #    py_slice = py[slice_particle_filter]
+            #else:
+            #    py_slice=None
+            #if pz is not None:
+            #    pz_slice = pz[slice_particle_filter]
+            #else:
+            #    pz_slice=None
             if hasattr(w, '__iter__'):
                 w_slice = w[slice_particle_filter]
             else:
                 w_slice = w
             slice_em[i] = normalized_transverse_rms_emittance(
-                x_slice, px_slice, py_slice, pz_slice, w_slice, disp_corrected,
+                x_slice, px_slice, py_slice, pz_slice, w_slice, False,
                 corr_order)
             slice_weight[i] = np.sum(w_slice)
     return slice_em, slice_weight, slice_lims
