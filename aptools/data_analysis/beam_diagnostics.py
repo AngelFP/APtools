@@ -639,8 +639,7 @@ def normalized_transverse_rms_slice_emittance(
             else:
                 w_slice = w
             slice_em[i] = normalized_transverse_rms_emittance(
-                x_slice, px_slice, py_slice, pz_slice, w_slice, False,
-                corr_order)
+                x_slice, px_slice, w=w_slice)
             slice_weight[i] = np.sum(w_slice)
     return slice_em, slice_weight, slice_lims
 
