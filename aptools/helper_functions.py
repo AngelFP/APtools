@@ -2,7 +2,7 @@
 
 import numpy as np
 
-def create_beam_slices(z, n_slices, len_slice=None):
+def create_beam_slices(z, n_slices=10, len_slice=None):
     """Calculates the slice limits along z of a partile distribution for a
     given number of slices or slice length.
 
