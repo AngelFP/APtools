@@ -19,6 +19,11 @@ def save_beam(code_name, beam_data, folder_path, file_name, reposition=False,
     code_name : str
         Name of the target tracking or PIC code. Possible values are
         'csrtrack', 'astra' and 'fbpic'
+    
+    beam_data : list
+        Contains the beam data as [x, y, z, px, py, pz, q], where the positions
+        have units of meters, momentun is in non-dimensional units (beta*gamma)
+        and q is in Coulomb.
 
     folder_path : str
         Path to the folder in which to save the data
