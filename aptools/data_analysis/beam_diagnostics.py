@@ -4,7 +4,8 @@ import scipy.constants as ct
 import numpy as np
 
 from aptools.helper_functions import (weighted_std, create_beam_slices,
-                                      slope_of_correlation, remove_correlation)
+                                      slope_of_correlation, remove_correlation,
+                                      filter_nans)
 
 def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
                      disp_corrected=False, corr_order=1):
@@ -44,7 +45,7 @@ def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
     if emitt == 'ph':
         em_x = normalized_transverse_rms_emittance(x, px, py, pz, w,
                                                    disp_corrected, corr_order)
-        gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+        gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
         gamma_avg = np.average(gamma, weights=w)
         x_avg = np.average(x, weights=w)
         px_avg = np.average(px, weights=w)
@@ -68,7 +69,7 @@ def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
         xp = xp - xp_avg
         if disp_corrected:
             # remove x-gamma correlation
-            gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+            gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
             gamma_avg = np.average(gamma, weights=w)
             dgamma = (gamma - gamma_avg)/gamma_avg
             x = remove_correlation(dgamma, x, w, corr_order)
@@ -106,7 +107,7 @@ def dispersion(x, px, py, pz, gamma_ref=None, w=1):
     --------
     A float with the value of the dispersion in m.
     """
-    gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+    gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
     if gamma_ref is None:
         gamma_ref = np.average(gamma, weights=w)
     x_avg = np.average(x, weights=w)
@@ -354,7 +355,7 @@ def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=1,
     if len(x) > 1:
         if disp_corrected:
             # remove x-gamma correlation
-            gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+            gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
             gamma_avg = np.average(gamma, weights=w)
             x_avg = np.average(x, weights=w)
             dgamma = (gamma - gamma_avg)/gamma_avg
@@ -395,7 +396,7 @@ def geometric_transverse_rms_emittance(x, px, py, pz, w=1,
     --------
     A float with the emmitance value in units of m * rad
     """
-    gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+    gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
     gamma_avg = np.average(gamma, weights=w)
     em_x = normalized_transverse_rms_emittance(x, px, py, pz, w,
                                                disp_corrected, corr_order)
@@ -431,7 +432,7 @@ def normalized_transverse_trace_space_rms_emittance(
     --------
     A float with the emmitance value in units of m * rad
     """
-    gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+    gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
     gamma_avg = np.average(gamma, weights=w)
     em_x = transverse_trace_space_rms_emittance(x, px, py, pz, w,
                                                 disp_corrected, corr_order)
@@ -472,7 +473,7 @@ def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=1,
         xp = px/pz
         if disp_corrected:
             # remove x-gamma correlation
-            gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+            gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
             gamma_avg = np.average(gamma, weights=w)
             dgamma = (gamma - gamma_avg)/gamma_avg
             x = remove_correlation(dgamma, x, w, corr_order)
@@ -611,7 +612,7 @@ def normalized_transverse_rms_slice_emittance(
     """
     if disp_corrected:
         # remove x-gamma correlation
-        gamma = np.sqrt(np.square(px) + np.square(py) + np.square(pz))
+        gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
         gamma_avg = np.average(gamma, weights=w)
         x_avg = np.average(x, weights=w)
         dgamma = (gamma - gamma_avg)/gamma_avg
@@ -674,3 +675,69 @@ def current_profile(z, q, n_slices=10, len_slice=None):
     sl_dur = adj_slice_len/ct.c
     current_prof = charge_hist/sl_dur
     return current_prof, z_edges
+
+def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6):
+    """Quick method to analyze the most relevant beam parameters at once.
+
+    Parameters:
+    -----------
+    x : array
+        Contains the transverse position of the particles in the x
+        transverse plane in units of meter
+    y : array
+        Contains the transverse position of the particles in the y
+        transverse plane in units of meter
+    z : array
+        Contains the longitudinal position of the particles in units of meters
+    px : array
+        Contains the transverse momentum of the beam particles in the same
+        plane as x in non-dimmensional units (beta*gamma)
+    py : array
+        Contains the transverse momentum of the beam particles in the opposite
+        plane as as x in non-dimmensional units (beta*gamma).
+    pz : array
+        Contains the longitudinal momentum of the beam particles in
+        non-dimmensional units (beta*gamma).
+    q : array
+        Charge of the particles in Coulomb.
+    len_slice : array
+        Length of the longitudinal slices.
+
+    Returns:
+    --------
+    A tuple containing the centroid position, pointing angle, Twiss parameters,
+    bunch length, divergence, energy and the total and slice emittance and
+    energy spread.
+    """
+    ax, bx, gx = twiss_parameters(x, px, pz, py, w=q)
+    ay, by, gy = twiss_parameters(y, py, pz, px, w=q)
+    ene = mean_energy(px, py, pz, w=q)
+    ene_sp = relative_rms_energy_spread(px, py, pz, w=q)
+    enespls, sl_w, _ = relative_rms_slice_energy_spread(z, px, py, pz, w=q,
+                                                        len_slice=len_slice)
+    enespls, sl_w = filter_nans(enespls, sl_w)
+    ene_sp_sl = np.average(enespls, weights=sl_w)
+    em_x = normalized_transverse_rms_emittance( x, px, py, pz, w=q)
+    em_y = normalized_transverse_rms_emittance( y, py, px, pz, w=q)
+    emsx, sl_w, _ = normalized_transverse_rms_slice_emittance(
+        z, x, px, py, pz, w=q, len_slice=len_slice)
+    emsx, sl_w = filter_nans(emsx, sl_w)
+    em_sl_x = np.average(emsx, weights=sl_w)
+    emsy, sl_w, _ = normalized_transverse_rms_slice_emittance(
+        z, y, py, px, pz, w=q, len_slice=len_slice)
+    emsy, sl_w = filter_nans(emsy, sl_w)
+    em_sl_y = np.average(emsy, weights=sl_w)
+    s_z = rms_length(z, w=q)
+    s_x = rms_size(x, w=q)
+    s_y = rms_size(y, w=q)
+    s_px = np.std(px/pz)
+    s_py = np.std(py/pz)
+    x_centroid = np.average(x, weights=q)
+    y_centroid = np.average(y, weights=q)
+    px_centroid = np.average(px, weights=q)
+    py_centroid = np.average(py, weights=q)
+    theta_x = px_centroid/ene
+    theta_y = py_centroid/ene
+    return (x_centroid, y_centroid, theta_x, theta_y,
+	        bx, by, ax, ay, gx, gy, s_z, s_px, s_py,
+	        em_x, em_y, ene, ene_sp, em_sl_x, em_sl_y, ene_sp_sl)
