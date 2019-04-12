@@ -124,3 +124,22 @@ def join_infile_path(*paths):
     # Correct double slashes, if any is present
     path = path.replace('//', '/')
     return path
+
+def filter_nans(data, data_weights):
+    """
+    Removes NaN values from a data array and is corresponding value in the
+    weights array.
+
+    Parameters:
+    -----------
+    data: data array to filter
+    data_weights: array with the same size as data containing the weights
+
+    Returns:
+    --------
+    Filtered data and data_weights arrays.
+    """
+    filter_idx = np.isfinite(data)
+    data_weights_f = data_weights[filter_idx]
+    data_f = data[filter_idx]
+    return data_f, data_weights_f
