@@ -46,6 +46,21 @@ def plasma_wavelength(plasma_dens):
     """
     return 2*ct.pi*ct.c / plasma_frequency(plasma_dens)
 
+def plasma_cold_non_relativisct_wave_breaking_field(plasma_dens):
+    """Calculate the cold, non relativisitic wave breaking field from the
+    plasma density.
+
+    Parameters:
+    -----------
+    plasma_dens : float
+        The plasma density in units of cm-3
+
+    Returns:
+    --------
+    A float with the field value in V/m
+    """
+    return ct.m_e*ct.c/ct.e * plasma_frequency(plasma_dens)
+
 def plasma_focusing_gradient_blowout(n_p):
     """Calculate the plasma focusing gradient assuming blowout regime
 
@@ -86,7 +101,7 @@ def plasma_focusing_gradient_linear(n_p, dist_from_driver, a_0, w_0):
     k_p = w_p/ct.c
     E_0 = ct.m_e*ct.c*w_p/ct.e
     K = (8*np.pi/np.e)**(1/4)*a_0/(k_p*w_0)
-    return -E0*K**2*k_p*np.sin(k_p*dist_from_driver)/ct.c
+    return -E_0*K**2*k_p*np.sin(k_p*dist_from_driver)/ct.c
 
 def laser_frequency(l_lambda):
     """Calculate the laser frequency from its wavelength.
