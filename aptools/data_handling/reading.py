@@ -9,7 +9,7 @@ from aptools.helper_functions import join_infile_path, reposition_bunch
 
 
 def read_beam(code_name, file_path, species_name=None, reposition=False,
-                           avg_pos=[None, None, None]):
+              avg_pos=[None, None, None]):
     """Reads particle data from the specified code.
 
     Parameters:
@@ -34,6 +34,7 @@ def read_beam(code_name, file_path, species_name=None, reposition=False,
         return read_beam_from[code_name](file_path, species_name, reposition,
                                          avg_pos)
 
+
 def read_csrtrack_data_fmt1(file_path, reposition=False,
                             avg_pos=[None, None, None]):
     """Reads particle data from CSRtrack in fmt1 format and returns it in the
@@ -50,13 +51,13 @@ def read_csrtrack_data_fmt1(file_path, reposition=False,
     particles.
     """
     data = np.genfromtxt(file_path)
-    z = data[1:,0]
-    x = data[1:,1]
-    y = data[1:,2]
-    pz = data[1:,3] / (ct.m_e*ct.c**2/ct.e)
-    px = data[1:,4] / (ct.m_e*ct.c**2/ct.e)
-    py = data[1:,5] / (ct.m_e*ct.c**2/ct.e)
-    q = data[1:,6]
+    z = data[1:, 0]
+    x = data[1:, 1]
+    y = data[1:, 2]
+    pz = data[1:, 3] / (ct.m_e*ct.c**2/ct.e)
+    px = data[1:, 4] / (ct.m_e*ct.c**2/ct.e)
+    py = data[1:, 5] / (ct.m_e*ct.c**2/ct.e)
+    q = data[1:, 6]
     x[1:] += x[0]
     y[1:] += y[0]
     z[1:] += z[0]
@@ -67,6 +68,7 @@ def read_csrtrack_data_fmt1(file_path, reposition=False,
     if reposition:
         reposition_bunch([x, y, z, px, py, pz, q], avg_pos)
     return x, y, z, px, py, pz, q
+
 
 def read_astra_data(file_path, reposition=False, avg_pos=[None, None, None]):
     """Reads particle data from ASTRA and returns it in the unis used by
@@ -83,19 +85,20 @@ def read_astra_data(file_path, reposition=False, avg_pos=[None, None, None]):
     particles.
     """
     data = np.genfromtxt(file_path)
-    x = data[:,0]
-    y = data[:,1]
-    z = data[:,2]
-    px = data[:,3] / (ct.m_e*ct.c**2/ct.e)
-    py = data[:,4] / (ct.m_e*ct.c**2/ct.e)
-    pz = data[:,5] / (ct.m_e*ct.c**2/ct.e)
+    x = data[:, 0]
+    y = data[:, 1]
+    z = data[:, 2]
+    px = data[:, 3] / (ct.m_e*ct.c**2/ct.e)
+    py = data[:, 4] / (ct.m_e*ct.c**2/ct.e)
+    pz = data[:, 5] / (ct.m_e*ct.c**2/ct.e)
     z[1:] += z[0]
     pz[1:] += pz[0]
-    q = data[:,7] * 1e-9
+    q = data[:, 7] * 1e-9
     # Perform repositioning of original distribution
     if reposition:
         reposition_bunch([x, y, z, px, py, pz, q], avg_pos)
     return x, y, z, px, py, pz, q
+
 
 def read_openpmd_beam(file_path, species_name, reposition=False,
                       avg_pos=[None, None, None]):
@@ -123,7 +126,7 @@ def read_openpmd_beam(file_path, species_name, reposition=False,
     particles_path = file_content.attrs['particlesPath'].decode()
     # get species
     beam_species = file_content[
-        join_infile_path(base_path, particles_path, species_name) ]
+        join_infile_path(base_path, particles_path, species_name)]
     # get data
     m = beam_species['mass'].attrs['value']
     q = beam_species['charge'].attrs['value']

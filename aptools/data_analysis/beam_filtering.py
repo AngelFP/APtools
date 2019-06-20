@@ -25,8 +25,10 @@ def filter_beam(beam_matrix, min_range, max_range):
     elements_to_keep = np.ones_like(beam_matrix[0])
     for i, arr in enumerate(beam_matrix):
         if min_range[i] is not None:
-            elements_to_keep = np.where(arr<min_range[i], 0, elements_to_keep)
+            elements_to_keep = np.where(
+                arr < min_range[i], 0, elements_to_keep)
         if max_range[i] is not None:
-            elements_to_keep = np.where(arr>max_range[i], 0, elements_to_keep)
+            elements_to_keep = np.where(
+                arr > max_range[i], 0, elements_to_keep)
     elements_to_keep = np.array(elements_to_keep, dtype=bool)
-    return beam_matrix[:,elements_to_keep]
+    return beam_matrix[:, elements_to_keep]

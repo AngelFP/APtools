@@ -1,4 +1,3 @@
-import sys
 from setuptools import setup, find_packages
 
 import aptools
@@ -7,9 +6,11 @@ import aptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+
 def read_requirements():
     with open('requirements.txt') as f:
         return [line.strip() for line in f.readlines()]
+
 
 # Main setup command
 setup(name='APtools',
@@ -32,4 +33,3 @@ setup(name='APtools',
           "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
           "Operating System :: OS Independent"),
       )
-

@@ -57,4 +57,4 @@ def convert_beam(orig_code, final_code, orig_path, final_path, final_file_name,
     x, y, z, px, py, pz, q = read_beam(orig_code, orig_path, species_name)
     beam_data = [x, y, z, px, py, pz, q]
     save_beam(final_code, beam_data, final_path, final_file_name, reposition,
-                          avg_pos, avg_mom, n_part)
+              avg_pos, avg_mom, n_part)

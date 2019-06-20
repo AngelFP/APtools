@@ -19,7 +19,7 @@ def save_beam(code_name, beam_data, folder_path, file_name, reposition=False,
     code_name : str
         Name of the target tracking or PIC code. Possible values are
         'csrtrack', 'astra' and 'fbpic'
-    
+
     beam_data : list
         Contains the beam data as [x, y, z, px, py, pz, q], where the positions
         have units of meters, momentun is in non-dimensional units (beta*gamma)
@@ -56,7 +56,8 @@ def save_beam(code_name, beam_data, folder_path, file_name, reposition=False,
                      'astra': save_for_astra,
                      'fbpic': save_for_fbpic}
     save_beam_for[code_name](beam_data, folder_path, file_name, reposition,
-                          avg_pos, avg_mom, n_part)
+                             avg_pos, avg_mom, n_part)
+
 
 def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
                            avg_pos=[None, None, None],
@@ -133,7 +134,7 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
     pz = np.zeros(q_orig.size+2)
     pz = np.zeros(q_orig.size+2)
     q = np.zeros(q_orig.size+2)
-        
+
     # Reference particle
     x[1] = np.average(x_orig, weights=q_orig)
     y[1] = np.average(y_orig, weights=q_orig)
@@ -156,7 +157,8 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
     data = np.column_stack((xi, x, y, pz, px, py, q))
     file_name += '.fmt1'
     np.savetxt(path.join(folder_path, file_name), data,
-                '%1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %1.12e \r\n')
+               '%1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %1.12e \r\n')
+
 
 def save_for_astra(beam_data, folder_path, file_name, reposition=False,
                    avg_pos=[None, None, None], avg_mom=[None, None, None],
@@ -208,7 +210,7 @@ def save_for_astra(beam_data, folder_path, file_name, reposition=False,
     px_orig = beam_data[3]*ct.m_e*ct.c**2/ct.e
     py_orig = beam_data[4]*ct.m_e*ct.c**2/ct.e
     pz_orig = beam_data[5]*ct.m_e*ct.c**2/ct.e
-    q_orig = beam_data[6]*1e9 # nC
+    q_orig = beam_data[6]*1e9  # nC
 
     # Create subset of n_part
     if (n_part is not None and n_part < len(q_orig)):
@@ -264,6 +266,7 @@ def save_for_astra(beam_data, folder_path, file_name, reposition=False,
     np.savetxt(
         path.join(folder_path, file_name), data,
         '%1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %i %i\r\n')
+
 
 def save_for_fbpic(beam_data, folder_path, file_name, reposition=False,
                    avg_pos=[None, None, None], avg_mom=[None, None, None],

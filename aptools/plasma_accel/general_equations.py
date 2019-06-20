@@ -4,6 +4,7 @@ equations for plasma-based accelerators"""
 import scipy.constants as ct
 import numpy as np
 
+
 def plasma_frequency(plasma_dens):
     """Calculate the plasma frequency from its densiy
 
@@ -17,6 +18,7 @@ def plasma_frequency(plasma_dens):
     A float with plasma frequency in units of 1/s
     """
     return np.sqrt(ct.e**2 * plasma_dens*1e6 / (ct.m_e*ct.epsilon_0))
+
 
 def plasma_skin_depth(plasma_dens):
     """Calculate the plasma skin depth from its densiy
@@ -32,6 +34,7 @@ def plasma_skin_depth(plasma_dens):
     """
     return ct.c / plasma_frequency(plasma_dens)
 
+
 def plasma_wavelength(plasma_dens):
     """Calculate the plasma wavelength from its densiy
 
@@ -45,6 +48,7 @@ def plasma_wavelength(plasma_dens):
     A float with the plasma wavelength in meters
     """
     return 2*ct.pi*ct.c / plasma_frequency(plasma_dens)
+
 
 def plasma_cold_non_relativisct_wave_breaking_field(plasma_dens):
     """Calculate the cold, non relativisitic wave breaking field from the
@@ -61,6 +65,7 @@ def plasma_cold_non_relativisct_wave_breaking_field(plasma_dens):
     """
     return ct.m_e*ct.c/ct.e * plasma_frequency(plasma_dens)
 
+
 def plasma_focusing_gradient_blowout(n_p):
     """Calculate the plasma focusing gradient assuming blowout regime
 
@@ -74,6 +79,7 @@ def plasma_focusing_gradient_blowout(n_p):
     A float with the focusing gradient value in T/m
     """
     return ct.m_e*plasma_frequency(n_p)**2 / (2*ct.e*ct.c)
+
 
 def plasma_focusing_gradient_linear(n_p, dist_from_driver, a_0, w_0):
     """Calculate the plasma focusing gradient assuming linear regime.
@@ -103,6 +109,7 @@ def plasma_focusing_gradient_linear(n_p, dist_from_driver, a_0, w_0):
     K = (8*np.pi/np.e)**(1/4)*a_0/(k_p*w_0)
     return -E_0*K**2*k_p*np.sin(k_p*dist_from_driver)/ct.c
 
+
 def laser_frequency(l_lambda):
     """Calculate the laser frequency from its wavelength.
 
@@ -116,6 +123,7 @@ def laser_frequency(l_lambda):
     A float with laser frequency in units of 1/s
     """
     return 2*ct.pi*ct.c / l_lambda
+
 
 def laser_rayleigh_length(w_0, l_lambda):
     """Calculate the Rayleigh length of the laser assuming a Gaussian profile.
@@ -133,7 +141,8 @@ def laser_rayleigh_length(w_0, l_lambda):
     --------
     A float with Rayleigh length in m
     """
-    return ct.pi* w_0**2 / l_lambda
+    return ct.pi * w_0**2 / l_lambda
+
 
 def self_guiding_threshold_a0_blowout(plasma_dens, l_lambda):
     """Get minimum a0 to fulfill self-guiding condition in the blowout regime.
@@ -157,6 +166,7 @@ def self_guiding_threshold_a0_blowout(plasma_dens, l_lambda):
     w_0 = laser_frequency(l_lambda)
     a_0 = (w_0/w_p)**(2/5)
     return a_0
+
 
 def plasma_density_for_self_guiding_blowout(w_0, a_0, l_0=None):
     """Get plasma density fulfilling self-guiding condition in blowout regime.
@@ -192,6 +202,7 @@ def plasma_density_for_self_guiding_blowout(w_0, a_0, l_0=None):
                                                                    a_0_thres))
     return n_p
 
+
 def laser_energy(a_0, l_0, lon_fwhm, w_0):
     """Calculate laser pulse energy assuming Gaussian profile.
 
@@ -222,6 +233,7 @@ def laser_energy(a_0, l_0, lon_fwhm, w_0):
     l_ene = (2*np.pi)**(3/2) * s_x * s_y * s_z * i_peak
     return l_ene
 
+
 def laser_peak_power(a_0, l_0, w_0):
     """Calculate laser pulse peak power assuming Gaussian profile.
 
@@ -245,6 +257,7 @@ def laser_peak_power(a_0, l_0, w_0):
     i_peak = 2*np.pi**2*ct.epsilon_0*ct.m_e**2*ct.c**5 * a_0**2 / (ct.e*l_0)**2
     p_peak = np.pi * w_0**2 * i_peak / 2
     return p_peak
+
 
 def laser_w0_for_self_guiding_blowout(n_p, a_0, l_0=None):
     """Get laser spot size fulfilling self-guiding condition in blowout regime.
@@ -279,6 +292,7 @@ def laser_w0_for_self_guiding_blowout(n_p, a_0, l_0=None):
                                                                    a_0_thres))
     return w_0
 
+
 def matched_laser_pulse_duration_blowout(n_p, a_0):
     """Get maximum matched laser pulse duration in the blowout regime.
 
@@ -300,6 +314,7 @@ def matched_laser_pulse_duration_blowout(n_p, a_0):
     k_p = plasma_frequency(n_p) / ct.c
     t_FWHM = 2/ct.c * np.sqrt(a_0)/k_p
     return t_FWHM
+
 
 def matched_beam_size(beam_ene, beam_em, n_p=None, k_x=None):
     """Get matched beam size for the plasma focusing fields.
@@ -331,6 +346,7 @@ def matched_beam_size(beam_ene, beam_em, n_p=None, k_x=None):
     s_x = np.sqrt(b_x*beam_em/beam_ene)
     return s_x
 
+
 def matched_plasma_beta_function(beam_ene, n_p=None, k_x=None,
                                  regime='Blowout', dist_from_driver=None,
                                  a_0=None, w_0=None):
@@ -355,15 +371,15 @@ def matched_plasma_beta_function(beam_ene, n_p=None, k_x=None,
         calculate the focusing fields. Only used if k_x is not provided.
 
     dist_from_driver : string
-        Distance from the driver center in units of m. Only needed for Linear 
+        Distance from the driver center in units of m. Only needed for Linear
         regime.
 
     a_0 : float
-        Peak normalized vector potential of the laser. Only needed for Linear 
+        Peak normalized vector potential of the laser. Only needed for Linear
         regime.
 
     w_0 : float
-        Spot size (w_0) of the laser pulse in units of m. Only needed for 
+        Spot size (w_0) of the laser pulse in units of m. Only needed for
         Linear regime.
 
     Returns:
@@ -371,8 +387,8 @@ def matched_plasma_beta_function(beam_ene, n_p=None, k_x=None,
     A float with the value of the beta function in meters
 
     """
-    if k_x == None:
-        if n_p == None:
+    if k_x is None:
+        if n_p is None:
             raise ValueError("No values for the plasma density and focusing"
                              " gradient have been provided.")
         else:
@@ -388,6 +404,7 @@ def matched_plasma_beta_function(beam_ene, n_p=None, k_x=None,
     # beta function
     b_x = ct.c/w_x
     return b_x
+
 
 def maximum_wakefield_plasma_lens(q_tot, s_z, s_r, n_p):
     """Calculates the maximum focusing gradient induced by beam wakefields in

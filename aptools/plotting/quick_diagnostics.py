@@ -8,9 +8,11 @@ import scipy.constants as ct
 import aptools.data_analysis.beam_diagnostics as bd
 from aptools.data_handling.reading import read_beam
 
+
 def phase_space_overview_from_file(code_name, file_path, species_name=None):
     x, y, z, px, py, pz, q = read_beam(code_name, file_path, species_name)
     phase_space_overview(x, y, z, px, py, pz, q)
+
 
 def phase_space_overview(x, y, z, px, py, pz, q):
     em_x = bd.normalized_transverse_rms_emittance(x, px, w=q) * 1e6
@@ -27,9 +29,9 @@ def phase_space_overview(x, y, z, px, py, pz, q):
                                                               w=q, n_slices=10)
     s_g_sl_av = np.average(s_g_sl, weights=w_sl)
     c_prof, _ = bd.current_profile(z, q, n_slices=50)
-    c_peak = max(abs(c_prof))/1e3 #kA
+    c_peak = max(abs(c_prof))/1e3  # kA
     #s_g_sl_c = s_g_sl[int(len(s_g_sl)/2)]
-    plt.figure(figsize=(8,3))
+    plt.figure(figsize=(8, 3))
     # x - px
     ax_1 = plt.subplot(131)
     plt.plot(x * 1e6, px, '.', ms=1)
@@ -46,7 +48,7 @@ def phase_space_overview(x, y, z, px, py, pz, q):
              + '$\\ \\mathrm{\\mu m}$', transform=ax_1.transAxes, fontsize=8)
     # y - py
     ax_2 = plt.subplot(132)
-    plt.plot(y * 1e6, py, '.', ms=1)    
+    plt.plot(y * 1e6, py, '.', ms=1)
     plt.xlabel("y [$\\mu m$]")
     plt.ylabel("$p_y \\ \\mathrm{[m_ec^2/e]}$")
     plt.text(0.1, 0.9, '$\\epsilon_{n,y} = $' + '{}'.format(np.around(em_y, 3))

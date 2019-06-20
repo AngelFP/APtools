@@ -2,6 +2,7 @@
 
 import numpy as np
 
+
 def create_beam_slices(z, n_slices=10, len_slice=None):
     """Calculates the slice limits along z of a partile distribution for a
     given number of slices or slice length.
@@ -31,6 +32,7 @@ def create_beam_slices(z, n_slices=10, len_slice=None):
         n_slices = len(slice_lims)-1
     return slice_lims, n_slices
 
+
 def weighted_std(values, weights=1):
     """Calculates the weighted standard deviation of the given values
 
@@ -48,6 +50,7 @@ def weighted_std(values, weights=1):
     mean_val = np.average(values, weights=np.abs(weights))
     std = np.sqrt(np.average((values-mean_val)**2, weights=np.abs(weights)))
     return std
+
 
 def slope_of_correlation(y, x, w=None):
     """Calculates the slope of the correlation between two variables x and y
@@ -71,6 +74,7 @@ def slope_of_correlation(y, x, w=None):
     c = np.average(x, weights=w)
     d = np.average(x**2, weights=w)
     return (a-b*c) / (d-c**2)
+
 
 def remove_correlation(x, y, w=None, order=1):
     """Removes the correlation between two variables x and y, where y=y(x), up
@@ -96,6 +100,7 @@ def remove_correlation(x, y, w=None, order=1):
         y = y - coef * x**(i+1)
     return y
 
+
 def reposition_bunch(beam_data, avg_pos):
     """Reposition bunch with the specified averages"""
     q = beam_data[6]
@@ -103,6 +108,7 @@ def reposition_bunch(beam_data, avg_pos):
         if new_avg is not None:
             current_avg = np.average(beam_data[i], weights=q)
             beam_data[i] += new_avg - current_avg
+
 
 def join_infile_path(*paths):
     """
@@ -124,6 +130,7 @@ def join_infile_path(*paths):
     # Correct double slashes, if any is present
     path = path.replace('//', '/')
     return path
+
 
 def filter_nans(data, data_weights):
     """
