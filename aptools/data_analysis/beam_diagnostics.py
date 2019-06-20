@@ -4,8 +4,7 @@ import scipy.constants as ct
 import numpy as np
 
 from aptools.helper_functions import (weighted_std, create_beam_slices,
-                                      slope_of_correlation, remove_correlation,
-                                      filter_nans)
+                                      remove_correlation, filter_nans)
 
 def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
                      disp_corrected=False, corr_order=1):
@@ -110,7 +109,6 @@ def dispersion(x, px, py, pz, gamma_ref=None, w=1):
     gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
     if gamma_ref is None:
         gamma_ref = np.average(gamma, weights=w)
-    x_avg = np.average(x, weights=w)
     dgamma = (gamma - gamma_ref)/gamma_ref
     fit_coefs = np.polyfit(x, dgamma, 1, w=w)
     disp = fit_coefs[0]
@@ -357,7 +355,6 @@ def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=1,
             # remove x-gamma correlation
             gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
             gamma_avg = np.average(gamma, weights=w)
-            x_avg = np.average(x, weights=w)
             dgamma = (gamma - gamma_avg)/gamma_avg
             x = remove_correlation(dgamma, x, w, corr_order)
         cov_x = np.cov(x, px, aweights=np.abs(w))
@@ -555,7 +552,6 @@ def relative_rms_slice_energy_spread(z, px, py, pz, w=1, n_slices=10,
         b = slice_lims[i+1]
         slice_particle_filter = (z > a) & (z <= b)
         if slice_particle_filter.any():
-            z_slice = z[slice_particle_filter]
             px_slice = px[slice_particle_filter]
             py_slice = py[slice_particle_filter]
             pz_slice = pz[slice_particle_filter]
@@ -614,7 +610,6 @@ def normalized_transverse_rms_slice_emittance(
         # remove x-gamma correlation
         gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
         gamma_avg = np.average(gamma, weights=w)
-        x_avg = np.average(x, weights=w)
         dgamma = (gamma - gamma_avg)/gamma_avg
         x = remove_correlation(dgamma, x, w, corr_order)
     slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
