@@ -315,6 +315,21 @@ def save_for_fbpic(beam_data, folder_path, file_name, reposition=False,
     px = beam_data[3]
     py = beam_data[4]
     pz = beam_data[5]
+    q = beam_data[6]
+
+    # Create subset of n_part
+    if (n_part is not None and n_part < len(q)):
+        q_tot = np.sum(q)
+        q_part = q_tot/n_part
+        i = np.arange(len(q))
+        i = np.random.choice(i, size=n_part)
+        x = x[i]
+        y = y[i]
+        xi = xi[i]
+        px = px[i]
+        py = py[i]
+        pz = pz[i]
+        q = np.ones(x.size)*q_part
 
     # Save to file
     data = np.column_stack((x, y, xi, px, py, pz))
