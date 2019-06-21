@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-import aptools
+from aptools.__version__ import __version__
 
 # Read long description
 with open("README.md", "r") as fh:
@@ -14,7 +14,7 @@ def read_requirements():
 
 # Main setup command
 setup(name='APtools',
-      version=aptools.__version__,
+      version=__version__,
       author='Angel Ferran Pousa',
       author_email="angel.ferran.pousa@desy.de",
       description='A collection of tools for accelerator physics',
