@@ -30,7 +30,7 @@ def phase_space_overview(x, y, z, px, py, pz, q):
     s_g_sl_av = np.average(s_g_sl, weights=w_sl)
     c_prof, _ = bd.current_profile(z, q, n_slices=50)
     c_peak = max(abs(c_prof))/1e3  # kA
-    #s_g_sl_c = s_g_sl[int(len(s_g_sl)/2)]
+    # s_g_sl_c = s_g_sl[int(len(s_g_sl)/2)]
     plt.figure(figsize=(8, 3))
     # x - px
     ax_1 = plt.subplot(131)
