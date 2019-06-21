@@ -752,5 +752,5 @@ def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6):
     theta_x = px_centroid/ene
     theta_y = py_centroid/ene
     return (x_centroid, y_centroid, theta_x, theta_y,
-            bx, by, ax, ay, gx, gy, s_z, s_px, s_py,
+            bx, by, ax, ay, gx, gy, s_x, s_y, s_z, s_px, s_py,
             em_x, em_y, ene, ene_sp, em_sl_x, em_sl_y, ene_sp_sl)
