@@ -6,37 +6,58 @@ import scipy.constants as ct
 from h5py import File as H5F
 
 from aptools.helper_functions import join_infile_path, reposition_bunch
+from aptools.plasma_accel.general_equations import plasma_skin_depth
 
 
-def read_beam(code_name, file_path, species_name=None, reposition=False,
-              avg_pos=[None, None, None]):
+def read_beam(code_name, file_path, reposition=False,
+              avg_pos=[None, None, None], avg_mom=[None, None, None],
+              **kwargs):
     """Reads particle data from the specified code.
 
     Parameters:
     -----------
     code_name : str
         Name of the tracking or PIC code of the data to read. Possible values
-        are 'csrtrack', 'astra' and 'openpmd'
+        are 'csrtrack', 'astra', 'openpmd' and 'hipace'
 
     file_path : str
         Path of the file containing the data
 
-    species_name : std
-        Only required for reading data from PIC codes. Name of the particle
-        species.
+    reposition : bool
+        Optional. Whether to reposition de particle distribution in space
+        and/or momentum centered in the coordinates specified in avg_pos and
+        avg_mom
+
+    avg_pos : list
+        Optional, only used it reposition=True. Contains the new average
+        positions of the beam after repositioning. Should be specified as
+        [x_avg, y_avg, z_avg] in meters. Setting a component as None prevents
+        repositioning in that coordinate.
+
+    avg_mom : list
+        Optional, only used it reposition=True. Contains the new
+        average momentum of the beam after repositioning. Should be specified
+        as [px_avg, py_avg, pz_avg] in non-dimmesional units (beta*gamma).
+        Setting a component as None prevents repositioning in that coordinate.
+
+    Other Parameters
+    ----------------
+    **kwargs
+        This method takes additional keyword parameters that might be needed
+        for some data readers. Possible parameters are 'species_name' and
+        'plasma_dens'.
     """
     read_beam_from = {'csrtrack': read_csrtrack_data_fmt1,
                       'astra': read_astra_data,
-                      'openpmd': read_openpmd_beam}
-    if species_name is None:
-        return read_beam_from[code_name](file_path, reposition, avg_pos)
-    else:
-        return read_beam_from[code_name](file_path, species_name, reposition,
-                                         avg_pos)
+                      'openpmd': read_openpmd_beam,
+                      'hipace': read_hipace_beam}
+    x, y, z, px, py, pz, q = read_beam_from[code_name](file_path, **kwargs)
+    if reposition:
+        reposition_bunch([x, y, z, px, py, pz, q], avg_pos+avg_mom)
+    return x, y, z, px, py, pz, q
 
 
-def read_csrtrack_data_fmt1(file_path, reposition=False,
-                            avg_pos=[None, None, None]):
+def read_csrtrack_data_fmt1(file_path):
     """Reads particle data from CSRtrack in fmt1 format and returns it in the
     unis used by APtools.
 
@@ -64,13 +85,10 @@ def read_csrtrack_data_fmt1(file_path, reposition=False,
     px[1:] += px[0]
     py[1:] += py[0]
     pz[1:] += pz[0]
-    # Perform repositioning of original distribution
-    if reposition:
-        reposition_bunch([x, y, z, px, py, pz, q], avg_pos)
     return x, y, z, px, py, pz, q
 
 
-def read_astra_data(file_path, reposition=False, avg_pos=[None, None, None]):
+def read_astra_data(file_path):
     """Reads particle data from ASTRA and returns it in the unis used by
     APtools.
 
@@ -94,14 +112,10 @@ def read_astra_data(file_path, reposition=False, avg_pos=[None, None, None]):
     z[1:] += z[0]
     pz[1:] += pz[0]
     q = data[:, 7] * 1e-9
-    # Perform repositioning of original distribution
-    if reposition:
-        reposition_bunch([x, y, z, px, py, pz, q], avg_pos)
     return x, y, z, px, py, pz, q
 
 
-def read_openpmd_beam(file_path, species_name, reposition=False,
-                      avg_pos=[None, None, None]):
+def read_openpmd_beam(file_path, species_name):
     """Reads particle data from a h5 file following the openPMD standard and
     returns it in the unis used by APtools.
 
@@ -141,7 +155,35 @@ def read_openpmd_beam(file_path, species_name, reposition=False,
     pz = beam_species['momentum/z'][:] / (m*ct.c)
     w = beam_species['weighting'][:]
     q *= w
-    # Perform repositioning of original distribution
-    if reposition:
-        reposition_bunch([x, y, z, px, py, pz, q], avg_pos)
+    return x, y, z, px, py, pz, q
+
+
+def read_hipace_beam(file_path, plasma_dens):
+    """Reads particle data from an HiPACE paricle file and returns it in the
+    unis used by APtools.
+
+    Parameters:
+    -----------
+    file_path : str
+        Path to the file with particle data
+
+    plasma_dens : float
+        Plasma density in units od cm^{-3} used to convert the beam data to
+        non-normalized units
+
+    Returns:
+    --------
+    A tuple with 7 arrays containing the 6D phase space and charge of the
+    particles.
+    """
+    s_d = plasma_skin_depth(plasma_dens)
+    file_content = H5F(file_path)
+    # get data
+    q = np.array(file_content.get('q')) * ct.e
+    x = np.array(file_content.get('x2')) * s_d
+    y = np.array(file_content.get('x3')) * s_d
+    z = np.array(file_content.get('x1')) * s_d
+    px = np.array(file_content.get('p2'))
+    py = np.array(file_content.get('p3'))
+    pz = np.array(file_content.get('p1'))
     return x, y, z, px, py, pz, q

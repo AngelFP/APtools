@@ -9,8 +9,8 @@ import aptools.data_analysis.beam_diagnostics as bd
 from aptools.data_handling.reading import read_beam
 
 
-def phase_space_overview_from_file(code_name, file_path, species_name=None):
-    x, y, z, px, py, pz, q = read_beam(code_name, file_path, species_name)
+def phase_space_overview_from_file(code_name, file_path, **kwargs):
+    x, y, z, px, py, pz, q = read_beam(code_name, file_path, **kwargs)
     phase_space_overview(x, y, z, px, py, pz, q)
 
 
