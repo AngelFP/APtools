@@ -326,7 +326,7 @@ def longitudinal_energy_chirp(z, px, py, pz, w=1):
     return K
 
 
-def rms_correlated_energy_spread(z, px, py, pz, w=1):
+def rms_relative_correlated_energy_spread(z, px, py, pz, w=1):
     """Calculate the correlated energy spread of the provided particle
     distribution
 
@@ -361,6 +361,99 @@ def rms_correlated_energy_spread(z, px, py, pz, w=1):
     corr_ene = K*dz
     corr_ene_sp = weighted_std(corr_ene, w)
     return corr_ene_sp
+
+
+def rms_relative_uncorrelated_energy_spread(z, px, py, pz, w=1):
+    """Calculate the uncorrelated energy spread of the provided particle
+    distribution
+
+    Parameters:
+    -----------
+    z : array
+        Contains the longitudinal position of the particles in units of meters
+
+    px : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+
+    py : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+
+    pz : array
+        Contains the longitudonal momentum of the beam particles in
+        non-dimmensional units (beta*gamma)
+
+    w : array or single value
+        Statistical weight of the particles.
+
+    Returns:
+    --------
+    A float with the energy spread value in non-dimmensional units,
+    i.e. [1/(m_e c**2)]
+    """
+    ene = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
+    mean_ene = np.average(ene, weights=w)
+    mean_z = np.average(z, weights=w)
+    dE_rel = (ene-mean_ene) / mean_ene
+    dz = z - mean_z
+    p = np.polyfit(dz, dE_rel, 1)
+    K = p[0]
+    unc_ene = ene - K*dz
+    unc_ene_sp = weighted_std(unc_ene, w)
+    return unc_ene_sp
+
+
+def rms_relative_uncorrelated_slice_energy_spread(z, px, py, pz, w=1,
+                                                  n_slices=10, len_slice=None):
+    """Calculate the uncorrelated energy spread of the provided particle
+    distribution
+
+    Parameters:
+    -----------
+    z : array
+        Contains the longitudinal position of the particles in units of meters
+
+    px : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+
+    py : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+
+    pz : array
+        Contains the longitudonal momentum of the beam particles in
+        non-dimmensional units (beta*gamma)
+
+    w : array or single value
+        Statistical weight of the particles.
+
+    Returns:
+    --------
+    A float with the energy spread value in non-dimmensional units,
+    i.e. [1/(m_e c**2)]
+    """
+    slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
+    slice_ene_sp = np.zeros(n_slices)
+    slice_weight = np.zeros(n_slices)
+    for i in np.arange(0, n_slices):
+        a = slice_lims[i]
+        b = slice_lims[i+1]
+        slice_particle_filter = (z > a) & (z <= b)
+        if slice_particle_filter.any():
+            z_slice = z[slice_particle_filter]
+            px_slice = px[slice_particle_filter]
+            py_slice = py[slice_particle_filter]
+            pz_slice = pz[slice_particle_filter]
+            if hasattr(w, '__iter__'):
+                w_slice = w[slice_particle_filter]
+            else:
+                w_slice = w
+            slice_ene_sp[i] = rms_relative_uncorrelated_energy_spread(
+                z_slice, px_slice, py_slice, z_slice, w_slice)
+            slice_weight[i] = np.sum(w_slice)
+    return slice_ene_sp, slice_weight, slice_lims
 
 
 def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=1,
