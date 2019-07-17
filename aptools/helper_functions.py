@@ -11,9 +11,11 @@ def create_beam_slices(z, n_slices=10, len_slice=None):
     -----------
     z : array
         Contains the longitudinal position of the particles in units of meters
+
     n_slices : array
         Number of longitudinal slices in which to divite the particle
         distribution. Not used if len_slice is specified.
+
     len_slice : array
         Length of the longitudinal slices. If not None, replaces n_slices.
 
@@ -40,6 +42,7 @@ def weighted_std(values, weights=1):
     -----------
     values: array
         Contains the values to be analyzed
+
     weights : array
         Contains the weights of the values to analyze
 
@@ -60,8 +63,10 @@ def slope_of_correlation(y, x, w=None):
     -----------
     y: array
         Contains the x values
+
     y: array
         Contains the y values
+
     w : array
         Contains the weights of the values
 
@@ -84,13 +89,17 @@ def remove_correlation(x, y, w=None, order=1):
     -----------
     y: array
         Contains the x values
+
     y: array
         Contains the y values
+
     w : array
         Contains the weights of the values
+
     order : int
         Determines the order of the polynomial fit and, thus, the higher
         correlaton order to remove.
+
     Returns:
     --------
     An array containing the new values of y
@@ -139,8 +148,11 @@ def filter_nans(data, data_weights):
 
     Parameters:
     -----------
-    data: data array to filter
-    data_weights: array with the same size as data containing the weights
+    data: array
+        Array containing the data to filter.
+
+    data_weights: array
+        Array with the same size as data containing the weights.
 
     Returns:
     --------

@@ -9,10 +9,12 @@ def filter_beam(beam_matrix, min_range, max_range):
     Parameters:
     -----------
     beam_matrix : array
-        M x N matrix containing all M components of the N particles
+        M x N matrix containing all M components of the N particles.
+
     min_range : array
         Array of size M with the minimum value for each given component. For
         values which are 'None' no filtering is performed.
+
     max_range : array
         Array of size M with the maximum value for each given component. For
         values which are 'None' no filtering is performed.

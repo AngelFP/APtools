@@ -17,24 +17,31 @@ def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
     x : array
         Contains the transverse position of the particles in one of the
         transverse planes in units of meters
+
     px : array
         Contains the transverse momentum of the beam particles in the same
         plane as x in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum of the beam particles in the opposite
         plane as as x in non-dimmensional units (beta*gamma). Necessary if
         disp_corrected=True or emitt='ph'.
+
     pz : array
         Contains the longitudinal momentum of the beam particles in
         non-dimmensional units (beta*gamma).
+
     w : array or single value
         Statistical weight of the particles.
+
     emitt : str
         Determines which emittance to use to calculate the Twiss parameters.
         Possible values are 'tr' for trace-space emittance and 'ph' for
         phase-space emittance
+
     disp_corrected : bool
         Whether ot not to correct for dispersion contributions.
+
     corr_order : int
         Highest order up to which dispersion effects should be corrected.
 
@@ -89,18 +96,23 @@ def dispersion(x, px, py, pz, gamma_ref=None, w=1):
     x : array
         Contains the transverse position of the particles in one of the
         transverse planes in units of meters
+
     px : array
         Contains the transverse momentum of the beam particles in the same
         plane as x in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum of the beam particles in the opposite
         plane as as x in non-dimmensional units (beta*gamma).
+
     pz : array
         Contains the longitudinal momentum of the beam particles in
         non-dimmensional units (beta*gamma).
+
     gamma_ref : float
         Reference energy for the dispersive element. If 'None' this will be the
         beam average energy.
+
     w : array or single value
         Statistical weight of the particles.
 
@@ -125,6 +137,7 @@ def rms_length(z, w=1):
     -----------
     z : array
         Contains the longitudinal position of the particles in units of meters
+
     w : array or single value
         Statistical weight of the particles.
 
@@ -144,6 +157,7 @@ def rms_size(x, w=1):
     -----------
     x : array
         Contains the transverse position of the particles in units of meters
+
     w : array or single value
         Statistical weight of the particles.
 
@@ -163,12 +177,15 @@ def mean_kinetic_energy(px, py, pz, w=1):
     px : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     pz : array
         Contains the longitudonal momentum of the beam particles in
         non-dimmensional units (beta*gamma)
+
     w : array or single value
         Statistical weight of the particles.
 
@@ -189,12 +206,15 @@ def mean_energy(px, py, pz, w=1):
     px : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     pz : array
         Contains the longitudonal momentum of the beam particles in
         non-dimmensional units (beta*gamma)
+
     w : array or single value
         Statistical weight of the particles.
 
@@ -215,12 +235,15 @@ def rms_energy_spread(px, py, pz, w=1):
     px : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     pz : array
         Contains the longitudonal momentum of the beam particles in
         non-dimmensional units (beta*gamma)
+
     w : array or single value
         Statistical weight of the particles.
 
@@ -243,12 +266,15 @@ def relative_rms_energy_spread(px, py, pz, w=1):
     px : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     pz : array
         Contains the longitudonal momentum of the beam particles in
         non-dimmensional units (beta*gamma)
+
     w : array or single value
         Statistical weight of the particles.
 
@@ -270,15 +296,19 @@ def longitudinal_energy_chirp(z, px, py, pz, w=1):
     -----------
     z : array
         Contains the longitudinal position of the particles in units of meters
+
     px : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     pz : array
         Contains the longitudonal momentum of the beam particles in
         non-dimmensional units (beta*gamma)
+
     w : array or single value
         Statistical weight of the particles.
 
@@ -304,15 +334,19 @@ def rms_correlated_energy_spread(z, px, py, pz, w=1):
     -----------
     z : array
         Contains the longitudinal position of the particles in units of meters
+
     px : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     pz : array
         Contains the longitudonal momentum of the beam particles in
         non-dimmensional units (beta*gamma)
+
     w : array or single value
         Statistical weight of the particles.
 
@@ -339,20 +373,26 @@ def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=1,
     x : array
         Contains the transverse position of the particles in one of the
         transverse planes in units of meters
+
     px : array
         Contains the transverse momentum of the beam particles in the same
         plane as x in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum of the beam particles in the opposite
         plane as as x in non-dimmensional units (beta*gamma). Necessary if
         disp_corrected=True.
+
     pz : array
         Contains the longitudinal momentum of the beam particles in
         non-dimmensional units (beta*gamma). Necessary if disp_corrected=True.
+
     w : array or single value
         Statistical weight of the particles.
+
     disp_corrected : bool
         Whether ot not to correct for dispersion contributions.
+
     corr_order : int
         Highest order up to which dispersion effects should be corrected.
 
@@ -421,19 +461,25 @@ def normalized_transverse_trace_space_rms_emittance(
     x : array
         Contains the transverse position of the particles in one of the
         transverse planes in units of meters
+
     px : array
         Contains the transverse momentum of the beam particles in the same
         plane as x in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum of the beam particles in the opposite
         plane as as x in non-dimmensional units (beta*gamma).
+
     pz : array
         Contains the longitudinal momentum of the beam particles in
         non-dimmensional units (beta*gamma).
+
     w : array or single value
         Statistical weight of the particles.
+
     disp_corrected : bool
         Whether ot not to correct for dispersion contributions.
+
     corr_order : int
         Highest order up to which dispersion effects should be corrected.
 
@@ -458,20 +504,26 @@ def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=1,
     x : array
         Contains the transverse position of the particles in one of the
         transverse planes in units of meters
+
     px : array
         Contains the transverse momentum of the beam particles in the same
         plane as x in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum of the beam particles in the opposite
         plane as as x in non-dimmensional units (beta*gamma). Necessary if
         disp_corrected=True.
+
     pz : array
         Contains the longitudinal momentum of the beam particles in
         non-dimmensional units (beta*gamma). Necessary if disp_corrected=True.
+
     w : array or single value
         Statistical weight of the particles.
+
     disp_corrected : bool
         Whether ot not to correct for dispersion contributions.
+
     corr_order : int
         Highest order up to which dispersion effects should be corrected.
 
@@ -504,15 +556,19 @@ def longitudinal_rms_emittance(z, px, py, pz, w=1):
     -----------
     z : array
         Contains the longitudinal position of the particles in units of meters
+
     px : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     pz : array
         Contains the longitudonal momentum of the beam particles in
         non-dimmensional units (beta*gamma)
+
     w : array or single value
         Statistical weight of the particles.
 
@@ -535,20 +591,26 @@ def relative_rms_slice_energy_spread(z, px, py, pz, w=1, n_slices=10,
     -----------
     z : array
         Contains the longitudinal position of the particles in units of meters
+
     px : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
+
     pz : array
         Contains the longitudonal momentum of the beam particles in
         non-dimmensional units (beta*gamma)
+
     w : array or single value
         Statistical weight of the particles.
+
     n_slices : array
         Number of longitudinal slices in which to divite the particle
         distribution. Not used if len_slice is specified.
+
     len_slice : array
         Length of the longitudinal slices. If not None, replaces n_slices.
 
@@ -590,28 +652,37 @@ def normalized_transverse_rms_slice_emittance(
     -----------
     z : array
         Contains the longitudinal position of the particles in units of meters
+
     x : array
         Contains the transverse position of the particles in one of the
         transverse planes in units of meters
+
     px : array
         Contains the transverse momentum of the beam particles in the same
         plane as x in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum of the beam particles in the opposite
         plane as as x in non-dimmensional units (beta*gamma). Necessary if
         disp_corrected=True.
+
     pz : array
         Contains the longitudinal momentum of the beam particles in
         non-dimmensional units (beta*gamma). Necessary if disp_corrected=True.
+
     w : array or single value
         Statistical weight of the particles.
+
     disp_corrected : bool
         Whether ot not to correct for dispersion contributions.
+
     corr_order : int
         Highest order up to which dispersion effects should be corrected.
+
     n_slices : array
         Number of longitudinal slices in which to divite the particle
         distribution. Not used if len_slice is specified.
+
     len_slice : array
         Length of the longitudinal slices. If not None, replaces n_slices.
 
@@ -663,11 +734,14 @@ def current_profile(z, q, n_slices=10, len_slice=None):
     -----------
     z : array
         Contains the longitudinal position of the particles in units of meters
+
     q : array
         Contains the charge of the particles in C
+
     n_slices : array
         Number of longitudinal slices in which to divite the particle
         distribution. Not used if len_slice is specified.
+
     len_slice : array
         Length of the longitudinal slices. If not None, replaces n_slices.
 
@@ -697,22 +771,29 @@ def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6):
     x : array
         Contains the transverse position of the particles in the x
         transverse plane in units of meter
+
     y : array
         Contains the transverse position of the particles in the y
         transverse plane in units of meter
+
     z : array
         Contains the longitudinal position of the particles in units of meters
+
     px : array
         Contains the transverse momentum of the beam particles in the same
         plane as x in non-dimmensional units (beta*gamma)
+
     py : array
         Contains the transverse momentum of the beam particles in the opposite
         plane as as x in non-dimmensional units (beta*gamma).
+
     pz : array
         Contains the longitudinal momentum of the beam particles in
         non-dimmensional units (beta*gamma).
+
     q : array
         Charge of the particles in Coulomb.
+
     len_slice : array
         Length of the longitudinal slices.
 
