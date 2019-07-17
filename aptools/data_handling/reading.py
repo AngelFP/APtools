@@ -3,7 +3,7 @@ tracking and PIC codes"""
 
 import numpy as np
 import scipy.constants as ct
-from h5py import File as H5F
+from h5py import File as H5File
 
 from aptools.helper_functions import join_infile_path, reposition_bunch
 from aptools.plasma_accel.general_equations import plasma_skin_depth
@@ -132,7 +132,7 @@ def read_openpmd_beam(file_path, species_name):
     A tuple with 7 arrays containing the 6D phase space and charge of the
     particles.
     """
-    file_content = H5F(file_path)
+    file_content = H5File(file_path)
     # get base path in file
     iteration = list(file_content['/data'].keys())[0]
     base_path = '/data/{}'.format(iteration)
@@ -177,7 +177,7 @@ def read_hipace_beam(file_path, plasma_dens):
     particles.
     """
     s_d = plasma_skin_depth(plasma_dens)
-    file_content = H5F(file_path)
+    file_content = H5File(file_path)
     # get data
     q = np.array(file_content.get('q')) * ct.e
     x = np.array(file_content.get('x2')) * s_d
