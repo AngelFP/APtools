@@ -399,7 +399,6 @@ def rms_relative_uncorrelated_energy_spread(z, px, py, pz, w=1):
     dz = z - mean_z
     p = np.polyfit(dz, dE, 1)
     K = p[0]
-    #print(K)
     unc_ene = ene - K*dz
     unc_ene_sp = weighted_std(unc_ene, w)/mean_ene
     return unc_ene_sp
