@@ -18,7 +18,7 @@ def read_beam(code_name, file_path, reposition=False,
     -----------
     code_name : str
         Name of the tracking or PIC code of the data to read. Possible values
-        are 'csrtrack', 'astra', 'openpmd' and 'hipace'
+        are 'csrtrack', 'astra', 'openpmd', 'osiris' and 'hipace'
 
     file_path : str
         Path of the file containing the data
@@ -50,6 +50,7 @@ def read_beam(code_name, file_path, reposition=False,
     read_beam_from = {'csrtrack': read_csrtrack_data_fmt1,
                       'astra': read_astra_data,
                       'openpmd': read_openpmd_beam,
+                      'osiris': read_osiris_beam,
                       'hipace': read_hipace_beam}
     x, y, z, px, py, pz, q = read_beam_from[code_name](file_path, **kwargs)
     if reposition:
@@ -160,6 +161,37 @@ def read_openpmd_beam(file_path, species_name):
 
 def read_hipace_beam(file_path, plasma_dens):
     """Reads particle data from an HiPACE paricle file and returns it in the
+    unis used by APtools.
+
+    Parameters:
+    -----------
+    file_path : str
+        Path to the file with particle data
+
+    plasma_dens : float
+        Plasma density in units od cm^{-3} used to convert the beam data to
+        non-normalized units
+
+    Returns:
+    --------
+    A tuple with 7 arrays containing the 6D phase space and charge of the
+    particles.
+    """
+    s_d = plasma_skin_depth(plasma_dens)
+    file_content = H5File(file_path)
+    # get data
+    q = np.array(file_content.get('q')) * ct.e
+    x = np.array(file_content.get('x2')) * s_d
+    y = np.array(file_content.get('x3')) * s_d
+    z = np.array(file_content.get('x1')) * s_d
+    px = np.array(file_content.get('p2'))
+    py = np.array(file_content.get('p3'))
+    pz = np.array(file_content.get('p1'))
+    return x, y, z, px, py, pz, q
+
+
+def read_osiris_beam(file_path, plasma_dens):
+    """Reads particle data from an OSIRIS paricle file and returns it in the
     unis used by APtools.
 
     Parameters:
