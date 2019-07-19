@@ -395,12 +395,13 @@ def rms_relative_uncorrelated_energy_spread(z, px, py, pz, w=1):
     ene = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
     mean_ene = np.average(ene, weights=w)
     mean_z = np.average(z, weights=w)
-    dE_rel = (ene-mean_ene) / mean_ene
+    dE = ene-mean_ene
     dz = z - mean_z
-    p = np.polyfit(dz, dE_rel, 1)
+    p = np.polyfit(dz, dE, 1)
     K = p[0]
+    #print(K)
     unc_ene = ene - K*dz
-    unc_ene_sp = weighted_std(unc_ene, w)
+    unc_ene_sp = weighted_std(unc_ene, w)/mean_ene
     return unc_ene_sp
 
 
@@ -451,7 +452,7 @@ def rms_relative_uncorrelated_slice_energy_spread(z, px, py, pz, w=1,
             else:
                 w_slice = w
             slice_ene_sp[i] = rms_relative_uncorrelated_energy_spread(
-                z_slice, px_slice, py_slice, z_slice, w_slice)
+                z_slice, px_slice, py_slice, pz_slice, w_slice)
             slice_weight[i] = np.sum(w_slice)
     return slice_ene_sp, slice_weight, slice_lims
 
