@@ -392,15 +392,18 @@ def rms_relative_uncorrelated_energy_spread(z, px, py, pz, w=1):
     A float with the energy spread value in non-dimmensional units,
     i.e. [1/(m_e c**2)]
     """
-    ene = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
-    mean_ene = np.average(ene, weights=w)
-    mean_z = np.average(z, weights=w)
-    dE = ene-mean_ene
-    dz = z - mean_z
-    p = np.polyfit(dz, dE, 1)
-    K = p[0]
-    unc_ene = ene - K*dz
-    unc_ene_sp = weighted_std(unc_ene, w)/mean_ene
+    if len(z) > 1:
+        ene = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
+        mean_ene = np.average(ene, weights=w)
+        mean_z = np.average(z, weights=w)
+        dE = ene-mean_ene
+        dz = z - mean_z
+        p = np.polyfit(dz, dE, 1)
+        K = p[0]
+        unc_ene = ene - K*dz
+        unc_ene_sp = weighted_std(unc_ene, w)/mean_ene
+    else:
+        unc_ene_sp = 0
     return unc_ene_sp
 
 
