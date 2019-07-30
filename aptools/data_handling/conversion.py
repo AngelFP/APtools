@@ -57,8 +57,7 @@ def convert_beam(orig_code, final_code, orig_path, final_path, final_file_name,
         for some data readers. Currenlty, the only parameter is 'species_name',
         for reading data from PIC codes.
     """
-    x, y, z, px, py, pz, q = read_beam(orig_code, orig_path,
-                                       species_name=species_name)
+    x, y, z, px, py, pz, q = read_beam(orig_code, orig_path, **kwargs)
     beam_data = [x, y, z, px, py, pz, q]
     save_beam(final_code, beam_data, final_path, final_file_name, reposition,
               avg_pos, avg_mom, n_part)
