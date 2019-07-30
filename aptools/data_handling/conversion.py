@@ -7,7 +7,7 @@ from aptools.data_handling.saving import save_beam
 
 def convert_beam(orig_code, final_code, orig_path, final_path, final_file_name,
                  reposition=False, avg_pos=[None, None, None],
-                 avg_mom=[None, None, None], n_part=None, species_name=None):
+                 avg_mom=[None, None, None], n_part=None, **kwargs):
     """Converts particle data from one code to another.
 
     Parameters:
@@ -50,9 +50,12 @@ def convert_beam(orig_code, final_code, orig_path, final_path, final_file_name,
         Optional. Number of particles to save. Must be lower than the original
         number of particles. Particles to save are chosen randomly.
 
-    species_name : std
-        Only required for reading data from PIC codes. Name of the particle
-        species.
+    Other Parameters
+    ----------------
+    **kwargs
+        This method takes additional keyword parameters that might be needed
+        for some data readers. Currenlty, the only parameter is 'species_name',
+        for reading data from PIC codes.
     """
     x, y, z, px, py, pz, q = read_beam(orig_code, orig_path,
                                        species_name=species_name)
