@@ -180,8 +180,8 @@ def read_hipace_beam(file_path, plasma_dens):
     s_d = plasma_skin_depth(plasma_dens)
     file_content = H5File(file_path)
     # sim parameters
-    n_cells = file_handle.attrs['NX']
-    sim_size = (file_handle.attrs['XMAX'] - file_handle.attrs['XMIN'])
+    n_cells = file_content.attrs['NX']
+    sim_size = (file_content.attrs['XMAX'] - file_content.attrs['XMIN'])
     cell_vol = np.prod(sim_size/n_cells)
     q_norm = cell_vol * plasma_dens * 1e6 * s_d**3 * ct.e
     # get data
