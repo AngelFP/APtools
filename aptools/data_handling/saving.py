@@ -116,7 +116,7 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
         q_tot = np.sum(q_orig)
         q_part = q_tot/n_part
         i = np.arange(len(q_orig), dtype=np.int32)
-        i = np.random.choice(i, size=n_part)
+        i = np.random.choice(i, size=int(n_part))
         x_orig = x_orig[i]
         y_orig = y_orig[i]
         xi_orig = xi_orig[i]
