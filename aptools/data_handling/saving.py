@@ -115,7 +115,7 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
     if (n_part is not None and n_part < len(q_orig)):
         q_tot = np.sum(q_orig)
         q_part = q_tot/n_part
-        i = np.arange(len(q_orig), dtype=np.int32)
+        i = np.arange(len(q_orig))
         i = np.random.choice(i, size=int(n_part))
         x_orig = x_orig[i]
         y_orig = y_orig[i]
@@ -217,7 +217,7 @@ def save_for_astra(beam_data, folder_path, file_name, reposition=False,
         q_tot = np.sum(q_orig)
         q_part = q_tot/n_part
         i = np.arange(len(q_orig))
-        i = np.random.choice(i, size=n_part)
+        i = np.random.choice(i, size=int(n_part))
         x_orig = x_orig[i]
         y_orig = y_orig[i]
         xi_orig = xi_orig[i]
@@ -325,7 +325,7 @@ def save_for_fbpic(beam_data, folder_path, file_name, reposition=False,
         q_tot = np.sum(q)
         q_part = q_tot/n_part
         i = np.arange(len(q))
-        i = np.random.choice(i, size=n_part)
+        i = np.random.choice(i, size=int(n_part))
         x = x[i]
         y = y[i]
         xi = xi[i]
