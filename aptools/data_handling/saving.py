@@ -157,7 +157,7 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
     data = np.column_stack((xi, x, y, pz, px, py, q))
     file_name += '.fmt1'
     np.savetxt(path.join(folder_path, file_name), data,
-               '%1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %1.12e \r\n')
+               '%1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %1.12e')
 
 
 def save_for_astra(beam_data, folder_path, file_name, reposition=False,
