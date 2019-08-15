@@ -265,7 +265,7 @@ def save_for_astra(beam_data, folder_path, file_name, reposition=False,
     file_name += '.txt'
     np.savetxt(
         path.join(folder_path, file_name), data,
-        '%1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %i %i\r\n')
+        '%1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %1.12e %i %i')
 
 
 def save_for_fbpic(beam_data, folder_path, file_name, reposition=False,
@@ -338,4 +338,4 @@ def save_for_fbpic(beam_data, folder_path, file_name, reposition=False,
     data = np.column_stack((x, y, xi, px, py, pz))
     file_name += '.txt'
     np.savetxt(path.join(folder_path, file_name), data,
-               '%1.12e %1.12e %1.12e %1.12e %1.12e %1.12e\r\n')
+               '%1.12e %1.12e %1.12e %1.12e %1.12e %1.12e')
