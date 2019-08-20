@@ -3,6 +3,7 @@
 import numpy as np
 import scipy.constants as ct
 from scipy.stats import truncnorm
+
 import aptools.data_handling.saving as ds
 import aptools.data_analysis.beam_diagnostics as bd
 
