@@ -266,3 +266,4 @@ __pycache__/
 /APtools.egg-info
 /build/lib/aptools
 /dist
+/tests.py
