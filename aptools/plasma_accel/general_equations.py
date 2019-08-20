@@ -144,6 +144,30 @@ def laser_rayleigh_length(w_0, l_lambda):
     return ct.pi * w_0**2 / l_lambda
 
 
+def laser_radius_at_z_pos(w_0, l_lambda, z):
+    """Calculate the laser radius (W) at a distance z from its focal position.
+
+    Parameters:
+    -----------
+    w_0 : float
+        The laser beam waist in meters, i. e., 1/e in field or 1/e^2 in
+        intesity. Calculate from FWHM as FWHM/sqrt(2*log(2)).
+
+    l_lambda : float
+        The laser wavelength in meters.
+
+    z : float or array
+        Distance from the focal position (in meters) at which to calculate the
+        laser radius.
+
+    Returns:
+    --------
+    A float or array with laser radius (W) in meters
+    """
+    z_r = laser_rayleigh_length(w_0, l_lambda)
+    return w_0 * np.sqrt(1 + (z/z_r)**2)
+
+
 def self_guiding_threshold_a0_blowout(plasma_dens, l_lambda):
     """Get minimum a0 to fulfill self-guiding condition in the blowout regime.
 
@@ -212,8 +236,7 @@ def laser_energy(a_0, l_0, lon_fwhm, w_0):
         The laser a_0
 
     l_0 : float
-        The laser wavelength in meters. Only necessary to check that the
-        self-guiding threshold is met.
+        The laser wavelength in meters.
 
     lon_fwhm : float
         Longitudinal FWHM of the intensity in seconds.
@@ -234,6 +257,39 @@ def laser_energy(a_0, l_0, lon_fwhm, w_0):
     return l_ene
 
 
+def laser_peak_intensity(a_0, l_0, z=None, w_0=None):
+    """Calculate laser pulse peak intensity assuming Gaussian profile.
+
+    Parameters:
+    -----------
+    a_0 : float
+        The laser a_0.
+
+    l_0 : float
+        The laser wavelength in meters.
+
+    z : float or array
+        Distance to the focal position of the laser pulse.
+
+    w_0 : float
+        The laser beam waist in meters, i. e., 1/e in field or 1/e^2 in
+        intesity. Calculate from FWHM as FWHM/sqrt(2*log(2)). Only needed if
+        z is not None.
+
+    Returns:
+    --------
+    A float with the value of the peak power in W/m^2.
+    """
+    if z is not None:
+        z_r = laser_rayleigh_length(w_0, l_0)
+        a_peak = a_0 / np.sqrt(1 + (z/z_r)**2)
+    else:
+        a_peak = a_0
+    k = 2*np.pi**2*ct.epsilon_0*ct.m_e**2*ct.c**5
+    i_peak = k * a_peak**2 / (ct.e*l_0)**2
+    return i_peak
+
+
 def laser_peak_power(a_0, l_0, w_0):
     """Calculate laser pulse peak power assuming Gaussian profile.
 
@@ -243,8 +299,7 @@ def laser_peak_power(a_0, l_0, w_0):
         The laser a_0
 
     l_0 : float
-        The laser wavelength in meters. Only necessary to check that the
-        self-guiding threshold is met.
+        The laser wavelength in meters.
 
     w_0 : float
         The laser beam waist in meters, i. e., 1/e in field or 1/e^2 in
@@ -254,7 +309,7 @@ def laser_peak_power(a_0, l_0, w_0):
     --------
     A float with the value of the oeak power in Watts
     """
-    i_peak = 2*np.pi**2*ct.epsilon_0*ct.m_e**2*ct.c**5 * a_0**2 / (ct.e*l_0)**2
+    i_peak = laser_peak_intensity(a_0, l_0)
     p_peak = np.pi * w_0**2 * i_peak / 2
     return p_peak
 
