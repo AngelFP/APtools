@@ -11,8 +11,8 @@ import aptools.data_analysis.beam_diagnostics as bd
 def generate_gaussian_bunch_from_twiss(
         a_x, a_y, b_x, b_y, en_x, en_y, ene, ene_sp, s_t, q_tot, n_part, x_c=0,
         y_c=0, z_c=0, lon_profile='gauss', min_len_scale_noise=None,
-        sigma_trunc_lon=None, save_to_file=None, save_to_code='astra',
-        perform_checks=True):
+        sigma_trunc_lon=None, save_to_file=False, save_to_code='astra',
+        save_to_path=None, file_name=None, perform_checks=True):
     """
     Creates a transversely Gaussian particle bunch with the specified Twiss
     parameters.
@@ -79,14 +79,21 @@ def generate_gaussian_bunch_from_twiss(
         Only used when lon_profile = 'gauss' and required if
         min_len_scale_noise is specified.
 
-    save_to_file: string
-        (optional) If specified, the generated distribution will be saved to
-        the path specified with this variable.
+    save_to_file: bool
+        Whether to save the generated distribution to a file.
 
     save_to_code: string
         (optional) Name of the target code that will use the saved file.
         Possible values are 'csrtrack', 'astra' and 'fbpic'. Required if
-        save_to_file is specified.
+        save_to_file=True.
+
+    save_to_path: string
+        (optional) Path to the folder where to save the data. Required if
+        save_to_file=True.
+
+    file_name: string
+        (optional) Name of the file where to store the beam data. Required if
+        save_to_file=True.
 
     perform_checks: bool
         Whether to compute and print the parameters of the generated bunch.
@@ -140,9 +147,10 @@ def generate_gaussian_bunch_from_twiss(
     q = np.ones(n_part)*(q_tot/n_part)
     print('Done.')
     # Save to file
-    if save_to_file is not None:
+    if save_to_file:
         print('Saving to file... ', end='')
-        ds.save_beam(save_to_code, [x, y, z, px, py, pz, q], save_to_file)
+        ds.save_beam(
+            save_to_code, [x, y, z, px, py, pz, q], save_to_path, file_name)
         print('Done.')
     if perform_checks:
         _check_beam_parameters(x, y, z, px, py, pz, q)
