@@ -10,8 +10,8 @@ def convert_beam(orig_code, final_code, orig_path, final_path, final_file_name,
                  avg_mom=[None, None, None], n_part=None, **kwargs):
     """Converts particle data from one code to another.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     orig_code : str
         Name of the tracking or PIC code of the original data. Possible values
         are 'csrtrack', 'astra' and 'openpmd'
@@ -51,7 +51,7 @@ def convert_beam(orig_code, final_code, orig_path, final_path, final_file_name,
         number of particles. Particles to save are chosen randomly.
 
     Other Parameters
-    ----------------
+    --------------
     **kwargs
         This method takes additional keyword parameters that might be needed
         for some data readers. Currenlty, the only parameter is 'species_name',

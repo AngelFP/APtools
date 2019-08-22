@@ -8,13 +8,13 @@ import numpy as np
 def plasma_frequency(plasma_dens):
     """Calculate the plasma frequency from its densiy
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     plasma_dens : float
         The plasma density in units of cm-3
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with plasma frequency in units of 1/s
     """
     return np.sqrt(ct.e**2 * plasma_dens*1e6 / (ct.m_e*ct.epsilon_0))
@@ -23,13 +23,13 @@ def plasma_frequency(plasma_dens):
 def plasma_skin_depth(plasma_dens):
     """Calculate the plasma skin depth from its densiy
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     plasma_dens : float
         The plasma density in units of cm-3
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the plasma skin depth in meters
     """
     return ct.c / plasma_frequency(plasma_dens)
@@ -38,13 +38,13 @@ def plasma_skin_depth(plasma_dens):
 def plasma_wavelength(plasma_dens):
     """Calculate the plasma wavelength from its densiy
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     plasma_dens : float
         The plasma density in units of cm-3
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the plasma wavelength in meters
     """
     return 2*ct.pi*ct.c / plasma_frequency(plasma_dens)
@@ -54,13 +54,13 @@ def plasma_cold_non_relativisct_wave_breaking_field(plasma_dens):
     """Calculate the cold, non relativisitic wave breaking field from the
     plasma density.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     plasma_dens : float
         The plasma density in units of cm-3
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the field value in V/m
     """
     return ct.m_e*ct.c/ct.e * plasma_frequency(plasma_dens)
@@ -69,13 +69,13 @@ def plasma_cold_non_relativisct_wave_breaking_field(plasma_dens):
 def plasma_focusing_gradient_blowout(n_p):
     """Calculate the plasma focusing gradient assuming blowout regime
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     plasma_dens : float
         The plasma density in units of cm-3
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the focusing gradient value in T/m
     """
     return ct.m_e*plasma_frequency(n_p)**2 / (2*ct.e*ct.c)
@@ -84,8 +84,8 @@ def plasma_focusing_gradient_blowout(n_p):
 def plasma_focusing_gradient_linear(n_p, dist_from_driver, a_0, w_0):
     """Calculate the plasma focusing gradient assuming linear regime.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     plasma_dens : float
         The plasma density in units of cm-3
 
@@ -98,8 +98,8 @@ def plasma_focusing_gradient_linear(n_p, dist_from_driver, a_0, w_0):
     w_0 : float
         Spot size (w_0) of the laser pulse in units of m.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the focusing gradient value in T/m.
 
     """
@@ -113,13 +113,13 @@ def plasma_focusing_gradient_linear(n_p, dist_from_driver, a_0, w_0):
 def laser_frequency(l_lambda):
     """Calculate the laser frequency from its wavelength.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     l_lambda : float
         The laser wavelength in meters
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with laser frequency in units of 1/s
     """
     return 2*ct.pi*ct.c / l_lambda
@@ -128,8 +128,8 @@ def laser_frequency(l_lambda):
 def laser_rayleigh_length(w_0, l_lambda):
     """Calculate the Rayleigh length of the laser assuming a Gaussian profile.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     w_0 : float
         The laser beam waist in meters, i. e., 1/e in field or 1/e^2 in
         intesity. Calculate from FWHM as FWHM/sqrt(2*log(2)).
@@ -137,8 +137,8 @@ def laser_rayleigh_length(w_0, l_lambda):
     l_lambda : float
         The laser wavelength in meters
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with Rayleigh length in m
     """
     return ct.pi * w_0**2 / l_lambda
@@ -147,8 +147,8 @@ def laser_rayleigh_length(w_0, l_lambda):
 def laser_radius_at_z_pos(w_0, l_lambda, z):
     """Calculate the laser radius (W) at a distance z from its focal position.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     w_0 : float
         The laser beam waist in meters, i. e., 1/e in field or 1/e^2 in
         intesity. Calculate from FWHM as FWHM/sqrt(2*log(2)).
@@ -160,8 +160,8 @@ def laser_radius_at_z_pos(w_0, l_lambda, z):
         Distance from the focal position (in meters) at which to calculate the
         laser radius.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float or array with laser radius (W) in meters
     """
     z_r = laser_rayleigh_length(w_0, l_lambda)
@@ -174,16 +174,16 @@ def self_guiding_threshold_a0_blowout(plasma_dens, l_lambda):
     For more details see W. Lu - 2007 - Designing LWFA in the blowout regime
     (https://ieeexplore.ieee.org/iel5/4439904/4439905/04440664.pdf).
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     plasma_dens : float
         The plasma density in units of cm-3
 
     l_lambda : float
         The laser wavelength in meters
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the value of the threshold a0
     """
     w_p = plasma_frequency(plasma_dens)
@@ -199,8 +199,8 @@ def plasma_density_for_self_guiding_blowout(w_0, a_0, l_0=None):
     using single stage laser wakeﬁeld acceleration in a 3D nonlinear regime
     (https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.10.061301)
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     w_0 : float
         The laser beam waist in meters, i. e., 1/e in field or 1/e^2 in
         intesity. Calculate from FWHM as FWHM/sqrt(2*log(2)).
@@ -212,8 +212,8 @@ def plasma_density_for_self_guiding_blowout(w_0, a_0, l_0=None):
         The laser wavelength in meters. Only necessary to check that the
         self-guiding threshold is met.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the value of the plasma density in units of cm-3
     """
     k_p = 2 * np.sqrt(a_0)/w_0
@@ -230,8 +230,8 @@ def plasma_density_for_self_guiding_blowout(w_0, a_0, l_0=None):
 def laser_energy(a_0, l_0, lon_fwhm, w_0):
     """Calculate laser pulse energy assuming Gaussian profile.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     a_0 : float
         The laser a_0
 
@@ -245,8 +245,8 @@ def laser_energy(a_0, l_0, lon_fwhm, w_0):
         The laser beam waist in meters, i. e., 1/e in field or 1/e^2 in
         intesity. Calculate from FWHM as FWHM/sqrt(2*log(2)).
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the value of the energy in Joules
     """
     i_peak = 2*np.pi**2*ct.epsilon_0*ct.m_e**2*ct.c**5 * a_0**2 / (ct.e*l_0)**2
@@ -260,8 +260,8 @@ def laser_energy(a_0, l_0, lon_fwhm, w_0):
 def laser_peak_intensity(a_0, l_0, z=None, w_0=None):
     """Calculate laser pulse peak intensity assuming Gaussian profile.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     a_0 : float
         The laser a_0.
 
@@ -276,8 +276,8 @@ def laser_peak_intensity(a_0, l_0, z=None, w_0=None):
         intesity. Calculate from FWHM as FWHM/sqrt(2*log(2)). Only needed if
         z is not None.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the value of the peak power in W/m^2.
     """
     if z is not None:
@@ -293,8 +293,8 @@ def laser_peak_intensity(a_0, l_0, z=None, w_0=None):
 def laser_peak_power(a_0, l_0, w_0):
     """Calculate laser pulse peak power assuming Gaussian profile.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     a_0 : float
         The laser a_0
 
@@ -305,8 +305,8 @@ def laser_peak_power(a_0, l_0, w_0):
         The laser beam waist in meters, i. e., 1/e in field or 1/e^2 in
         intesity. Calculate from FWHM as FWHM/sqrt(2*log(2)).
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the value of the oeak power in Watts
     """
     i_peak = laser_peak_intensity(a_0, l_0)
@@ -321,8 +321,8 @@ def laser_w0_for_self_guiding_blowout(n_p, a_0, l_0=None):
     bunches using single stage laser wakeﬁeld acceleration in a 3D nonlinear
     regime (https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.10.061301)
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     n_p : float
         The plasma density in units of cm-3
 
@@ -333,8 +333,8 @@ def laser_w0_for_self_guiding_blowout(n_p, a_0, l_0=None):
         The laser wavelength in meters. Only necessary to check that the
         self-guiding threshold is met.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the value of w_0 in meters
     """
     k_p = plasma_frequency(n_p) / ct.c
@@ -354,16 +354,16 @@ def matched_laser_pulse_duration_blowout(n_p, a_0):
     For more details see W. Lu - 2007 - Designing LWFA in the blowout regime
     (https://ieeexplore.ieee.org/iel5/4439904/4439905/04440664.pdf).
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     n_p : float
         The plasma density in units of cm-3
 
     a_0 : float
         The laser a_0
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the value of t_FWHM in seconds
     """
     k_p = plasma_frequency(n_p) / ct.c
@@ -377,8 +377,8 @@ def matched_beam_size(beam_ene, beam_em, n_p=None, k_x=None):
     The focusing gradient, k_x, can be provided or calculated from the plasma
     density, n_p.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     beam_ene : float
         Unitless electron beam mean energy (beta*gamma)
 
@@ -391,8 +391,8 @@ def matched_beam_size(beam_ene, beam_em, n_p=None, k_x=None):
     k_x : float
         The plasma transverse focusing gradient in T/m
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the value of beam size in meters
     """
     # matched beta function
@@ -410,8 +410,8 @@ def matched_plasma_beta_function(beam_ene, n_p=None, k_x=None,
     The focusing gradient, k_x, can be provided or calculated from the plasma
     density, n_p.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     beam_ene : float
         Unitless electron beam mean energy (beta*gamma)
 
@@ -437,8 +437,8 @@ def matched_plasma_beta_function(beam_ene, n_p=None, k_x=None,
         Spot size (w_0) of the laser pulse in units of m. Only needed for
         Linear regime.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the value of the beta function in meters
 
     """
@@ -467,8 +467,8 @@ def maximum_wakefield_plasma_lens(q_tot, s_z, s_r, n_p):
 
     Formula obtained from https://arxiv.org/pdf/1802.02750.pdf
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     q_tot : float
         Total beam charge in C
 
@@ -481,8 +481,8 @@ def maximum_wakefield_plasma_lens(q_tot, s_z, s_r, n_p):
     n_p : float
         The plasma density in units of cm-3
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the value of the focusing gradient in T/m
     """
     k_p = 1 / plasma_skin_depth(n_p)

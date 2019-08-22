@@ -14,8 +14,8 @@ def read_beam(code_name, file_path, reposition=False,
               **kwargs):
     """Reads particle data from the specified code.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     code_name : str
         Name of the tracking or PIC code of the data to read. Possible values
         are 'csrtrack', 'astra', 'openpmd', 'osiris' and 'hipace'
@@ -41,7 +41,7 @@ def read_beam(code_name, file_path, reposition=False,
         Setting a component as None prevents repositioning in that coordinate.
 
     Other Parameters
-    ----------------
+    --------------
     **kwargs
         This method takes additional keyword parameters that might be needed
         for some data readers. Possible parameters are 'species_name' and
@@ -62,13 +62,13 @@ def read_csrtrack_data_fmt1(file_path):
     """Reads particle data from CSRtrack in fmt1 format and returns it in the
     unis used by APtools.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     file_path : str
         Path to the file with particle data
 
-    Returns:
-    --------
+    Returns
+    -------
     A tuple with 7 arrays containing the 6D phase space and charge of the
     particles.
     """
@@ -93,13 +93,13 @@ def read_astra_data(file_path):
     """Reads particle data from ASTRA and returns it in the unis used by
     APtools.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     file_path : str
         Path to the file with particle data
 
-    Returns:
-    --------
+    Returns
+    -------
     A tuple with 7 arrays containing the 6D phase space and charge of the
     particles.
     """
@@ -120,16 +120,16 @@ def read_openpmd_beam(file_path, species_name):
     """Reads particle data from a h5 file following the openPMD standard and
     returns it in the unis used by APtools.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     file_path : str
         Path to the file with particle data
 
     species_name : str
         Name of the particle species
 
-    Returns:
-    --------
+    Returns
+    -------
     A tuple with 7 arrays containing the 6D phase space and charge of the
     particles.
     """
@@ -163,8 +163,8 @@ def read_hipace_beam(file_path, plasma_dens):
     """Reads particle data from an HiPACE paricle file and returns it in the
     unis used by APtools.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     file_path : str
         Path to the file with particle data
 
@@ -172,8 +172,8 @@ def read_hipace_beam(file_path, plasma_dens):
         Plasma density in units od cm^{-3} used to convert the beam data to
         non-normalized units
 
-    Returns:
-    --------
+    Returns
+    -------
     A tuple with 7 arrays containing the 6D phase space and charge of the
     particles.
     """
@@ -199,8 +199,8 @@ def read_osiris_beam(file_path, plasma_dens):
     """Reads particle data from an OSIRIS paricle file and returns it in the
     unis used by APtools.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     file_path : str
         Path to the file with particle data
 
@@ -208,8 +208,8 @@ def read_osiris_beam(file_path, plasma_dens):
         Plasma density in units od cm^{-3} used to convert the beam data to
         non-normalized units
 
-    Returns:
-    --------
+    Returns
+    -------
     A tuple with 7 arrays containing the 6D phase space and charge of the
     particles.
     """

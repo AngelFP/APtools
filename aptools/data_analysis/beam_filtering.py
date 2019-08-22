@@ -6,8 +6,8 @@ import numpy as np
 def filter_beam(beam_matrix, min_range, max_range):
     """Filter the beam particles keeping only those within a given range.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     beam_matrix : array
         M x N matrix containing all M components of the N particles.
 
@@ -19,8 +19,8 @@ def filter_beam(beam_matrix, min_range, max_range):
         Array of size M with the maximum value for each given component. For
         values which are 'None' no filtering is performed.
 
-    Returns:
-    --------
+    Returns
+    -------
     A M x N' matrix containing the particles within the given range. N' is the
     number of particles after filtering.
     """

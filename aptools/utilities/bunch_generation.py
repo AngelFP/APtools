@@ -17,8 +17,8 @@ def generate_gaussian_bunch_from_twiss(
     Creates a transversely Gaussian particle bunch with the specified Twiss
     parameters.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     a_x : float
         Alpha parameter in the x-plane.
 
@@ -98,8 +98,8 @@ def generate_gaussian_bunch_from_twiss(
     perform_checks: bool
         Whether to compute and print the parameters of the generated bunch.
 
-    Returns:
-    --------
+    Returns
+    -------
     The 6D components and charge of the bunch in 7 arrays.
 
     """

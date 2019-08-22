@@ -7,8 +7,8 @@ def create_beam_slices(z, n_slices=10, len_slice=None):
     """Calculates the slice limits along z of a partile distribution for a
     given number of slices or slice length.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     z : array
         Contains the longitudinal position of the particles in units of meters
 
@@ -19,8 +19,8 @@ def create_beam_slices(z, n_slices=10, len_slice=None):
     len_slice : array
         Length of the longitudinal slices. If not None, replaces n_slices.
 
-    Returns:
-    --------
+    Returns
+    -------
     A tuple containing an array with the slice limits and integer with the
     number of slices, which might have been redefined.
     """
@@ -38,16 +38,16 @@ def create_beam_slices(z, n_slices=10, len_slice=None):
 def weighted_std(values, weights=1):
     """Calculates the weighted standard deviation of the given values
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     values: array
         Contains the values to be analyzed
 
     weights : array
         Contains the weights of the values to analyze
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the value of the standard deviation
     """
     mean_val = np.average(values, weights=np.abs(weights))
@@ -59,8 +59,8 @@ def slope_of_correlation(y, x, w=None):
     """Calculates the slope of the correlation between two variables x and y
     according to y = slope*x
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     y: array
         Contains the x values
 
@@ -70,8 +70,8 @@ def slope_of_correlation(y, x, w=None):
     w : array
         Contains the weights of the values
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the value of the slope
     """
     a = np.average(y*x, weights=w)
@@ -85,8 +85,8 @@ def remove_correlation(x, y, w=None, order=1):
     """Removes the correlation between two variables x and y, where y=y(x), up
     to the desired order.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     y: array
         Contains the x values
 
@@ -100,8 +100,8 @@ def remove_correlation(x, y, w=None, order=1):
         Determines the order of the polynomial fit and, thus, the higher
         correlaton order to remove.
 
-    Returns:
-    --------
+    Returns
+    -------
     An array containing the new values of y
     """
     fit_coefs = np.polyfit(x, y, order, w=w)
@@ -126,12 +126,12 @@ def join_infile_path(*paths):
     as separator in Windows environments and is therefore not valid to navigate
     within data files.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     *paths: all strings with path components to join
 
-    Returns:
-    --------
+    Returns
+    -------
     A string with the complete path using '/' as separator.
     """
     # Join path components
@@ -146,16 +146,16 @@ def filter_nans(data, data_weights):
     Removes NaN values from a data array and is corresponding value in the
     weights array.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     data: array
         Array containing the data to filter.
 
     data_weights: array
         Array with the same size as data containing the weights.
 
-    Returns:
-    --------
+    Returns
+    -------
     Filtered data and data_weights arrays.
     """
     filter_idx = np.isfinite(data)

@@ -14,8 +14,8 @@ def save_beam(code_name, beam_data, folder_path, file_name, reposition=False,
               n_part=None):
     """Converts particle data from one code to another.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     code_name : str
         Name of the target tracking or PIC code. Possible values are
         'csrtrack', 'astra' and 'fbpic'
@@ -64,8 +64,8 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
                            avg_mom=[None, None, None], n_part=None):
     """Saves particle data for CSRtrack in fmt1 format.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     beam_data : list
         Contains the beam data as [x, y, z, px, py, pz, q], where the positions
         have units of meters, momentun is in non-dimensional units (beta*gamma)
@@ -165,8 +165,8 @@ def save_for_astra(beam_data, folder_path, file_name, reposition=False,
                    n_part=None):
     """Saves particle data in ASTRA format.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     beam_data : list
         Contains the beam data as [x, y, z, px, py, pz, q], where the positions
         have units of meters, momentun is in non-dimensional units (beta*gamma)
@@ -273,8 +273,8 @@ def save_for_fbpic(beam_data, folder_path, file_name, reposition=False,
                    n_part=None):
     """Saves particle data in in a format that can be read by FBPIC.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     beam_data : list
         Contains the beam data as [x, y, z, px, py, pz, q], where the positions
         have units of meters, momentun is in non-dimensional units (beta*gamma)

@@ -12,8 +12,8 @@ def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
     """Calculate the alpha and beta functions of the beam in a certain
     transverse plane
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : array
         Contains the transverse position of the particles in one of the
         transverse planes in units of meters
@@ -45,8 +45,8 @@ def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
     corr_order : int
         Highest order up to which dispersion effects should be corrected.
 
-    Returns:
-    --------
+    Returns
+    -------
     A tuple with the value of the alpha, beta [m] and gamma [m^-1] functions
     """
     if emitt == 'ph':
@@ -91,8 +91,8 @@ def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
 def dispersion(x, px, py, pz, gamma_ref=None, w=1):
     """Calculate the first-order dispersion from the beam distribution
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : array
         Contains the transverse position of the particles in one of the
         transverse planes in units of meters
@@ -116,8 +116,8 @@ def dispersion(x, px, py, pz, gamma_ref=None, w=1):
     w : array or single value
         Statistical weight of the particles.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the value of the dispersion in m.
     """
     gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
@@ -133,16 +133,16 @@ def rms_length(z, w=1):
     """Calculate the RMS bunch length of the provided particle
     distribution
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     z : array
         Contains the longitudinal position of the particles in units of meters
 
     w : array or single value
         Statistical weight of the particles.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the RMS length value in meters.
     """
     s_z = weighted_std(z, weights=w)
@@ -153,16 +153,16 @@ def rms_size(x, w=1):
     """Calculate the RMS bunch size of the provided particle
     distribution
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : array
         Contains the transverse position of the particles in units of meters
 
     w : array or single value
         Statistical weight of the particles.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the RMS length value in meters.
     """
     s_x = weighted_std(x, weights=w)
@@ -172,8 +172,8 @@ def rms_size(x, w=1):
 def mean_kinetic_energy(px, py, pz, w=1):
     """Calculate the mean kinetic energy of the provided particle distribution
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     px : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
@@ -189,8 +189,8 @@ def mean_kinetic_energy(px, py, pz, w=1):
     w : array or single value
         Statistical weight of the particles.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the mean kinetic energy in non-dimmensional
     units, i.e. [1/(m_e c**2)]
     """
@@ -201,8 +201,8 @@ def mean_kinetic_energy(px, py, pz, w=1):
 def mean_energy(px, py, pz, w=1):
     """Calculate the mean energy of the provided particle distribution
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     px : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
@@ -218,8 +218,8 @@ def mean_energy(px, py, pz, w=1):
     w : array or single value
         Statistical weight of the particles.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the mean energy in non-dimmensional units, i.e. [1/(m_e c**2)]
     """
     kin_ene = mean_kinetic_energy(px, py, pz, w)
@@ -230,8 +230,8 @@ def rms_energy_spread(px, py, pz, w=1):
     """Calculate the absotule RMS energy spread of the provided particle
     distribution
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     px : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
@@ -247,8 +247,8 @@ def rms_energy_spread(px, py, pz, w=1):
     w : array or single value
         Statistical weight of the particles.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the energy spread value in non-dimmensional units,
     i.e. [1/(m_e c**2)]
     """
@@ -261,8 +261,8 @@ def relative_rms_energy_spread(px, py, pz, w=1):
     """Calculate the relative RMS energy spread of the provided particle
     distribution
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     px : array
         Contains the transverse momentum in the x direction of the
         beam particles in non-dimmensional units (beta*gamma)
@@ -278,8 +278,8 @@ def relative_rms_energy_spread(px, py, pz, w=1):
     w : array or single value
         Statistical weight of the particles.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the relative energy spread value.
     """
     abs_spread = rms_energy_spread(px, py, pz, w)
@@ -292,8 +292,8 @@ def longitudinal_energy_chirp(z, px, py, pz, w=1):
     """Calculate the longitudinal energy chirp, K, of the provided particle
     distribution in units of m**(-1). It is defined as dE/<E> = K*dz.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     z : array
         Contains the longitudinal position of the particles in units of meters
 
@@ -312,8 +312,8 @@ def longitudinal_energy_chirp(z, px, py, pz, w=1):
     w : array or single value
         Statistical weight of the particles.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the chirp value in units of m^(-1)
     """
     ene = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
@@ -330,8 +330,8 @@ def rms_relative_correlated_energy_spread(z, px, py, pz, w=1):
     """Calculate the correlated energy spread of the provided particle
     distribution
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     z : array
         Contains the longitudinal position of the particles in units of meters
 
@@ -350,8 +350,8 @@ def rms_relative_correlated_energy_spread(z, px, py, pz, w=1):
     w : array or single value
         Statistical weight of the particles.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the energy spread value in non-dimmensional units,
     i.e. [1/(m_e c**2)]
     """
@@ -367,8 +367,8 @@ def rms_relative_uncorrelated_energy_spread(z, px, py, pz, w=1):
     """Calculate the uncorrelated energy spread of the provided particle
     distribution
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     z : array
         Contains the longitudinal position of the particles in units of meters
 
@@ -387,8 +387,8 @@ def rms_relative_uncorrelated_energy_spread(z, px, py, pz, w=1):
     w : array or single value
         Statistical weight of the particles.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the energy spread value in non-dimmensional units,
     i.e. [1/(m_e c**2)]
     """
@@ -412,8 +412,8 @@ def rms_relative_uncorrelated_slice_energy_spread(z, px, py, pz, w=1,
     """Calculate the uncorrelated energy spread of the provided particle
     distribution
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     z : array
         Contains the longitudinal position of the particles in units of meters
 
@@ -432,8 +432,8 @@ def rms_relative_uncorrelated_slice_energy_spread(z, px, py, pz, w=1,
     w : array or single value
         Statistical weight of the particles.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the energy spread value in non-dimmensional units,
     i.e. [1/(m_e c**2)]
     """
@@ -464,8 +464,8 @@ def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=1,
     """Calculate the normalized transverse RMS emittance without dispersion
     contributions of the particle distribution in a given plane.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : array
         Contains the transverse position of the particles in one of the
         transverse planes in units of meters
@@ -492,8 +492,8 @@ def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=1,
     corr_order : int
         Highest order up to which dispersion effects should be corrected.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the emmitance value in units of m * rad
     """
     if len(x) > 1:
@@ -515,8 +515,8 @@ def geometric_transverse_rms_emittance(x, px, py, pz, w=1,
     """Calculate the geometric transverse RMS emittance without dispersion
     contributions of the particle distribution in a given plane.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : array
         Contains the transverse position of the particles in one of the
         transverse planes in units of meters
@@ -536,8 +536,8 @@ def geometric_transverse_rms_emittance(x, px, py, pz, w=1,
     corr_order : int
         Highest order up to which dispersion effects should be corrected.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the emmitance value in units of m * rad
     """
     gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
@@ -552,8 +552,8 @@ def normalized_transverse_trace_space_rms_emittance(
     """Calculate the normalized trasnverse trace-space RMS emittance of the
     particle distribution in a given plane.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : array
         Contains the transverse position of the particles in one of the
         transverse planes in units of meters
@@ -579,8 +579,8 @@ def normalized_transverse_trace_space_rms_emittance(
     corr_order : int
         Highest order up to which dispersion effects should be corrected.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the emmitance value in units of m * rad
     """
     gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
@@ -595,8 +595,8 @@ def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=1,
     """Calculate the trasnverse trace-space RMS emittance of the
     particle distribution in a given plane.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : array
         Contains the transverse position of the particles in one of the
         transverse planes in units of meters
@@ -623,8 +623,8 @@ def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=1,
     corr_order : int
         Highest order up to which dispersion effects should be corrected.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the emmitance value in units of m * rad
     """
     if len(x) > 1:
@@ -648,8 +648,8 @@ def longitudinal_rms_emittance(z, px, py, pz, w=1):
     """Calculate the longitudinal RMS emittance of the particle
     distribution in a given plane.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     z : array
         Contains the longitudinal position of the particles in units of meters
 
@@ -668,8 +668,8 @@ def longitudinal_rms_emittance(z, px, py, pz, w=1):
     w : array or single value
         Statistical weight of the particles.
 
-    Returns:
-    --------
+    Returns
+    -------
     A float with the emmitance value in units of m
     """
     g = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
@@ -683,8 +683,8 @@ def relative_rms_slice_energy_spread(z, px, py, pz, w=1, n_slices=10,
     """Calculate the relative RMS slice energy spread of the provided particle
     distribution
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     z : array
         Contains the longitudinal position of the particles in units of meters
 
@@ -710,8 +710,8 @@ def relative_rms_slice_energy_spread(z, px, py, pz, w=1, n_slices=10,
     len_slice : array
         Length of the longitudinal slices. If not None, replaces n_slices.
 
-    Returns:
-    --------
+    Returns
+    -------
     A tuple containing:
     - An array with the relative energy spread value in each slice.
     - An array with the statistical weight of each slice.
@@ -744,8 +744,8 @@ def normalized_transverse_rms_slice_emittance(
     """Calculate the normalized transverse RMS slice emittance of the particle
     distribution in a given plane.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     z : array
         Contains the longitudinal position of the particles in units of meters
 
@@ -782,8 +782,8 @@ def normalized_transverse_rms_slice_emittance(
     len_slice : array
         Length of the longitudinal slices. If not None, replaces n_slices.
 
-    Returns:
-    --------
+    Returns
+    -------
     A tuple containing:
     - An array with the emmitance value in each slice in units of m * rad.
     - An array with the statistical weight of each slice.
@@ -826,8 +826,8 @@ def normalized_transverse_rms_slice_emittance(
 def current_profile(z, q, n_slices=10, len_slice=None):
     """Calculate the current profile of the given particle distribution.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     z : array
         Contains the longitudinal position of the particles in units of meters
 
@@ -841,8 +841,8 @@ def current_profile(z, q, n_slices=10, len_slice=None):
     len_slice : array
         Length of the longitudinal slices. If not None, replaces n_slices.
 
-    Returns:
-    --------
+    Returns
+    -------
     A tuple containing:
     - An array with the current of each slice in units of A.
     - An array with the slice edges along z.
@@ -862,8 +862,8 @@ def current_profile(z, q, n_slices=10, len_slice=None):
 def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6):
     """Quick method to analyze the most relevant beam parameters at once.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     x : array
         Contains the transverse position of the particles in the x
         transverse plane in units of meter
@@ -893,8 +893,8 @@ def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6):
     len_slice : array
         Length of the longitudinal slices.
 
-    Returns:
-    --------
+    Returns
+    -------
     A tuple containing the centroid position, pointing angle, Twiss parameters,
     bunch length, divergence, energy and the total and slice emittance and
     energy spread.
