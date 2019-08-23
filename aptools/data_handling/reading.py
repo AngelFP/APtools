@@ -41,7 +41,7 @@ def read_beam(code_name, file_path, reposition=False,
         Setting a component as None prevents repositioning in that coordinate.
 
     Other Parameters
-    --------------
+    ----------------
     **kwargs
         This method takes additional keyword parameters that might be needed
         for some data readers. Possible parameters are 'species_name' and
