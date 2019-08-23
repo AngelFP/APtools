@@ -180,7 +180,7 @@ def generate_from_file_modifying_twiss(
     read_kwargs: dict
         Dictionary containing optional parameters for the read_beam function.
 
-    
+
     save_to_file: bool
         Whether to save the generated distribution to a file.
 
@@ -202,7 +202,7 @@ def generate_from_file_modifying_twiss(
 
     perform_checks: bool
         Whether to compute and print the parameters of the generated bunch.
-    
+
     Returns
     -------
     A tuple with 7 arrays containing the 6D components and charge of the

@@ -3,8 +3,7 @@ distributions"""
 
 import numpy as np
 
-from aptools.data_analysis.beam_diagnostics import (twiss_parameters,
-                                                    general_analysis)
+from aptools.data_analysis.beam_diagnostics import twiss_parameters
 
 
 def modify_twiss_parameters_all_beam(beam_data, betax_target=None,
@@ -135,10 +134,10 @@ def modify_twiss_parameters(x, px, pz, weights=None, beta_target=None,
     M11 = np.sqrt(bx/bx_0)
     M22 = np.sqrt(bx_0/bx)
     M21 = (M22*ax_0 - ax/M11)/bx_0
-    M = np.zeros((2,2))
-    M[0,0] = M11
-    M[1,0] = M21
-    M[1,1] = M22
+    M = np.zeros((2, 2))
+    M[0, 0] = M11
+    M[1, 0] = M21
+    M[1, 1] = M22
     # Apply transform matrix
     xp = px/pz
     x_new, xp_new = M.dot(np.vstack((x, xp)))
