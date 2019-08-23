@@ -7,6 +7,58 @@ from aptools.data_analysis.beam_diagnostics import (twiss_parameters,
                                                     general_analysis)
 
 
+def modify_twiss_parameters_all_beam(beam_data, betax_target=None,
+                                     alphax_target=None, gammax_target=None,
+                                     betay_target=None, alphay_target=None,
+                                     gammay_target=None):
+    """
+    Modifies the transverse distribution of a particle bunch in both transverse
+    planes so that it has the specified Twiss parameters.
+
+    Parameters
+    ----------
+    beam_data: iterable
+        List, tuple or array containing the beam data arrays as
+        [x, y, z, px, py, pz, q].
+
+    betax_target: float
+        Target beta in the x-plane (horizontal) of the resulting distribution.
+        Not necessary if alphax_target and gammax_target are already provided.
+
+    alphax_target: float
+        Target alpha in the x-plane (horizontal) of the resulting distribution.
+        Not necessary if betax_target and gammax_target are already provided.
+
+    gammax_target: float
+        Target gamma in the x-plane (horizontal) of the resulting distribution.
+        Not necessary if betax_target and alphax_target are already provided.
+
+    betay_target: float
+        Target beta in the y-plane (vertical) of the resulting distribution.
+        Not necessary if alphay_target and gammay_target are already provided.
+
+    alphay_target: float
+        Target alpha in the y-plane (vertical) of the resulting distribution.
+        Not necessary if betay_target and gammay_target are already provided.
+
+    gammay_target: float
+        Target gamma in the y-plane (vertical) of the resulting distribution.
+        Not necessary if betay_target and alphay_target are already provided.
+
+    Returns
+    -------
+    A tuple with 7 arrays containing the 6D components and charge of the
+    modified distribution.
+
+    """
+    x, y, z, px, py, pz, q = beam_data
+    x, px = modify_twiss_parameters(x, px, pz, q, betax_target, alphax_target,
+                                    gammax_target)
+    y, py = modify_twiss_parameters(y, py, pz, q, betay_target, alphay_target,
+                                    gammay_target)
+    return x, y, z, px, py, pz, q
+
+
 def modify_twiss_parameters(x, px, pz, weights=None, beta_target=None,
                             alpha_target=None, gamma_target=None):
     """
@@ -91,10 +143,4 @@ def modify_twiss_parameters(x, px, pz, weights=None, beta_target=None,
     xp = px/pz
     x_new, xp_new = M.dot(np.vstack((x, xp)))
     px_new = xp_new*pz
-    ax_n, bx_n, gx_n = twiss_parameters(x_new, px_new, pz, w=weights)
-    print('New beam parameters:')
-    print('-'*80)
-    print('alpha_x = {:1.2e}'.format(ax_n))
-    print('beta_x = {:1.2e}'.format(bx_n))
-    print('gamma_x = {:1.2e}'.format(gx_n))
     return x_new, px_new
