@@ -4,15 +4,17 @@ import numpy as np
 import scipy.constants as ct
 from scipy.stats import truncnorm
 
+import aptools.data_handling.reading as dr
 import aptools.data_handling.saving as ds
 import aptools.data_analysis.beam_diagnostics as bd
+import aptools.data_processing.beam_operations as bo
 
 
 def generate_gaussian_bunch_from_twiss(
         a_x, a_y, b_x, b_y, en_x, en_y, ene, ene_sp, s_t, q_tot, n_part, x_c=0,
         y_c=0, z_c=0, lon_profile='gauss', min_len_scale_noise=None,
         sigma_trunc_lon=None, save_to_file=False, save_to_code='astra',
-        save_to_path=None, file_name=None, perform_checks=True):
+        save_to_path=None, file_name=None, perform_checks=False):
     """
     Creates a transversely Gaussian particle bunch with the specified Twiss
     parameters.
@@ -152,6 +154,76 @@ def generate_gaussian_bunch_from_twiss(
         ds.save_beam(
             save_to_code, [x, y, z, px, py, pz, q], save_to_path, file_name)
         print('Done.')
+    if perform_checks:
+        _check_beam_parameters(x, y, z, px, py, pz, q)
+    return x, y, z, px, py, pz, q
+
+
+def generate_from_file_modifying_twiss(
+        code_name, file_path, read_kwargs={}, alphax_target=None,
+        betax_target=None, alphay_target=None, betay_target=None,
+        save_to_file=False, save_to_code='astra', save_to_path=None,
+        file_name=None, save_kwargs={}, perform_checks=False):
+    """
+    Creates a transversely Gaussian particle bunch with the specified Twiss
+    parameters.
+
+    Parameters
+    ----------
+    code_name: str
+        Name of the tracking or PIC code of the data to read. Possible values
+        are 'csrtrack', 'astra', 'openpmd', 'osiris' and 'hipace'
+
+    file_path: str
+        Path of the file containing the data
+
+    read_kwargs: dict
+        Dictionary containing optional parameters for the read_beam function.
+
+    
+    save_to_file: bool
+        Whether to save the generated distribution to a file.
+
+    save_to_code: string
+        (optional) Name of the target code that will use the saved file.
+        Possible values are 'csrtrack', 'astra' and 'fbpic'. Required if
+        save_to_file=True.
+
+    save_to_path: string
+        (optional) Path to the folder where to save the data. Required if
+        save_to_file=True.
+
+    file_name: string
+        (optional) Name of the file where to store the beam data. Required if
+        save_to_file=True.
+
+    save_kwargs: dict
+        Dictionary containing optional parameters for the save_beam function.
+
+    perform_checks: bool
+        Whether to compute and print the parameters of the generated bunch.
+    
+    Returns
+    -------
+    A tuple with 7 arrays containing the 6D components and charge of the
+    modified distribution.
+
+    """
+    # Read distribution
+    x, y, z, px, py, pz, q = dr.read_beam(code_name, file_path, **read_kwargs)
+    # Modify Twiss parameters
+    x, y, z, px, py, pz, q = bo.modify_twiss_parameters_all_beam(
+        [x, y, z, px, py, pz, q], alphax_target=alphax_target,
+        betax_target=betax_target, alphay_target=alphay_target,
+        betay_target=betay_target)
+    # Save to file
+    if save_to_file:
+        print('Saving to file... ', end='')
+        ds.save_beam(
+            save_to_code, [x, y, z, px, py, pz, q], save_to_path, file_name,
+            **save_kwargs)
+        print('Done.')
+        # Perform checks
     if perform_checks:
         _check_beam_parameters(x, y, z, px, py, pz, q)
     return x, y, z, px, py, pz, q
