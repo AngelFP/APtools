@@ -86,11 +86,11 @@ def generate_gaussian_bunch_from_twiss(
         The sigma of the Gaussian longitudinal smoothing applied to the
         flat-top profile when lon_profile='flattop_smoothed'. Units are in
         seconds.
-    
+
     smooth_trunc: float
         Number of sigmas after which to truncate the Gaussian smoothing when
         lon_profile='flattop_smoothed'
-        
+
     save_to_file: bool
         Whether to save the generated distribution to a file.
 
@@ -285,19 +285,22 @@ def _create_flattop_longitudinal_profile_with_smoothing(z_c, length, n_part,
                                                         smooth_trunc):
     """ Creates a flattop longitudinal profile with gaussian smoothing at the
     head and tail"""
-    # number of particles
+    # Number of particles
     smooth_sigma = ct.c*smooth_sigma
     n_plat = n_part * length/(length+np.sqrt(2*np.pi*smooth_sigma**2))
     n_smooth = n_part * (np.sqrt(2*np.pi*smooth_sigma**2)
-                         /(length+np.sqrt(2*np.pi*smooth_sigma**2)))
+                         / (length+np.sqrt(2*np.pi*smooth_sigma**2)))
+    # Create flattop and gaussian profiles
     z_plat = _create_flattop_longitudinal_profile(length/2, length, n_plat,
                                                   min_len_scale_noise)
     z_smooth = _create_gaussian_longitudinal_profile(0, smooth_sigma, n_smooth,
                                                      smooth_trunc,
                                                      min_len_scale_noise)
-    z = np.concatenate((z_smooth[np.where(z_smooth<=0)],
+    # Concatenate both profiles
+    z = np.concatenate((z_smooth[np.where(z_smooth <= 0)],
                         z_plat,
-                        z_smooth[np.where(z_smooth>0)]+length))
+                        z_smooth[np.where(z_smooth > 0)] + length))
+    # Center distribution around desired position
     z = z - length/2 + z_c
     return z
 
