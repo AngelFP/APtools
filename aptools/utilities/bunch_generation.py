@@ -13,7 +13,8 @@ import aptools.data_processing.beam_operations as bo
 def generate_gaussian_bunch_from_twiss(
         a_x, a_y, b_x, b_y, en_x, en_y, ene, ene_sp, s_t, q_tot, n_part, x_c=0,
         y_c=0, z_c=0, lon_profile='gauss', min_len_scale_noise=None,
-        sigma_trunc_lon=None, save_to_file=False, save_to_code='astra',
+        sigma_trunc_lon=None, smooth_sigma=None, smooth_trunc=None,
+        save_to_file=False, save_to_code='astra',
         save_to_path=None, file_name=None, perform_checks=False):
     """
     Creates a transversely Gaussian particle bunch with the specified Twiss
@@ -47,8 +48,8 @@ def generate_gaussian_bunch_from_twiss(
 
     s_t: float
         Bunch duration in seconds. If lon_profile='gauss', this corresponds to
-        the RMS duration. If lon_profile='flattop', this instead the whole
-        flat-top lenght.
+        the RMS duration. If lon_profile='flattop' or
+        lon_profile='flattop_smoothed', this instead the whole flat-top lenght.
 
     q_tot: float
         Total bunch charge in C.
@@ -81,6 +82,15 @@ def generate_gaussian_bunch_from_twiss(
         Only used when lon_profile = 'gauss' and required if
         min_len_scale_noise is specified.
 
+    smooth_sigma: float
+        The sigma of the Gaussian longitudinal smoothing applied to the
+        flat-top profile when lon_profile='flattop_smoothed'. Units are in
+        seconds.
+    
+    smooth_trunc: float
+        Number of sigmas after which to truncate the Gaussian smoothing when
+        lon_profile='flattop_smoothed'
+        
     save_to_file: bool
         Whether to save the generated distribution to a file.
 
@@ -129,6 +139,9 @@ def generate_gaussian_bunch_from_twiss(
     elif lon_profile == 'flattop':
         z = _create_flattop_longitudinal_profile(z_c, s_z, n_part,
                                                  min_len_scale_noise)
+    elif lon_profile == 'flattop_smoothed':
+        z = _create_flattop_longitudinal_profile_with_smoothing(
+            z_c, s_z, n_part, min_len_scale_noise, smooth_sigma, smooth_trunc)
     # Define again n_part in case it changed when crealing long. profile
     n_part = len(z)
     pz = np.random.normal(ene, ene_sp_abs, n_part)
@@ -252,17 +265,40 @@ def _create_gaussian_longitudinal_profile(z_c, s_z, n_part, sigma_trunc_lon,
     return z
 
 
-def _create_flattop_longitudinal_profile(z_c, s_z, n_part,
+def _create_flattop_longitudinal_profile(z_c, length, n_part,
                                          min_len_scale_noise):
     """ Creates a flattop longitudinal profile """
     if min_len_scale_noise is None:
-        z = np.random.uniform(z_c-s_z/2, z_c+s_z/2, n_part)
+        z = np.random.uniform(z_c-length/2, z_c+length/2, n_part)
     else:
-        n_slices = int(np.round(s_z/(min_len_scale_noise)))
+        n_slices = int(np.round(length/(min_len_scale_noise)))
         part_per_slice = np.round(np.ones(n_slices)*n_part/n_slices)
         part_per_slice = part_per_slice.astype(int)
-        slice_edges = np.linspace(z_c-s_z/2, z_c+s_z/2, n_slices+1)
+        slice_edges = np.linspace(z_c-length/2, z_c+length/2, n_slices+1)
         z = _create_smooth_z_array(part_per_slice, slice_edges)
+    return z
+
+
+def _create_flattop_longitudinal_profile_with_smoothing(z_c, length, n_part,
+                                                        min_len_scale_noise,
+                                                        smooth_sigma,
+                                                        smooth_trunc):
+    """ Creates a flattop longitudinal profile with gaussian smoothing at the
+    head and tail"""
+    # number of particles
+    smooth_sigma = ct.c*smooth_sigma
+    n_plat = n_part * length/(length+np.sqrt(2*np.pi*smooth_sigma**2))
+    n_smooth = n_part * (np.sqrt(2*np.pi*smooth_sigma**2)
+                         /(length+np.sqrt(2*np.pi*smooth_sigma**2)))
+    z_plat = _create_flattop_longitudinal_profile(length/2, length, n_plat,
+                                                  min_len_scale_noise)
+    z_smooth = _create_gaussian_longitudinal_profile(0, smooth_sigma, n_smooth,
+                                                     smooth_trunc,
+                                                     min_len_scale_noise)
+    z = np.concatenate((z_smooth[np.where(z_smooth<=0)],
+                        z_plat,
+                        z_smooth[np.where(z_smooth>0)]+length))
+    z = z - length/2 + z_c
     return z
 
 
