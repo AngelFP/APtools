@@ -18,7 +18,7 @@ def read_beam(code_name, file_path, reposition=False,
     ----------
     code_name : str
         Name of the tracking or PIC code of the data to read. Possible values
-        are 'csrtrack', 'astra', 'openpmd', 'osiris' and 'hipace'
+        are 'csrtrack', 'astra', 'openpmd', 'osiris', 'hipace' and 'fbpic'.
 
     file_path : str
         Path of the file containing the data
@@ -51,7 +51,8 @@ def read_beam(code_name, file_path, reposition=False,
                       'astra': read_astra_data,
                       'openpmd': read_openpmd_beam,
                       'osiris': read_osiris_beam,
-                      'hipace': read_hipace_beam}
+                      'hipace': read_hipace_beam,
+                      'fbpic': read_fbpic_input_beam}
     x, y, z, px, py, pz, q = read_beam_from[code_name](file_path, **kwargs)
     if reposition:
         reposition_bunch([x, y, z, px, py, pz, q], avg_pos+avg_mom)
@@ -223,4 +224,30 @@ def read_osiris_beam(file_path, plasma_dens):
     px = np.array(file_content.get('p2'))
     py = np.array(file_content.get('p3'))
     pz = np.array(file_content.get('p1'))
+    return x, y, z, px, py, pz, q
+
+
+def read_fbpic_input_beam(file_path, q_tot):
+    """Reads particle data from an FBPIC input beam file
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the file with particle data
+
+    q_tot: float
+        Total beam charge.
+    Returns
+    -------
+    A tuple with 7 arrays containing the 6D phase space and charge of the
+    particles.
+    """
+    data = np.genfromtxt(file_path)
+    x = data[:, 0]
+    y = data[:, 1]
+    z = data[:, 2]
+    px = data[:, 3]
+    py = data[:, 4]
+    pz = data[:, 5]
+    q = np.ones(len(x))*q_tot/len(x)
     return x, y, z, px, py, pz, q
