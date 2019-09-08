@@ -7,6 +7,7 @@ import scipy.constants as ct
 
 import aptools.data_analysis.beam_diagnostics as bd
 from aptools.data_handling.reading import read_beam
+from aptools.plotting.plot_types import scatter_histogram
 
 
 def phase_space_overview_from_file(code_name, file_path, **kwargs):
@@ -34,7 +35,7 @@ def phase_space_overview(x, y, z, px, py, pz, q):
     plt.figure(figsize=(8, 3))
     # x - px
     ax_1 = plt.subplot(131)
-    plt.plot(x * 1e6, px, '.', ms=1)
+    scatter_histogram(x*1e6, px)
     plt.xlabel("x [$\\mu m$]")
     plt.ylabel("$p_x \\ \\mathrm{[m_ec^2/e]}$")
     plt.text(0.1, 0.9, '$\\epsilon_{n,x} = $' + '{}'.format(np.around(em_x, 3))
@@ -48,7 +49,7 @@ def phase_space_overview(x, y, z, px, py, pz, q):
              + '$\\ \\mathrm{\\mu m}$', transform=ax_1.transAxes, fontsize=8)
     # y - py
     ax_2 = plt.subplot(132)
-    plt.plot(y * 1e6, py, '.', ms=1)
+    scatter_histogram(y * 1e6, py)
     plt.xlabel("y [$\\mu m$]")
     plt.ylabel("$p_y \\ \\mathrm{[m_ec^2/e]}$")
     plt.text(0.1, 0.9, '$\\epsilon_{n,y} = $' + '{}'.format(np.around(em_y, 3))
@@ -62,7 +63,7 @@ def phase_space_overview(x, y, z, px, py, pz, q):
              + '$\\ \\mathrm{\\mu m}$', transform=ax_2.transAxes, fontsize=8)
     # z - pz
     ax_3 = plt.subplot(133)
-    plt.plot(dz / ct.c * 1e15, pz, '.', ms=1)
+    scatter_histogram(dz / ct.c * 1e15, pz)
     plt.xlabel("$\\Delta z$ [fs]")
     plt.ylabel("$p_z \\ \\mathrm{[m_ec^2/e]}$")
     plt.text(0.1, 0.9, '$\\epsilon_{L} = $' + '{}'.format(np.around(em_l, 3))
