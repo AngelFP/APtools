@@ -924,7 +924,7 @@ def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6):
     s_py = np.std(py/pz)
     x_centroid = np.average(x, weights=q)
     y_centroid = np.average(y, weights=q)
-    z_centroid = np.average(y, weights=q)
+    z_centroid = np.average(z, weights=q)
     px_centroid = np.average(px, weights=q)
     py_centroid = np.average(py, weights=q)
     theta_x = px_centroid/ene
