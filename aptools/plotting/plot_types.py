@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def scatter_histogram(x, y, bins=[300, 300], range=None, cmap='plasma', s=1):
+def scatter_histogram(x, y, bins=[300, 300], range=None, cmap='plasma', s=1,
+                      **kwargs):
     """
     Does a scatter plot from the histogram of a particle distribution.
     """
@@ -20,4 +21,4 @@ def scatter_histogram(x, y, bins=[300, 300], range=None, cmap='plasma', s=1):
     counts /= np.max(counts)
     X = X[filt]
     Y = Y[filt]
-    plt.scatter(X, Y, c=counts, s=s, cmap=cmap)
+    plt.scatter(X, Y, c=counts, s=s, cmap=cmap, **kwargs)
