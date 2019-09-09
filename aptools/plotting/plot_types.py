@@ -16,9 +16,16 @@ def scatter_histogram(x, y, bins=[300, 300], range=None, cmap='plasma', s=1,
     counts = counts.T.flatten()
     X = X.flatten()
     Y = Y.flatten()
+    # filter out empty areas
     filt = np.where(counts > 0)
     counts = counts[filt]
+    # determine order in which the scatter dots will be drawn so that higher
+    # values appear on top
+    draw_order = np.argsort(counts)
+    counts = counts[draw_order]
+    # normalize counts
     counts /= np.max(counts)
-    X = X[filt]
-    Y = Y[filt]
+    # apply filter and draw order to X and Y arrays
+    X = X[filt][draw_order]
+    Y = Y[filt][draw_order]
     plt.scatter(X, Y, c=counts, s=s, cmap=cmap, edgecolor=edgecolor, **kwargs)
