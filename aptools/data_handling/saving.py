@@ -132,7 +132,6 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
     px = np.zeros(q_orig.size+2)
     py = np.zeros(q_orig.size+2)
     pz = np.zeros(q_orig.size+2)
-    pz = np.zeros(q_orig.size+2)
     q = np.zeros(q_orig.size+2)
 
     # Reference particle
@@ -141,7 +140,6 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
     xi[1] = np.average(xi_orig, weights=q_orig)
     px[1] = np.average(px_orig, weights=q_orig)
     py[1] = np.average(py_orig, weights=q_orig)
-    pz[1] = np.average(pz_orig, weights=q_orig)
     pz[1] = np.average(pz_orig, weights=q_orig)
     q[1] = sum(q_orig)/len(q_orig)
 
@@ -233,7 +231,6 @@ def save_for_astra(beam_data, folder_path, file_name, reposition=False,
     px = np.zeros(q_orig.size+1)
     py = np.zeros(q_orig.size+1)
     pz = np.zeros(q_orig.size+1)
-    pz = np.zeros(q_orig.size+1)
     q = np.zeros(q_orig.size+1)
 
     # Reference particle
@@ -242,7 +239,6 @@ def save_for_astra(beam_data, folder_path, file_name, reposition=False,
     xi[0] = np.average(xi_orig, weights=q_orig)
     px[0] = np.average(px_orig, weights=q_orig)
     py[0] = np.average(py_orig, weights=q_orig)
-    pz[0] = np.average(pz_orig, weights=q_orig)
     pz[0] = np.average(pz_orig, weights=q_orig)
     q[0] = sum(q_orig)/len(q_orig)
 
