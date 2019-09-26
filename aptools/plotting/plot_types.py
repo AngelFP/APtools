@@ -28,4 +28,5 @@ def scatter_histogram(x, y, bins=[300, 300], range=None, cmap='plasma', s=1,
     # apply filter and draw order to X and Y arrays
     X = X[filt][draw_order]
     Y = Y[filt][draw_order]
-    plt.scatter(X, Y, c=counts, s=s, cmap=cmap, edgecolor=edgecolor, **kwargs)
+    return plt.scatter(X, Y, c=counts, s=s, cmap=cmap, edgecolor=edgecolor,
+                       **kwargs)
