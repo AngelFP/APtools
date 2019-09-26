@@ -4,12 +4,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def scatter_histogram(x, y, bins=[300, 300], range=None, cmap='plasma', s=1,
-                      edgecolor='none', **kwargs):
+def scatter_histogram(x, y, bins=[300, 300], range=None, weights=None,
+                      cmap='plasma', s=1, edgecolor='none', **kwargs):
     """
     Does a scatter plot from the histogram of a particle distribution.
     """
-    counts, xedges, yedges = np.histogram2d(x, y, bins=bins, range=range)
+    counts, xedges, yedges = np.histogram2d(x, y, bins=bins, range=range,
+                                            weights=weights)
     x_grid = xedges[1:] - np.abs(xedges[1]-xedges[0])/2
     y_grid = yedges[1:] - np.abs(yedges[1]-yedges[0])/2
     X, Y = np.meshgrid(x_grid, y_grid)
