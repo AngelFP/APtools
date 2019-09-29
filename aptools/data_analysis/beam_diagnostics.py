@@ -222,8 +222,7 @@ def mean_energy(px, py, pz, w=1):
     -------
     A float with the mean energy in non-dimmensional units, i.e. [1/(m_e c**2)]
     """
-    kin_ene = mean_kinetic_energy(px, py, pz, w)
-    return np.average(1 + np.sqrt(np.square(kin_ene)))
+    return np.average(np.sqrt(1 + px**2 + py**2 + pz**2), weights=np.abs(w))
 
 
 def rms_energy_spread(px, py, pz, w=1):
