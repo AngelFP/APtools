@@ -406,58 +406,6 @@ def rms_relative_uncorrelated_energy_spread(z, px, py, pz, w=None):
     return unc_ene_sp
 
 
-def rms_relative_uncorrelated_slice_energy_spread(z, px, py, pz, w=None,
-                                                  n_slices=10, len_slice=None):
-    """Calculate the uncorrelated energy spread of the provided particle
-    distribution
-
-    Parameters
-    ----------
-    z : array
-        Contains the longitudinal position of the particles in units of meters
-
-    px : array
-        Contains the transverse momentum in the x direction of the
-        beam particles in non-dimmensional units (beta*gamma)
-
-    py : array
-        Contains the transverse momentum in the x direction of the
-        beam particles in non-dimmensional units (beta*gamma)
-
-    pz : array
-        Contains the longitudonal momentum of the beam particles in
-        non-dimmensional units (beta*gamma)
-
-    w : array or single value
-        Statistical weight of the particles.
-
-    Returns
-    -------
-    A float with the energy spread value in non-dimmensional units,
-    i.e. [1/(m_e c**2)]
-    """
-    slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
-    slice_ene_sp = np.zeros(n_slices)
-    slice_weight = np.zeros(n_slices)
-    for i in np.arange(0, n_slices):
-        a = slice_lims[i]
-        b = slice_lims[i+1]
-        slice_particle_filter = (z > a) & (z <= b)
-        if slice_particle_filter.any():
-            z_slice = z[slice_particle_filter]
-            px_slice = px[slice_particle_filter]
-            py_slice = py[slice_particle_filter]
-            pz_slice = pz[slice_particle_filter]
-            if hasattr(w, '__iter__'):
-                w_slice = w[slice_particle_filter]
-            else:
-                w_slice = w
-            slice_ene_sp[i] = rms_relative_uncorrelated_energy_spread(
-                z_slice, px_slice, py_slice, pz_slice, w_slice)
-            slice_weight[i] = np.sum(w_slice)
-    return slice_ene_sp, slice_weight, slice_lims
-
-
 def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=None,
                                         disp_corrected=False, corr_order=1):
     """Calculate the normalized transverse RMS emittance without dispersion
@@ -737,6 +685,58 @@ def relative_rms_slice_energy_spread(z, px, py, pz, w=None, n_slices=10,
     return slice_ene_sp, slice_weight, slice_lims
 
 
+def rms_relative_uncorrelated_slice_energy_spread(z, px, py, pz, w=None,
+                                                  n_slices=10, len_slice=None):
+    """Calculate the uncorrelated energy spread of the provided particle
+    distribution
+
+    Parameters
+    ----------
+    z : array
+        Contains the longitudinal position of the particles in units of meters
+
+    px : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+
+    py : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+
+    pz : array
+        Contains the longitudonal momentum of the beam particles in
+        non-dimmensional units (beta*gamma)
+
+    w : array or single value
+        Statistical weight of the particles.
+
+    Returns
+    -------
+    A float with the energy spread value in non-dimmensional units,
+    i.e. [1/(m_e c**2)]
+    """
+    slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
+    slice_ene_sp = np.zeros(n_slices)
+    slice_weight = np.zeros(n_slices)
+    for i in np.arange(0, n_slices):
+        a = slice_lims[i]
+        b = slice_lims[i+1]
+        slice_particle_filter = (z > a) & (z <= b)
+        if slice_particle_filter.any():
+            z_slice = z[slice_particle_filter]
+            px_slice = px[slice_particle_filter]
+            py_slice = py[slice_particle_filter]
+            pz_slice = pz[slice_particle_filter]
+            if hasattr(w, '__iter__'):
+                w_slice = w[slice_particle_filter]
+            else:
+                w_slice = w
+            slice_ene_sp[i] = rms_relative_uncorrelated_energy_spread(
+                z_slice, px_slice, py_slice, pz_slice, w_slice)
+            slice_weight[i] = np.sum(w_slice)
+    return slice_ene_sp, slice_weight, slice_lims
+
+
 def normalized_transverse_rms_slice_emittance(
         z, x, px, py=None, pz=None, w=None, disp_corrected=False, corr_order=1,
         n_slices=10, len_slice=None):
@@ -820,6 +820,63 @@ def normalized_transverse_rms_slice_emittance(
                 x_slice, px_slice, w=w_slice)
             slice_weight[i] = np.sum(w_slice)
     return slice_em, slice_weight, slice_lims
+
+
+def energy_profile(z, px, py, pz, w=None, n_slices=10, len_slice=None):
+    """Calculate the sliced longitudinal energy profile of the distribution
+
+    Parameters
+    ----------
+    z : array
+        Contains the longitudinal position of the particles in units of meters
+
+    px : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+
+    py : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+
+    pz : array
+        Contains the longitudonal momentum of the beam particles in
+        non-dimmensional units (beta*gamma)
+
+    w : array or single value
+        Statistical weight of the particles.
+
+    n_slices : array
+        Number of longitudinal slices in which to divite the particle
+        distribution. Not used if len_slice is specified.
+
+    len_slice : array
+        Length of the longitudinal slices. If not None, replaces n_slices.
+
+    Returns
+    -------
+    A tuple containing:
+    - An array with the mean energy value in each slice.
+    - An array with the statistical weight of each slice.
+    - An array with the slice edges.
+    """
+    slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
+    slice_ene = np.zeros(n_slices)
+    slice_weight = np.zeros(n_slices)
+    for i in np.arange(0, n_slices):
+        a = slice_lims[i]
+        b = slice_lims[i+1]
+        slice_particle_filter = (z > a) & (z <= b)
+        if slice_particle_filter.any():
+            px_slice = px[slice_particle_filter]
+            py_slice = py[slice_particle_filter]
+            pz_slice = pz[slice_particle_filter]
+            if hasattr(w, '__iter__'):
+                w_slice = w[slice_particle_filter]
+            else:
+                w_slice = w
+            slice_ene[i] = mean_energy(px_slice, py_slice, pz_slice, w_slice)
+            slice_weight[i] = np.sum(w_slice)
+    return slice_ene, slice_weight, slice_lims
 
 
 def current_profile(z, q, n_slices=10, len_slice=None):
