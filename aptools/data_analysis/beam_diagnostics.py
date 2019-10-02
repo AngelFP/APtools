@@ -7,7 +7,7 @@ from aptools.helper_functions import (weighted_std, create_beam_slices,
                                       remove_correlation, filter_nans)
 
 
-def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
+def twiss_parameters(x, px, pz, py=None, w=None, emitt='tr',
                      disp_corrected=False, corr_order=1):
     """Calculate the alpha and beta functions of the beam in a certain
     transverse plane
@@ -88,7 +88,7 @@ def twiss_parameters(x, px, pz, py=None, w=1, emitt='tr',
     return (a_x, b_x, g_x)
 
 
-def dispersion(x, px, py, pz, gamma_ref=None, w=1):
+def dispersion(x, px, py, pz, gamma_ref=None, w=None):
     """Calculate the first-order dispersion from the beam distribution
 
     Parameters
@@ -129,7 +129,7 @@ def dispersion(x, px, py, pz, gamma_ref=None, w=1):
     return disp
 
 
-def rms_length(z, w=1):
+def rms_length(z, w=None):
     """Calculate the RMS bunch length of the provided particle
     distribution
 
@@ -149,7 +149,7 @@ def rms_length(z, w=1):
     return s_z
 
 
-def rms_size(x, w=1):
+def rms_size(x, w=None):
     """Calculate the RMS bunch size of the provided particle
     distribution
 
@@ -169,7 +169,7 @@ def rms_size(x, w=1):
     return s_x
 
 
-def mean_kinetic_energy(px, py, pz, w=1):
+def mean_kinetic_energy(px, py, pz, w=None):
     """Calculate the mean kinetic energy of the provided particle distribution
 
     Parameters
@@ -198,7 +198,7 @@ def mean_kinetic_energy(px, py, pz, w=1):
                       weights=np.abs(w))
 
 
-def mean_energy(px, py, pz, w=1):
+def mean_energy(px, py, pz, w=None):
     """Calculate the mean energy of the provided particle distribution
 
     Parameters
@@ -225,7 +225,7 @@ def mean_energy(px, py, pz, w=1):
     return np.average(np.sqrt(1 + px**2 + py**2 + pz**2), weights=np.abs(w))
 
 
-def rms_energy_spread(px, py, pz, w=1):
+def rms_energy_spread(px, py, pz, w=None):
     """Calculate the absotule RMS energy spread of the provided particle
     distribution
 
@@ -256,7 +256,7 @@ def rms_energy_spread(px, py, pz, w=1):
     return ene_std
 
 
-def relative_rms_energy_spread(px, py, pz, w=1):
+def relative_rms_energy_spread(px, py, pz, w=None):
     """Calculate the relative RMS energy spread of the provided particle
     distribution
 
@@ -287,7 +287,7 @@ def relative_rms_energy_spread(px, py, pz, w=1):
     return rel_spread
 
 
-def longitudinal_energy_chirp(z, px, py, pz, w=1):
+def longitudinal_energy_chirp(z, px, py, pz, w=None):
     """Calculate the longitudinal energy chirp, K, of the provided particle
     distribution in units of m**(-1). It is defined as dE/<E> = K*dz.
 
@@ -325,7 +325,7 @@ def longitudinal_energy_chirp(z, px, py, pz, w=1):
     return K
 
 
-def rms_relative_correlated_energy_spread(z, px, py, pz, w=1):
+def rms_relative_correlated_energy_spread(z, px, py, pz, w=None):
     """Calculate the correlated energy spread of the provided particle
     distribution
 
@@ -362,7 +362,7 @@ def rms_relative_correlated_energy_spread(z, px, py, pz, w=1):
     return corr_ene_sp
 
 
-def rms_relative_uncorrelated_energy_spread(z, px, py, pz, w=1):
+def rms_relative_uncorrelated_energy_spread(z, px, py, pz, w=None):
     """Calculate the uncorrelated energy spread of the provided particle
     distribution
 
@@ -406,7 +406,7 @@ def rms_relative_uncorrelated_energy_spread(z, px, py, pz, w=1):
     return unc_ene_sp
 
 
-def rms_relative_uncorrelated_slice_energy_spread(z, px, py, pz, w=1,
+def rms_relative_uncorrelated_slice_energy_spread(z, px, py, pz, w=None,
                                                   n_slices=10, len_slice=None):
     """Calculate the uncorrelated energy spread of the provided particle
     distribution
@@ -458,7 +458,7 @@ def rms_relative_uncorrelated_slice_energy_spread(z, px, py, pz, w=1,
     return slice_ene_sp, slice_weight, slice_lims
 
 
-def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=1,
+def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=None,
                                         disp_corrected=False, corr_order=1):
     """Calculate the normalized transverse RMS emittance without dispersion
     contributions of the particle distribution in a given plane.
@@ -509,7 +509,7 @@ def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=1,
     return em_x
 
 
-def geometric_transverse_rms_emittance(x, px, py, pz, w=1,
+def geometric_transverse_rms_emittance(x, px, py, pz, w=None,
                                        disp_corrected=False, corr_order=1):
     """Calculate the geometric transverse RMS emittance without dispersion
     contributions of the particle distribution in a given plane.
@@ -547,7 +547,7 @@ def geometric_transverse_rms_emittance(x, px, py, pz, w=1,
 
 
 def normalized_transverse_trace_space_rms_emittance(
-        x, px, py, pz, w=1, disp_corrected=False, corr_order=1):
+        x, px, py, pz, w=None, disp_corrected=False, corr_order=1):
     """Calculate the normalized trasnverse trace-space RMS emittance of the
     particle distribution in a given plane.
 
@@ -589,7 +589,7 @@ def normalized_transverse_trace_space_rms_emittance(
     return em_x * gamma_avg
 
 
-def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=1,
+def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=None,
                                          disp_corrected=False, corr_order=1):
     """Calculate the trasnverse trace-space RMS emittance of the
     particle distribution in a given plane.
@@ -643,7 +643,7 @@ def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=1,
     return em_x
 
 
-def longitudinal_rms_emittance(z, px, py, pz, w=1):
+def longitudinal_rms_emittance(z, px, py, pz, w=None):
     """Calculate the longitudinal RMS emittance of the particle
     distribution in a given plane.
 
@@ -677,7 +677,7 @@ def longitudinal_rms_emittance(z, px, py, pz, w=1):
     return em_l
 
 
-def relative_rms_slice_energy_spread(z, px, py, pz, w=1, n_slices=10,
+def relative_rms_slice_energy_spread(z, px, py, pz, w=None, n_slices=10,
                                      len_slice=None):
     """Calculate the relative RMS slice energy spread of the provided particle
     distribution
@@ -738,7 +738,7 @@ def relative_rms_slice_energy_spread(z, px, py, pz, w=1, n_slices=10,
 
 
 def normalized_transverse_rms_slice_emittance(
-        z, x, px, py=None, pz=None, w=1, disp_corrected=False, corr_order=1,
+        z, x, px, py=None, pz=None, w=None, disp_corrected=False, corr_order=1,
         n_slices=10, len_slice=None):
     """Calculate the normalized transverse RMS slice emittance of the particle
     distribution in a given plane.
