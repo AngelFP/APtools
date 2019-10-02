@@ -822,6 +822,95 @@ def normalized_transverse_rms_slice_emittance(
     return slice_em, slice_weight, slice_lims
 
 
+def slice_twiss_parameters(
+        z, x, px, py=None, pz=None, w=None, disp_corrected=False, corr_order=1,
+        n_slices=10, len_slice=None):
+    """Calculate the Twiss parameters for each longitudinal slice of the
+    particle distribution in a given plane.
+
+    Parameters
+    ----------
+    z : array
+        Contains the longitudinal position of the particles in units of meters
+
+    x : array
+        Contains the transverse position of the particles in one of the
+        transverse planes in units of meters
+
+    px : array
+        Contains the transverse momentum of the beam particles in the same
+        plane as x in non-dimmensional units (beta*gamma)
+
+    py : array
+        Contains the transverse momentum of the beam particles in the opposite
+        plane as as x in non-dimmensional units (beta*gamma). Necessary if
+        disp_corrected=True.
+
+    pz : array
+        Contains the longitudinal momentum of the beam particles in
+        non-dimmensional units (beta*gamma). Necessary if disp_corrected=True.
+
+    w : array or single value
+        Statistical weight of the particles.
+
+    disp_corrected : bool
+        Whether ot not to correct for dispersion contributions.
+
+    corr_order : int
+        Highest order up to which dispersion effects should be corrected.
+
+    n_slices : array
+        Number of longitudinal slices in which to divite the particle
+        distribution. Not used if len_slice is specified.
+
+    len_slice : array
+        Length of the longitudinal slices. If not None, replaces n_slices.
+
+    Returns
+    -------
+    A tuple containing:
+    - An array with the beta function in each slice in units of m.
+    - An array with the alpha function in each slice.
+    - An array with the gamma function in each slice in units of m^{-1}.
+    - An array with the statistical weight of each slice.
+    - An array with the slice edges.
+    """
+    if disp_corrected:
+        # remove x-gamma correlation
+        gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
+        gamma_avg = np.average(gamma, weights=w)
+        dgamma = (gamma - gamma_avg)/gamma_avg
+        x = remove_correlation(dgamma, x, w, corr_order)
+    slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
+    slice_alpha = np.zeros(n_slices)
+    slice_beta = np.zeros(n_slices)
+    slice_gamma = np.zeros(n_slices)
+    slice_weight = np.zeros(n_slices)
+    for i in np.arange(0, n_slices):
+        a = slice_lims[i]
+        b = slice_lims[i+1]
+        slice_particle_filter = (z > a) & (z <= b)
+        if slice_particle_filter.any():
+            x_slice = x[slice_particle_filter]
+            px_slice = px[slice_particle_filter]
+            # if py is not None:
+            #    py_slice = py[slice_particle_filter]
+            # else:
+            #    py_slice=None
+            # if pz is not None:
+            #    pz_slice = pz[slice_particle_filter]
+            # else:
+            #    pz_slice=None
+            if hasattr(w, '__iter__'):
+                w_slice = w[slice_particle_filter]
+            else:
+                w_slice = w
+            slice_em[i] = normalized_transverse_rms_emittance(
+                x_slice, px_slice, w=w_slice)
+            slice_weight[i] = np.sum(w_slice)
+    return slice_alpha, slice_beta, slice_gamma, slice_weight, slice_lims
+
+
 def energy_profile(z, px, py, pz, w=None, n_slices=10, len_slice=None):
     """Calculate the sliced longitudinal energy profile of the distribution
 
