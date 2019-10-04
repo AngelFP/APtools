@@ -26,12 +26,9 @@ def create_beam_slices(z, n_slices=10, len_slice=None):
     """
     max_z = np.max(z)
     min_z = np.min(z)
-    if len_slice is None:
-        slice_lims = np.linspace(min_z, max_z, n_slices+1)
-    else:
-        slice_lims = np.arange(min_z, max_z, len_slice)
-        slice_lims = np.append(slice_lims, max_z)
-        n_slices = len(slice_lims)-1
+    if len_slice is not None:
+        n_slices = int(np.round((max_z-min_z)/len_slice))
+    slice_lims = np.linspace(min_z, max_z, n_slices+1)
     return slice_lims, n_slices
 
 
