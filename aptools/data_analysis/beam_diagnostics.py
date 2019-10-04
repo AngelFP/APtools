@@ -625,6 +625,67 @@ def longitudinal_rms_emittance(z, px, py, pz, w=None):
     return em_l
 
 
+def peak_current(z, q, n_slices=10, len_slice=None):
+    """Calculate the peak current of the given particle distribution.
+
+    Parameters
+    ----------
+    z : array
+        Contains the longitudinal position of the particles in units of meters
+
+    q : array
+        Contains the charge of the particles in C
+
+    n_slices : array
+        Number of longitudinal slices in which to divite the particle
+        distribution. Not used if len_slice is specified.
+
+    len_slice : array
+        Length of the longitudinal slices. If not None, replaces n_slices.
+
+    Returns
+    -------
+    The absolute value of the peak current in Ampere.
+    """
+    current_prof, *_ = current_profile(z, q, n_slices=n_slices,
+                                       len_slice=len_slice)
+    current_prof = abs(current_prof)
+    return max(current_prof)
+
+
+def fwhm_length(z, q, n_slices=10, len_slice=0.1e-6):
+    """Calculate the FWHM length of the given particle distribution.
+
+    Parameters
+    ----------
+    z : array
+        Contains the longitudinal position of the particles in units of meters
+
+    q : array
+        Contains the charge of the particles in C
+
+    n_slices : array
+        Number of longitudinal slices in which to divite the particle
+        distribution. Not used if len_slice is specified.
+
+    len_slice : array
+        Length of the longitudinal slices. If not None, replaces n_slices.
+
+    Returns
+    -------
+    The FWHM value in metres.
+    """
+    current_prof, z_edges = current_profile(z, q, n_slices=n_slices,
+                                            len_slice=len_slice)
+    slice_pos = z_edges[1:] - abs(z_edges[1]-z_edges[0])/2
+    current_prof = abs(current_prof)
+    i_peak = max(current_prof)
+    i_half = i_peak/2
+    slices_in_fwhm = slice_pos[np.where(current_prof >= i_half)]
+    fwhm = max(slices_in_fwhm) - min(slices_in_fwhm)
+    return fwhm
+
+
 def relative_rms_slice_energy_spread(z, px, py, pz, w=None, n_slices=10,
                                      len_slice=None):
     """Calculate the relative RMS slice energy spread of the provided particle
@@ -823,7 +884,7 @@ def normalized_transverse_rms_slice_emittance(
 
 
 def slice_twiss_parameters(
-        z, x, px, py=None, pz=None, w=None, disp_corrected=False, corr_order=1,
+        z, x, px, pz, py=None, w=None, disp_corrected=False, corr_order=1,
         n_slices=10, len_slice=None):
     """Calculate the Twiss parameters for each longitudinal slice of the
     particle distribution in a given plane.
@@ -841,14 +902,14 @@ def slice_twiss_parameters(
         Contains the transverse momentum of the beam particles in the same
         plane as x in non-dimmensional units (beta*gamma)
 
+    pz : array
+        Contains the longitudinal momentum of the beam particles in
+        non-dimmensional units (beta*gamma).
+
     py : array
         Contains the transverse momentum of the beam particles in the opposite
         plane as as x in non-dimmensional units (beta*gamma). Necessary if
         disp_corrected=True.
-
-    pz : array
-        Contains the longitudinal momentum of the beam particles in
-        non-dimmensional units (beta*gamma). Necessary if disp_corrected=True.
 
     w : array or single value
         Statistical weight of the particles.
@@ -893,6 +954,7 @@ def slice_twiss_parameters(
         if slice_particle_filter.any():
             x_slice = x[slice_particle_filter]
             px_slice = px[slice_particle_filter]
+            pz_slice = pz[slice_particle_filter]
             # if py is not None:
             #    py_slice = py[slice_particle_filter]
             # else:
@@ -905,8 +967,8 @@ def slice_twiss_parameters(
                 w_slice = w[slice_particle_filter]
             else:
                 w_slice = w
-            slice_em[i] = normalized_transverse_rms_emittance(
-                x_slice, px_slice, w=w_slice)
+            slice_alpha[i], slice_beta[i], slice_gamma[i] = twiss_parameters(
+                x_slice, px_slice, pz_slice, w=w_slice)
             slice_weight[i] = np.sum(w_slice)
     return slice_alpha, slice_beta, slice_gamma, slice_weight, slice_lims
 
@@ -992,14 +1054,10 @@ def current_profile(z, q, n_slices=10, len_slice=None):
     - An array with the current of each slice in units of A.
     - An array with the slice edges along z.
     """
-    max_z = np.max(z)
-    min_z = np.min(z)
-    if len_slice is not None:
-        n_slices = int((max_z-min_z)/len_slice)
-    adj_slice_len = (max_z-min_z)/n_slices
-    print('Slice length = {} m'.format(adj_slice_len))
+    slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
+    sl_len = slice_lims[1] - slice_lims[0]
     charge_hist, z_edges = np.histogram(z, bins=n_slices, weights=q)
-    sl_dur = adj_slice_len/ct.c
+    sl_dur = sl_len/ct.c
     current_prof = charge_hist/sl_dur
     return current_prof, z_edges
 
