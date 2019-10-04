@@ -113,8 +113,8 @@ def phase_space_overview(x, y, z, px, py, pz, q):
 
 
 def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
-                   left=0.125, right=0.875, top=0.98, bottom=0.11,
-                   add_labels=False):
+                   left=0.125, right=0.875, top=0.98, bottom=0.13,
+                   add_labels=False, include_twiss=False):
     # analyze beam
     current_prof, z_edges = bd.current_profile(z, q, n_slices=n_slices,
                                                len_slice=len_slice)
@@ -167,8 +167,16 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
     ene_mean = np.average(ene, weights=q)
 
     # make plot
-    fig = plt.figure(figsize=(4, 3.5))
-    gs = gridspec.GridSpec(3, 2, height_ratios=[2.5, 1, 1],
+    if include_twiss:
+        nrows = 3
+        hr = [2.5, 1, 1]
+        fh = 3.5
+    else:
+        nrows = 2
+        hr = [2.5, 1]
+        fh = 2.7
+    fig = plt.figure(figsize=(4, fh))
+    gs = gridspec.GridSpec(nrows, 2, height_ratios=hr,
                            width_ratios=[1, 0.02], hspace=0.1, wspace=0.05,
                            figure=fig, left=left, right=right,
                            top=top, bottom=bottom)
@@ -232,7 +240,10 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
         l1 = plt.plot(slice_z, slice_ene_sp, lw=1, c='tab:green',
                       label='$\\sigma_\\gamma/\\gamma$')
         plt.ylabel('$\\sigma_\\gamma/\\gamma$ [%]')
-        plt.tick_params(axis='x', which='both', labelbottom=False)
+        if include_twiss:
+            plt.tick_params(axis='x', which='both', labelbottom=False)
+        else:
+            plt.xlabel('$\\Delta z \\ [\\mathrm{\\mu m}]$')
         # make room for legend
         ylim = list(plt.ylim())
         ylim[1] += (ylim[1] - ylim[0]) * leg_frac
@@ -257,33 +268,35 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
                      fontsize=6, horizontalalignment='left',
                      verticalalignment='top')
 
-        plt.subplot(gs[4])
-        l1 = plt.plot(slice_z, beta_x, lw=1, c='tab:blue', label='$\\beta_x$')
-        l2 = plt.plot(slice_z, beta_y, lw=1, c='tab:orange',
-                      label='$\\beta_y$')
-        plt.xlabel('$\\Delta z \\ [\\mathrm{\\mu m}]$')
-        plt.ylabel('$\\beta$ [{}]'.format(beta_units))
-        # make room for legend
-        ylim = list(plt.ylim())
-        ylim[1] += (ylim[1] - ylim[0]) * leg_frac
-        plt.ylim(ylim)
-        plt.twinx()
-        l3 = plt.plot(slice_z, alpha_x, lw=1, c='tab:blue', ls='--',
-                      label='$\\alpha_x$')
-        l4 = plt.plot(slice_z, alpha_y, lw=1, c='tab:orange', ls='--',
-                      label='$\\alpha_y$')
-        lines = l1 + l2 + l3 + l4
-        labels = [l.get_label() for l in lines]
-        # make room for legend
-        ylim = list(plt.ylim())
-        ylim[1] += (ylim[1] - ylim[0]) * leg_frac
-        plt.ylim(ylim)
-        plt.legend(lines, labels, fontsize=6, ncol=4, frameon=False,
-                   loc='upper right', borderaxespad=0)
-        if add_labels:
-            plt.text(0.03, 0.95, '(c)', transform=plt.gca().transAxes,
-                     fontsize=6, horizontalalignment='left',
-                     verticalalignment='top')
-        plt.ylabel('$\\alpha$')
+        if include_twiss:
+            plt.subplot(gs[4])
+            l1 = plt.plot(slice_z, beta_x, lw=1, c='tab:blue',
+                          label='$\\beta_x$')
+            l2 = plt.plot(slice_z, beta_y, lw=1, c='tab:orange',
+                          label='$\\beta_y$')
+            plt.xlabel('$\\Delta z \\ [\\mathrm{\\mu m}]$')
+            plt.ylabel('$\\beta$ [{}]'.format(beta_units))
+            # make room for legend
+            ylim = list(plt.ylim())
+            ylim[1] += (ylim[1] - ylim[0]) * leg_frac
+            plt.ylim(ylim)
+            plt.twinx()
+            l3 = plt.plot(slice_z, alpha_x, lw=1, c='tab:blue', ls='--',
+                          label='$\\alpha_x$')
+            l4 = plt.plot(slice_z, alpha_y, lw=1, c='tab:orange', ls='--',
+                          label='$\\alpha_y$')
+            lines = l1 + l2 + l3 + l4
+            labels = [l.get_label() for l in lines]
+            # make room for legend
+            ylim = list(plt.ylim())
+            ylim[1] += (ylim[1] - ylim[0]) * leg_frac
+            plt.ylim(ylim)
+            plt.legend(lines, labels, fontsize=6, ncol=4, frameon=False,
+                       loc='upper right', borderaxespad=0)
+            if add_labels:
+                plt.text(0.03, 0.95, '(c)', transform=plt.gca().transAxes,
+                         fontsize=6, horizontalalignment='left',
+                         verticalalignment='top')
+            plt.ylabel('$\\alpha$')
 
     plt.show()
