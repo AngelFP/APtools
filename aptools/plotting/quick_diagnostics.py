@@ -12,19 +12,19 @@ from aptools.data_handling.reading import read_beam
 from aptools.plotting.plot_types import scatter_histogram
 
 
-aptools_rc_params = {'axes.linewidth' : 0.5,
-                     'axes.labelsize' : 8,
-                     'xtick.major.size' : 2,
-                     'ytick.major.size' : 2,
-                     'xtick.major.width' : 0.5,
-                     'ytick.major.width' : 0.5,
-                     'xtick.labelsize' : 8,
-                     'ytick.labelsize' : 8,
-                     'xtick.direction' : 'in',
-                     'ytick.direction' : 'in',
-                     'xtick.top' : True,
-                     'ytick.right' : True,
-                     'legend.borderaxespad' : 1}
+aptools_rc_params = {'axes.linewidth': 0.5,
+                     'axes.labelsize': 8,
+                     'xtick.major.size': 2,
+                     'ytick.major.size': 2,
+                     'xtick.major.width': 0.5,
+                     'ytick.major.width': 0.5,
+                     'xtick.labelsize': 8,
+                     'ytick.labelsize': 8,
+                     'xtick.direction': 'in',
+                     'ytick.direction': 'in',
+                     'xtick.top': True,
+                     'ytick.right': True,
+                     'legend.borderaxespad': 1}
 
 
 def phase_space_overview_from_file(code_name, file_path, **kwargs):
@@ -121,7 +121,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
     slice_ene, *_ = bd.energy_profile(
         z, px, py, pz, w=q, n_slices=n_slices, len_slice=len_slice)
     slice_ene_sp, *_ = bd.relative_rms_slice_energy_spread(
-        z, px, py, pz, w=q,n_slices=n_slices, len_slice=len_slice)
+        z, px, py, pz, w=q, n_slices=n_slices, len_slice=len_slice)
     params = bd.slice_twiss_parameters(
         z, x, px, pz, w=q, n_slices=n_slices, len_slice=len_slice)
     alpha_x = params[0]
@@ -139,18 +139,18 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
 
     # perform operations
     gamma = np.sqrt(1 + px**2 + py**2 + pz**2)
-    ene = gamma * ct.m_e*ct.c**2/ct.e * 1e-9 # GeV
+    ene = gamma * ct.m_e*ct.c**2/ct.e * 1e-9  # GeV
     z_center = np.average(z, weights=q)
     dz = z_edges[1] - z_edges[0]
-    slice_z = (z_edges[1:] - dz/2 - z_center) * 1e6 # micron
-    current_prof = np.abs(current_prof) * 1e-3 # kA
+    slice_z = (z_edges[1:] - dz/2 - z_center) * 1e6  # micron
+    current_prof = np.abs(current_prof) * 1e-3  # kA
     peak_current = max(current_prof)
-    len_fwhm *= 1e15/ct.c # fs
-    slice_ene *= ct.m_e*ct.c**2/ct.e * 1e-9 # GeV
-    slice_ene_sp *= 1e2 # %
-    ene_sp_tot *= 1e2 # %
-    slice_em_x *= 1e6 # micron
-    slice_em_y *= 1e6 # micron
+    len_fwhm *= 1e15/ct.c  # fs
+    slice_ene *= ct.m_e*ct.c**2/ct.e * 1e-9  # GeV
+    slice_ene_sp *= 1e2  # %
+    ene_sp_tot *= 1e2  # %
+    slice_em_x *= 1e6  # micron
+    slice_em_y *= 1e6  # micron
     max_beta = max(beta_x)
     if max_beta <= 0.1:
         beta_units = 'mm'
@@ -172,7 +172,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
                            width_ratios=[1, 0.02], hspace=0.1, wspace=0.05,
                            figure=fig, left=left, right=right,
                            top=top, bottom=bottom)
-    leg_frac = 0.25 # space to reserve for legend
+    leg_frac = 0.25  # space to reserve for legend
 
     with plt.rc_context(aptools_rc_params):
         ax_or = plt.subplot(gs[0])
@@ -186,14 +186,14 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
                        + '{:0.1f}$ %\n'.format(ene_sp_tot)
                        + '$I_\\mathrm{peak}='
                        + '{:0.1f}$ kA\n'.format(peak_current)
-                       +'$\\tau_\\mathrm{FWHM}='
+                       + '$\\tau_\\mathrm{FWHM}='
                        + '{:0.1f}$ fs'.format(len_fwhm))
         plt.text(0.95, 0.95, params_text, transform=ax_or.transAxes,
                  fontsize=6, horizontalalignment='right',
                  verticalalignment='top')
         if add_labels:
             plt.text(0.03, 0.05, '(a)', transform=ax_or.transAxes, fontsize=6,
-                 horizontalalignment='left', verticalalignment='bottom')
+                     horizontalalignment='left', verticalalignment='bottom')
 
         ylim = list(plt.ylim())
         ylim[0] -= (ylim[1] - ylim[0])/3
@@ -204,7 +204,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
         pos[3] /= 5
         ax_or.patch.set_alpha(0)
         xlim = plt.xlim()
-    
+
         ax = fig.add_axes(pos)
         ax.set_zorder(z_or-1)
         plt.plot(slice_z, current_prof, c='k', lw=0.5, alpha=0.5)
@@ -230,14 +230,14 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
 
         plt.subplot(gs[2])
         l1 = plt.plot(slice_z, slice_ene_sp, lw=1, c='tab:green',
-                      label='$\\sigma_\\gamma/\gamma$')
-        plt.ylabel('$\\sigma_\\gamma/\gamma$ [%]')
+                      label='$\\sigma_\\gamma/\\gamma$')
+        plt.ylabel('$\\sigma_\\gamma/\\gamma$ [%]')
         plt.tick_params(axis='x', which='both', labelbottom=False)
         # make room for legend
         ylim = list(plt.ylim())
         ylim[1] += (ylim[1] - ylim[0]) * leg_frac
         plt.ylim(ylim)
-    
+
         ax = plt.twinx()
         l2 = plt.plot(slice_z, slice_em_x, lw=1, c='tab:blue',
                       label='$\\epsilon_{n,x}$')
