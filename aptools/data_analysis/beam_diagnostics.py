@@ -4,7 +4,7 @@ import scipy.constants as ct
 import numpy as np
 
 from aptools.helper_functions import (weighted_std, create_beam_slices,
-                                      remove_correlation, filter_nans,
+                                      remove_correlation,
                                       calculate_slice_average)
 
 
@@ -896,7 +896,7 @@ def normalized_transverse_rms_slice_emittance(
                 x_slice, px_slice, w=w_slice)
             slice_weight[i] = np.sum(w_slice)
     slice_avg = calculate_slice_average(slice_em, slice_weight)
-    return slice_em, slice_weight, slice_lims
+    return slice_em, slice_weight, slice_lims, slice_avg
 
 
 def slice_twiss_parameters(
