@@ -4,7 +4,8 @@ import scipy.constants as ct
 import numpy as np
 
 from aptools.helper_functions import (weighted_std, create_beam_slices,
-                                      remove_correlation, filter_nans)
+                                      remove_correlation, filter_nans,
+                                      calculate_slice_average)
 
 
 def twiss_parameters(x, px, pz, py=None, w=None, emitt='tr',
@@ -195,7 +196,7 @@ def mean_kinetic_energy(px, py, pz, w=None):
     units, i.e. [1/(m_e c**2)]
     """
     return np.average(np.sqrt(np.square(px) + np.square(py) + np.square(pz)),
-                      weights=np.abs(w))
+                      weights=w)
 
 
 def mean_energy(px, py, pz, w=None):
@@ -222,7 +223,7 @@ def mean_energy(px, py, pz, w=None):
     -------
     A float with the mean energy in non-dimmensional units, i.e. [1/(m_e c**2)]
     """
-    return np.average(np.sqrt(1 + px**2 + py**2 + pz**2), weights=np.abs(w))
+    return np.average(np.sqrt(1 + px**2 + py**2 + pz**2), weights=w)
 
 
 def rms_energy_spread(px, py, pz, w=None):
@@ -450,7 +451,7 @@ def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=None,
             gamma_avg = np.average(gamma, weights=w)
             dgamma = (gamma - gamma_avg)/gamma_avg
             x = remove_correlation(dgamma, x, w, corr_order)
-        cov_x = np.cov(x, px, aweights=np.abs(w))
+        cov_x = np.cov(x, px, aweights=w)
         em_x = np.sqrt(np.linalg.det(cov_x))
     else:
         em_x = 0
@@ -584,7 +585,7 @@ def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=None,
             x = remove_correlation(dgamma, x, w, corr_order)
             # remove xp-gamma correlation
             xp = remove_correlation(dgamma, xp, w, corr_order)
-        cov_x = np.cov(x, xp, aweights=np.abs(w))
+        cov_x = np.cov(x, xp, aweights=w)
         em_x = np.sqrt(np.linalg.det(cov_x))
     else:
         em_x = 0
@@ -620,7 +621,7 @@ def longitudinal_rms_emittance(z, px, py, pz, w=None):
     A float with the emmitance value in units of m
     """
     g = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
-    cov_l = np.cov(z, g, aweights=np.abs(w))
+    cov_l = np.cov(z, g, aweights=w)
     em_l = np.sqrt(np.linalg.det(cov_l))
     return em_l
 
@@ -724,6 +725,7 @@ def relative_rms_slice_energy_spread(z, px, py, pz, w=None, n_slices=10,
     - An array with the relative energy spread value in each slice.
     - An array with the statistical weight of each slice.
     - An array with the slice edges.
+    - A float with the weigthed average of the slice values.
     """
     slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
     slice_ene_sp = np.zeros(n_slices)
@@ -743,12 +745,13 @@ def relative_rms_slice_energy_spread(z, px, py, pz, w=None, n_slices=10,
             slice_ene_sp[i] = relative_rms_energy_spread(px_slice, py_slice,
                                                          pz_slice, w_slice)
             slice_weight[i] = np.sum(w_slice)
-    return slice_ene_sp, slice_weight, slice_lims
+    slice_avg = calculate_slice_average(slice_ene_sp, slice_weight)
+    return slice_ene_sp, slice_weight, slice_lims, slice_avg
 
 
 def rms_relative_uncorrelated_slice_energy_spread(z, px, py, pz, w=None,
                                                   n_slices=10, len_slice=None):
-    """Calculate the uncorrelated energy spread of the provided particle
+    """Calculate the uncorrelated slcie energy spread of the provided particle
     distribution
 
     Parameters
@@ -771,10 +774,20 @@ def rms_relative_uncorrelated_slice_energy_spread(z, px, py, pz, w=None,
     w : array or single value
         Statistical weight of the particles.
 
+    n_slices : array
+        Number of longitudinal slices in which to divite the particle
+        distribution. Not used if len_slice is specified.
+
+    len_slice : array
+        Length of the longitudinal slices. If not None, replaces n_slices.
+
     Returns
     -------
-    A float with the energy spread value in non-dimmensional units,
-    i.e. [1/(m_e c**2)]
+    A tuple containing:
+    - An array with the relative energy spread value in each slice.
+    - An array with the statistical weight of each slice.
+    - An array with the slice edges.
+    - A float with the weigthed average of the slice values.
     """
     slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
     slice_ene_sp = np.zeros(n_slices)
@@ -795,7 +808,8 @@ def rms_relative_uncorrelated_slice_energy_spread(z, px, py, pz, w=None,
             slice_ene_sp[i] = rms_relative_uncorrelated_energy_spread(
                 z_slice, px_slice, py_slice, pz_slice, w_slice)
             slice_weight[i] = np.sum(w_slice)
-    return slice_ene_sp, slice_weight, slice_lims
+    slice_avg = calculate_slice_average(slice_ene_sp, slice_weight)
+    return slice_ene_sp, slice_weight, slice_lims, slice_avg
 
 
 def normalized_transverse_rms_slice_emittance(
@@ -848,6 +862,7 @@ def normalized_transverse_rms_slice_emittance(
     - An array with the emmitance value in each slice in units of m * rad.
     - An array with the statistical weight of each slice.
     - An array with the slice edges.
+    - A float with the weigthed average of the slice values.
     """
     if disp_corrected:
         # remove x-gamma correlation
@@ -880,6 +895,7 @@ def normalized_transverse_rms_slice_emittance(
             slice_em[i] = normalized_transverse_rms_emittance(
                 x_slice, px_slice, w=w_slice)
             slice_weight[i] = np.sum(w_slice)
+    slice_avg = calculate_slice_average(slice_em, slice_weight)
     return slice_em, slice_weight, slice_lims
 
 
@@ -930,11 +946,10 @@ def slice_twiss_parameters(
     Returns
     -------
     A tuple containing:
-    - An array with the beta function in each slice in units of m.
-    - An array with the alpha function in each slice.
-    - An array with the gamma function in each slice in units of m^{-1}.
+    - A list with the arrays of the alpha, beta [m] and gamma [m^-1] functions.
     - An array with the statistical weight of each slice.
     - An array with the slice edges.
+    - A list with the weighted average slice values of alpha, beta and gamma.
     """
     if disp_corrected:
         # remove x-gamma correlation
@@ -970,7 +985,12 @@ def slice_twiss_parameters(
             slice_alpha[i], slice_beta[i], slice_gamma[i] = twiss_parameters(
                 x_slice, px_slice, pz_slice, w=w_slice)
             slice_weight[i] = np.sum(w_slice)
-    return slice_alpha, slice_beta, slice_gamma, slice_weight, slice_lims
+    slice_twiss_params = [slice_alpha, slice_beta, slice_gamma]
+    alpha_avg = calculate_slice_average(slice_alpha, slice_weight)
+    beta_avg = calculate_slice_average(slice_beta, slice_weight)
+    gamma_avg = calculate_slice_average(slice_gamma, slice_weight)
+    slice_avgs = [alpha_avg, beta_avg, gamma_avg]
+    return slice_twiss_params, slice_weight, slice_lims, slice_avgs
 
 
 def energy_profile(z, px, py, pz, w=None, n_slices=10, len_slice=None):
