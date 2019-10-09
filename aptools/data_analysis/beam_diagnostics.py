@@ -1126,20 +1126,14 @@ def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6):
     ay, by, gy = twiss_parameters(y, py, pz, px, w=q)
     ene = mean_energy(px, py, pz, w=q)
     ene_sp = relative_rms_energy_spread(px, py, pz, w=q)
-    enespls, sl_w, _ = relative_rms_slice_energy_spread(z, px, py, pz, w=q,
-                                                        len_slice=len_slice)
-    enespls, sl_w = filter_nans(enespls, sl_w)
-    ene_sp_sl = np.average(enespls, weights=sl_w)
+    enespls, sl_w, sl_lim, ene_sp_sl = relative_rms_slice_energy_spread(
+        z, px, py, pz, w=q, len_slice=len_slice)
     em_x = normalized_transverse_rms_emittance(x, px, py, pz, w=q)
     em_y = normalized_transverse_rms_emittance(y, py, px, pz, w=q)
-    emsx, sl_w, _ = normalized_transverse_rms_slice_emittance(
+    emsx, sl_w,  sl_lim, em_sl_x = normalized_transverse_rms_slice_emittance(
         z, x, px, py, pz, w=q, len_slice=len_slice)
-    emsx, sl_w = filter_nans(emsx, sl_w)
-    em_sl_x = np.average(emsx, weights=sl_w)
-    emsy, sl_w, _ = normalized_transverse_rms_slice_emittance(
+    emsy, sl_w, sl_lim, em_sl_y = normalized_transverse_rms_slice_emittance(
         z, y, py, px, pz, w=q, len_slice=len_slice)
-    emsy, sl_w = filter_nans(emsy, sl_w)
-    em_sl_y = np.average(emsy, weights=sl_w)
     s_z = rms_length(z, w=q)
     s_x = rms_size(x, w=q)
     s_y = rms_size(y, w=q)

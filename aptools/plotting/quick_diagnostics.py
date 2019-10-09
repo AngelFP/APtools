@@ -43,9 +43,8 @@ def phase_space_overview(x, y, z, px, py, pz, q):
     dz = z - np.average(z, weights=q)
     s_z = bd.rms_length(z, w=q)
     s_g = bd.relative_rms_energy_spread(pz, py, pz, w=q)
-    s_g_sl, w_sl, sl_ed = bd.relative_rms_slice_energy_spread(z, px, py, pz,
-                                                              w=q, n_slices=10)
-    s_g_sl_av = np.average(s_g_sl, weights=w_sl)
+    s_g_sl, w_sl, sl_ed, s_g_sl_av = bd.relative_rms_slice_energy_spread(
+        z, px, py, pz, w=q, n_slices=10)
     c_prof, _ = bd.current_profile(z, q, n_slices=50)
     c_peak = max(abs(c_prof))/1e3  # kA
     # s_g_sl_c = s_g_sl[int(len(s_g_sl)/2)]
@@ -122,14 +121,14 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
         z, px, py, pz, w=q, n_slices=n_slices, len_slice=len_slice)
     slice_ene_sp, *_ = bd.relative_rms_slice_energy_spread(
         z, px, py, pz, w=q, n_slices=n_slices, len_slice=len_slice)
-    params = bd.slice_twiss_parameters(
+    sl_tw, *_ = bd.slice_twiss_parameters(
         z, x, px, pz, w=q, n_slices=n_slices, len_slice=len_slice)
-    alpha_x = params[0]
-    beta_x = params[1]
-    params = bd.slice_twiss_parameters(
+    alpha_x = sl_tw[0]
+    beta_x = sl_tw[1]
+    sl_tw, *_ = bd.slice_twiss_parameters(
         z, y, py, pz, w=q, n_slices=n_slices, len_slice=len_slice)
-    alpha_y = params[0]
-    beta_y = params[1]
+    alpha_y = sl_tw[0]
+    beta_y = sl_tw[1]
     slice_em_x, *_ = bd.normalized_transverse_rms_slice_emittance(
         z, x, px, w=q, n_slices=n_slices, len_slice=len_slice)
     slice_em_y, *_ = bd.normalized_transverse_rms_slice_emittance(
