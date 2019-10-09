@@ -138,6 +138,28 @@ def join_infile_path(*paths):
     return path
 
 
+def calculate_slice_average(slice_vals, slice_weights):
+    """
+    Calculates the weighted average of the computed sliced values and their
+    corresponding weights, not taking into account any possible NaN values in
+    the 'slice_vals' array.
+
+    Parameters
+    ----------
+    slice_vals: array
+        Array containing the slice values.
+
+    slice_weights: array
+        Array containing the statitical weights of each slice.
+
+    Returns
+    -------
+    The weighted average of 'slice_vals'.
+    """
+    slice_vals, slice_weights = filter_nans(slice_vals, slice_weights)
+    return np.average(slice_vals, weights=slice_weights)
+
+
 def filter_nans(data, data_weights):
     """
     Removes NaN values from a data array and is corresponding value in the
