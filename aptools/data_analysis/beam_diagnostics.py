@@ -451,7 +451,7 @@ def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=None,
             gamma_avg = np.average(gamma, weights=w)
             dgamma = (gamma - gamma_avg)/gamma_avg
             x = remove_correlation(dgamma, x, w, corr_order)
-        cov_x = np.cov(x, px, aweights=w)
+        cov_x = np.cov(x, px, aweights=np.abs(w))
         em_x = np.sqrt(np.linalg.det(cov_x))
     else:
         em_x = 0
@@ -585,7 +585,7 @@ def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=None,
             x = remove_correlation(dgamma, x, w, corr_order)
             # remove xp-gamma correlation
             xp = remove_correlation(dgamma, xp, w, corr_order)
-        cov_x = np.cov(x, xp, aweights=w)
+        cov_x = np.cov(x, xp, aweights=np.abs(w))
         em_x = np.sqrt(np.linalg.det(cov_x))
     else:
         em_x = 0
@@ -621,7 +621,7 @@ def longitudinal_rms_emittance(z, px, py, pz, w=None):
     A float with the emmitance value in units of m
     """
     g = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
-    cov_l = np.cov(z, g, aweights=w)
+    cov_l = np.cov(z, g, aweights=np.abs(w))
     em_l = np.sqrt(np.linalg.det(cov_l))
     return em_l
 
