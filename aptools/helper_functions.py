@@ -48,8 +48,8 @@ def weighted_avg(values, weights=None):
     -------
     A float with the value of the weighted average
     """
-    if w is not None:
-        w = np.abs(w)
+    if weights is not None:
+        weights = np.abs(weights)
     return np.average(values, weights=weights)
 
 
