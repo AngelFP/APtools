@@ -3,8 +3,8 @@
 import scipy.constants as ct
 import numpy as np
 
-from aptools.helper_functions import (weighted_avg, weighted_std,
-                                      create_beam_slices, remove_correlation,
+from aptools.helper_functions import (weighted_std, create_beam_slices,
+                                      remove_correlation,
                                       calculate_slice_average)
 
 
@@ -54,9 +54,9 @@ def twiss_parameters(x, px, pz, py=None, w=None, emitt='tr',
         em_x = normalized_transverse_rms_emittance(x, px, py, pz, w,
                                                    disp_corrected, corr_order)
         gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
-        gamma_avg = weighted_avg(gamma, weights=w)
-        x_avg = weighted_avg(x, weights=w)
-        px_avg = weighted_avg(px, weights=w)
+        gamma_avg = np.average(gamma, weights=w)
+        x_avg = np.average(x, weights=w)
+        px_avg = np.average(px, weights=w)
         # center x and x
         x = x - x_avg
         px = px - px_avg
@@ -64,27 +64,27 @@ def twiss_parameters(x, px, pz, py=None, w=None, emitt='tr',
             # remove x-gamma correlation
             dgamma = (gamma - gamma_avg)/gamma_avg
             x = remove_correlation(dgamma, x, w, corr_order)
-        b_x = weighted_avg(x**2, weights=w)*gamma_avg/em_x
-        a_x = -weighted_avg(x*px, weights=w)/em_x
+        b_x = np.average(x**2, weights=w)*gamma_avg/em_x
+        a_x = -np.average(x*px, weights=w)/em_x
     elif emitt == 'tr':
         em_x = transverse_trace_space_rms_emittance(x, px, py, pz, w,
                                                     disp_corrected, corr_order)
         xp = px/pz
         # center x and xp
-        x_avg = weighted_avg(x, weights=w)
-        xp_avg = weighted_avg(xp, weights=w)
+        x_avg = np.average(x, weights=w)
+        xp_avg = np.average(xp, weights=w)
         x = x - x_avg
         xp = xp - xp_avg
         if disp_corrected:
             # remove x-gamma correlation
             gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
-            gamma_avg = weighted_avg(gamma, weights=w)
+            gamma_avg = np.average(gamma, weights=w)
             dgamma = (gamma - gamma_avg)/gamma_avg
             x = remove_correlation(dgamma, x, w, corr_order)
             # remove xp-gamma correlation
             xp = remove_correlation(dgamma, xp, w, corr_order)
-        b_x = weighted_avg(x**2, weights=w)/em_x
-        a_x = -weighted_avg(x*xp, weights=w)/em_x
+        b_x = np.average(x**2, weights=w)/em_x
+        a_x = -np.average(x*xp, weights=w)/em_x
     g_x = (1 + a_x**2)/b_x
     return (a_x, b_x, g_x)
 
@@ -123,7 +123,7 @@ def dispersion(x, px, py, pz, gamma_ref=None, w=None):
     """
     gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
     if gamma_ref is None:
-        gamma_ref = weighted_avg(gamma, weights=w)
+        gamma_ref = np.average(gamma, weights=w)
     dgamma = (gamma - gamma_ref)/gamma_ref
     fit_coefs = np.polyfit(x, dgamma, 1, w=w)
     disp = fit_coefs[0]
@@ -195,7 +195,7 @@ def mean_kinetic_energy(px, py, pz, w=None):
     A float with the mean kinetic energy in non-dimmensional
     units, i.e. [1/(m_e c**2)]
     """
-    return weighted_avg(np.sqrt(np.square(px) + np.square(py) + np.square(pz)),
+    return np.average(np.sqrt(np.square(px) + np.square(py) + np.square(pz)),
                       weights=w)
 
 
@@ -223,7 +223,7 @@ def mean_energy(px, py, pz, w=None):
     -------
     A float with the mean energy in non-dimmensional units, i.e. [1/(m_e c**2)]
     """
-    return weighted_avg(np.sqrt(1 + px**2 + py**2 + pz**2), weights=w)
+    return np.average(np.sqrt(1 + px**2 + py**2 + pz**2), weights=w)
 
 
 def rms_energy_spread(px, py, pz, w=None):
@@ -317,8 +317,8 @@ def longitudinal_energy_chirp(z, px, py, pz, w=None):
     A float with the chirp value in units of m^(-1)
     """
     ene = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
-    mean_ene = weighted_avg(ene, weights=w)
-    mean_z = weighted_avg(z, weights=w)
+    mean_ene = np.average(ene, weights=w)
+    mean_z = np.average(z, weights=w)
     dE_rel = (ene-mean_ene) / mean_ene
     dz = z - mean_z
     p = np.polyfit(dz, dE_rel, 1)
@@ -356,7 +356,7 @@ def rms_relative_correlated_energy_spread(z, px, py, pz, w=None):
     i.e. [1/(m_e c**2)]
     """
     K = longitudinal_energy_chirp(z, px, py, pz, w)
-    mean_z = weighted_avg(z, weights=w)
+    mean_z = np.average(z, weights=w)
     dz = z - mean_z
     corr_ene = K*dz
     corr_ene_sp = weighted_std(corr_ene, w)
@@ -394,8 +394,8 @@ def rms_relative_uncorrelated_energy_spread(z, px, py, pz, w=None):
     """
     if len(z) > 1:
         ene = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
-        mean_ene = weighted_avg(ene, weights=w)
-        mean_z = weighted_avg(z, weights=w)
+        mean_ene = np.average(ene, weights=w)
+        mean_z = np.average(z, weights=w)
         dE = ene-mean_ene
         dz = z - mean_z
         p = np.polyfit(dz, dE, 1)
@@ -448,7 +448,7 @@ def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=None,
         if disp_corrected:
             # remove x-gamma correlation
             gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
-            gamma_avg = weighted_avg(gamma, weights=w)
+            gamma_avg = np.average(gamma, weights=w)
             dgamma = (gamma - gamma_avg)/gamma_avg
             x = remove_correlation(dgamma, x, w, corr_order)
         cov_x = np.cov(x, px, aweights=w)
@@ -489,7 +489,7 @@ def geometric_transverse_rms_emittance(x, px, py, pz, w=None,
     A float with the emmitance value in units of m * rad
     """
     gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
-    gamma_avg = weighted_avg(gamma, weights=w)
+    gamma_avg = np.average(gamma, weights=w)
     em_x = normalized_transverse_rms_emittance(x, px, py, pz, w,
                                                disp_corrected, corr_order)
     return em_x / gamma_avg
@@ -532,7 +532,7 @@ def normalized_transverse_trace_space_rms_emittance(
     A float with the emmitance value in units of m * rad
     """
     gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
-    gamma_avg = weighted_avg(gamma, weights=w)
+    gamma_avg = np.average(gamma, weights=w)
     em_x = transverse_trace_space_rms_emittance(x, px, py, pz, w,
                                                 disp_corrected, corr_order)
     return em_x * gamma_avg
@@ -580,7 +580,7 @@ def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=None,
         if disp_corrected:
             # remove x-gamma correlation
             gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
-            gamma_avg = weighted_avg(gamma, weights=w)
+            gamma_avg = np.average(gamma, weights=w)
             dgamma = (gamma - gamma_avg)/gamma_avg
             x = remove_correlation(dgamma, x, w, corr_order)
             # remove xp-gamma correlation
@@ -867,7 +867,7 @@ def normalized_transverse_rms_slice_emittance(
     if disp_corrected:
         # remove x-gamma correlation
         gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
-        gamma_avg = weighted_avg(gamma, weights=w)
+        gamma_avg = np.average(gamma, weights=w)
         dgamma = (gamma - gamma_avg)/gamma_avg
         x = remove_correlation(dgamma, x, w, corr_order)
     slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
@@ -954,7 +954,7 @@ def slice_twiss_parameters(
     if disp_corrected:
         # remove x-gamma correlation
         gamma = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
-        gamma_avg = weighted_avg(gamma, weights=w)
+        gamma_avg = np.average(gamma, weights=w)
         dgamma = (gamma - gamma_avg)/gamma_avg
         x = remove_correlation(dgamma, x, w, corr_order)
     slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
@@ -1139,11 +1139,11 @@ def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6):
     s_y = rms_size(y, w=q)
     s_px = np.std(px/pz)
     s_py = np.std(py/pz)
-    x_centroid = weighted_avg(x, weights=q)
-    y_centroid = weighted_avg(y, weights=q)
-    z_centroid = weighted_avg(z, weights=q)
-    px_centroid = weighted_avg(px, weights=q)
-    py_centroid = weighted_avg(py, weights=q)
+    x_centroid = np.average(x, weights=q)
+    y_centroid = np.average(y, weights=q)
+    z_centroid = np.average(z, weights=q)
+    px_centroid = np.average(px, weights=q)
+    py_centroid = np.average(py, weights=q)
     theta_x = px_centroid/ene
     theta_y = py_centroid/ene
     return (x_centroid, y_centroid, z_centroid, theta_x, theta_y,

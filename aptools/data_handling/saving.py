@@ -6,7 +6,7 @@ from os import path
 import numpy as np
 import scipy.constants as ct
 
-from aptools.helper_functions import weighted_avg, reposition_bunch
+from aptools.helper_functions import reposition_bunch
 
 
 def save_beam(code_name, beam_data, folder_path, file_name, reposition=False,
@@ -135,12 +135,12 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
     q = np.zeros(q_orig.size+2)
 
     # Reference particle
-    x[1] = weighted_avg(x_orig, weights=q_orig)
-    y[1] = weighted_avg(y_orig, weights=q_orig)
-    xi[1] = weighted_avg(xi_orig, weights=q_orig)
-    px[1] = weighted_avg(px_orig, weights=q_orig)
-    py[1] = weighted_avg(py_orig, weights=q_orig)
-    pz[1] = weighted_avg(pz_orig, weights=q_orig)
+    x[1] = np.average(x_orig, weights=q_orig)
+    y[1] = np.average(y_orig, weights=q_orig)
+    xi[1] = np.average(xi_orig, weights=q_orig)
+    px[1] = np.average(px_orig, weights=q_orig)
+    py[1] = np.average(py_orig, weights=q_orig)
+    pz[1] = np.average(pz_orig, weights=q_orig)
     q[1] = sum(q_orig)/len(q_orig)
 
     # Relative coordinates
@@ -234,12 +234,12 @@ def save_for_astra(beam_data, folder_path, file_name, reposition=False,
     q = np.zeros(q_orig.size+1)
 
     # Reference particle
-    x[0] = weighted_avg(x_orig, weights=q_orig)
-    y[0] = weighted_avg(y_orig, weights=q_orig)
-    xi[0] = weighted_avg(xi_orig, weights=q_orig)
-    px[0] = weighted_avg(px_orig, weights=q_orig)
-    py[0] = weighted_avg(py_orig, weights=q_orig)
-    pz[0] = weighted_avg(pz_orig, weights=q_orig)
+    x[0] = np.average(x_orig, weights=q_orig)
+    y[0] = np.average(y_orig, weights=q_orig)
+    xi[0] = np.average(xi_orig, weights=q_orig)
+    px[0] = np.average(px_orig, weights=q_orig)
+    py[0] = np.average(py_orig, weights=q_orig)
+    pz[0] = np.average(pz_orig, weights=q_orig)
     q[0] = sum(q_orig)/len(q_orig)
 
     # Put relative to reference particle

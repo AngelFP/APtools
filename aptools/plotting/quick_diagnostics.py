@@ -10,7 +10,6 @@ import scipy.constants as ct
 import aptools.data_analysis.beam_diagnostics as bd
 from aptools.data_handling.reading import read_beam
 from aptools.plotting.plot_types import scatter_histogram
-from aptools.helper_functions import weighted_avg
 
 
 aptools_rc_params = {'axes.linewidth': 0.5,
@@ -41,7 +40,7 @@ def phase_space_overview(x, y, z, px, py, pz, q):
     s_x = bd.rms_size(x, w=q)
     s_y = bd.rms_size(y, w=q)
     em_l = bd.longitudinal_rms_emittance(z, px, py, pz, w=q) * 1e6
-    dz = z - weighted_avg(z, weights=q)
+    dz = z - np.average(z, weights=q)
     s_z = bd.rms_length(z, w=q)
     s_g = bd.relative_rms_energy_spread(pz, py, pz, w=q)
     s_g_sl, w_sl, sl_ed, s_g_sl_av = bd.relative_rms_slice_energy_spread(
@@ -140,7 +139,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
     # perform operations
     gamma = np.sqrt(1 + px**2 + py**2 + pz**2)
     ene = gamma * ct.m_e*ct.c**2/ct.e * 1e-9  # GeV
-    z_center = weighted_avg(z, weights=q)
+    z_center = np.average(z, weights=q)
     dz = z_edges[1] - z_edges[0]
     slice_z = (z_edges[1:] - dz/2 - z_center) * 1e6  # micron
     current_prof = np.abs(current_prof) * 1e-3  # kA
@@ -164,7 +163,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
         ene *= 1e3
     else:
         ene_units = 'GeV'
-    ene_mean = weighted_avg(ene, weights=q)
+    ene_mean = np.average(ene, weights=q)
 
     # make plot
     if include_twiss:
