@@ -32,7 +32,28 @@ def create_beam_slices(z, n_slices=10, len_slice=None):
     return slice_lims, n_slices
 
 
-def weighted_std(values, weights=1):
+def weighted_avg(values, weights=None):
+    """Calculates the weighted average of the given values even when the
+    weights are negative (as it happens for negative charges)
+
+    Parameters
+    ----------
+    values: array
+        Contains the values to be analyzed
+
+    weights : array
+        Contains the weights of the values to analyze
+
+    Returns
+    -------
+    A float with the value of the weighted average
+    """
+    if w is not None:
+        w = np.abs(w)
+    return np.average(values, weights=weights)
+
+
+def weighted_std(values, weights=None):
     """Calculates the weighted standard deviation of the given values
 
     Parameters
@@ -47,8 +68,8 @@ def weighted_std(values, weights=1):
     -------
     A float with the value of the standard deviation
     """
-    mean_val = np.average(values, weights=np.abs(weights))
-    std = np.sqrt(np.average((values-mean_val)**2, weights=np.abs(weights)))
+    mean_val = weighted_avg(values, weights=weights)
+    std = np.sqrt(weighted_avg((values-mean_val)**2, weights=weights))
     return std
 
 
@@ -112,7 +133,7 @@ def reposition_bunch(beam_data, avg_pos):
     q = beam_data[6]
     for i, new_avg in enumerate(avg_pos):
         if new_avg is not None:
-            current_avg = np.average(beam_data[i], weights=q)
+            current_avg = weighted_avg(beam_data[i], weights=q)
             beam_data[i] += new_avg - current_avg
 
 
@@ -157,7 +178,7 @@ def calculate_slice_average(slice_vals, slice_weights):
     The weighted average of 'slice_vals'.
     """
     slice_vals, slice_weights = filter_nans(slice_vals, slice_weights)
-    return np.average(slice_vals, weights=slice_weights)
+    return weighted_avg(slice_vals, weights=slice_weights)
 
 
 def filter_nans(data, data_weights):
