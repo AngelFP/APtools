@@ -267,4 +267,4 @@ __pycache__/
 /build/lib/aptools
 /dist
 /tests.py
-/docs
+/docs_test
