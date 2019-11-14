@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/license-LGPLv3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0.html)
 
 <p align="center">
-  <img alt="fluentterminal logo" src="docs/logo/aptools_logo.png" width="300px" />
+  <img alt="aptools logo" src="docs/logo/aptools_logo.png" width="300px" />
 </p>
 
 
