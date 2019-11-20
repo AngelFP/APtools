@@ -319,9 +319,9 @@ def _check_beam_parameters(x, y, z, px, py, pz, q):
     """ Analyzes and prints the parameters of the generated distribution """
     print('Performing checks... ', end='')
     beam_params = bd.general_analysis(x, y, z, px, py, pz, q)
-    (x_centroid, y_centroid, theta_x, theta_y, b_x, b_y, a_x, a_y, g_x, g_y,
-     s_x, s_y, s_z, s_px, s_py, em_x, em_y, ene, ene_sp, em_sl_x, em_sl_y,
-     ene_sp_sl) = beam_params
+    (x_centroid, y_centroid, z_centroid, theta_x, theta_y,
+     b_x, b_y, a_x, a_y, g_x, g_y, s_x, s_y, s_z, s_px, s_py,
+     em_x, em_y, ene, ene_sp, em_sl_x, em_sl_y, ene_sp_sl) = beam_params
     print('Done.')
     print('Generated beam with:')
     print('-'*80)
