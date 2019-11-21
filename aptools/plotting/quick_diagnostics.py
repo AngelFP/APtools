@@ -221,7 +221,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
         ylim = list(plt.ylim())
         ylim[0] -= (ylim[1] - ylim[0])/3
         plt.ylim(ylim)
-        
+
         # current profile plot
         z_or = ax_or.get_zorder()
         pos = list(ax_or.get_position().bounds)
@@ -254,7 +254,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
         ax.set_zorder(z_or-1)
         plt.plot(ene_spectrum, ene_spec_edgs, c='k', lw=0.5, alpha=0.5)
         plt.fill_betweenx(ene_spec_edgs, ene_spectrum, facecolor='tab:gray',
-                         alpha=0.3)
+                          alpha=0.3)
         plt.gca().axis('off')
         plt.ylim(ylim)
 
@@ -272,10 +272,10 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
         else:
             plt.xlabel('$\\Delta z \\ [\\mathrm{\\mu m}]$')
         # make room for legend
-        #ylim = list(plt.ylim())
-        #ylim[1] += (ylim[1] - ylim[0]) * leg_frac
+        # ylim = list(plt.ylim())
+        # ylim[1] += (ylim[1] - ylim[0]) * leg_frac
         plt.xlim(xlim)
-        #plt.ylim(ylim)
+        # plt.ylim(ylim)
 
         ax = plt.twinx()
         l2 = plt.plot(slice_z, slice_em_x, lw=1, c='tab:blue',
@@ -284,9 +284,9 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
                       label='$\\epsilon_{n,y}$')
         plt.ylabel('$\\epsilon_{n} \\ [\\mathrm{\\mu m}]$')
         # make room for legend
-        #ylim = list(plt.ylim())
-        #ylim[1] += (ylim[1] - ylim[0]) * leg_frac
-        #plt.ylim(ylim)
+        # ylim = list(plt.ylim())
+        # ylim[1] += (ylim[1] - ylim[0]) * leg_frac
+        # plt.ylim(ylim)
         lines = l1 + l2 + l3
         labels = [l.get_label() for l in lines]
         plt.legend(lines, labels, fontsize=6, frameon=False,
@@ -317,9 +317,9 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
             lines = l1 + l2 + l3 + l4
             labels = [l.get_label() for l in lines]
             # make room for legend
-            #ylim = list(plt.ylim())
-            #ylim[1] += (ylim[1] - ylim[0]) * leg_frac
-            #plt.ylim(ylim)
+            # ylim = list(plt.ylim())
+            # ylim[1] += (ylim[1] - ylim[0]) * leg_frac
+            # plt.ylim(ylim)
             plt.legend(lines, labels, fontsize=6, ncol=1, frameon=False,
                        loc='upper right', borderaxespad=0.3, labelspacing=0.20)
             if add_labels:
