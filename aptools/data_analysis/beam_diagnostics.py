@@ -1082,6 +1082,44 @@ def current_profile(z, q, n_slices=10, len_slice=None):
     return current_prof, z_edges
 
 
+def energy_spectrum(px, py, pz, w=None, bins=10):
+    """Calculate the energy spectrum (histogram) of the given particle
+    distribution.
+
+    Parameters
+    ----------
+    px : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+
+    py : array
+        Contains the transverse momentum in the y direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+
+    pz : array
+        Contains the longitudinal momentum of the beam particles in
+        non-dimmensional units (beta*gamma)
+
+    w : array or single value
+        Statistical weight of the particles.
+
+    bins : int
+        Number of bins of the histogram.
+
+    Returns
+    -------
+    A tuple containing:
+    - An array with the energy histogram  (normalized to 1).
+    - An array with the bin edges of the histogram.
+    """
+    if w is not None:
+        w = np.abs(w)
+    gamma = np.sqrt(1 + px**2 + py**2 + pz**2)
+    ene_hist, bin_edges = np.histogram(gamma, bins=bins, weights=w)
+    ene_hist /= np.max(ene_hist)
+    return ene_hist, bin_edges
+
+
 def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6):
     """Quick method to analyze the most relevant beam parameters at once.
 
