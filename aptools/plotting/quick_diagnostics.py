@@ -150,7 +150,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
     dz = z_edges[1] - z_edges[0]
     slice_z = (z_edges[1:] - dz/2 - z_center) * 1e6  # micron
     current_prof = np.abs(current_prof) * 1e-3  # kA
-    peak_current = max(current_prof)
+    peak_current = np.nanmax(current_prof)
     len_fwhm *= 1e15/ct.c  # fs
     slice_ene *= ct.m_e*ct.c**2/ct.e * 1e-9  # GeV
     ene_spec_edgs = ene_spec_edgs[:-1] + (ene_spec_edgs[1]-ene_spec_edgs[0])/2
@@ -159,14 +159,14 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
     ene_sp_tot *= 1e2  # %
     slice_em_x *= 1e6  # micron
     slice_em_y *= 1e6  # micron
-    max_beta = max(beta_x)
+    max_beta = np.nanmax(beta_x)
     if max_beta <= 0.1:
         beta_units = 'mm'
         beta_x *= 1e3
         beta_y *= 1e3
     else:
         beta_units = 'm'
-    max_ene = max(ene)
+    max_ene = np.nanmax(ene)
     if max_ene <= 1:
         ene_units = 'MeV'
         ene *= 1e3
@@ -290,7 +290,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
         lines = l1 + l2 + l3
         labels = [l.get_label() for l in lines]
         plt.legend(lines, labels, fontsize=6, frameon=False,
-                   loc='upper right', borderaxespad=0.3)
+                   loc='center right', borderaxespad=0.3)
         if add_labels:
             plt.text(0.03, 0.05, '(b)', transform=plt.gca().transAxes,
                      fontsize=6, horizontalalignment='left',
@@ -321,7 +321,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
             # ylim[1] += (ylim[1] - ylim[0]) * leg_frac
             # plt.ylim(ylim)
             plt.legend(lines, labels, fontsize=6, ncol=1, frameon=False,
-                       loc='upper right', borderaxespad=0.3, labelspacing=0.20)
+                       loc='center right', borderaxespad=0.3, labelspacing=0.20)
             if add_labels:
                 plt.text(0.03, 0.05, '(c)', transform=plt.gca().transAxes,
                          fontsize=6, horizontalalignment='left',
