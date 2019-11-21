@@ -321,7 +321,8 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
             # ylim[1] += (ylim[1] - ylim[0]) * leg_frac
             # plt.ylim(ylim)
             plt.legend(lines, labels, fontsize=6, ncol=1, frameon=False,
-                       loc='center right', borderaxespad=0.3, labelspacing=0.20)
+                       loc='center right', borderaxespad=0.3,
+                       labelspacing=0.20)
             if add_labels:
                 plt.text(0.03, 0.05, '(c)', transform=plt.gca().transAxes,
                          fontsize=6, horizontalalignment='left',
