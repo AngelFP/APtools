@@ -10,6 +10,7 @@ import scipy.constants as ct
 import aptools.data_analysis.beam_diagnostics as bd
 from aptools.data_handling.reading import read_beam
 from aptools.plotting.plot_types import scatter_histogram
+from aptools.helper_functions import get_only_statistically_relevant_slices
 
 
 aptools_rc_params = {'axes.linewidth': 0.5,
@@ -111,24 +112,30 @@ def phase_space_overview(x, y, z, px, py, pz, q):
     plt.show()
 
 
-def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
-                   left=0.125, right=0.875, top=0.98, bottom=0.13,
-                   add_labels=False, include_twiss=False):
+def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
+                   ene_bins=50, left=0.125, right=0.875, top=0.98, bottom=0.13,
+                   add_labels=False, include_twiss=False, fig=None):
     # analyze beam
     current_prof, z_edges = bd.current_profile(z, q, n_slices=n_slices,
                                                len_slice=len_slice)
+    ene_spectrum, ene_spec_edgs = bd.energy_spectrum(px, py, pz, w=q,
+                                                     bins=ene_bins)
     slice_ene, *_ = bd.energy_profile(
         z, px, py, pz, w=q, n_slices=n_slices, len_slice=len_slice)
     slice_ene_sp, *_ = bd.relative_rms_slice_energy_spread(
         z, px, py, pz, w=q, n_slices=n_slices, len_slice=len_slice)
-    sl_tw, *_ = bd.slice_twiss_parameters(
+    sl_tw, sl_w, *_ = bd.slice_twiss_parameters(
         z, x, px, pz, w=q, n_slices=n_slices, len_slice=len_slice)
-    alpha_x = sl_tw[0]
-    beta_x = sl_tw[1]
+    alpha_x, *_ = get_only_statistically_relevant_slices(
+        sl_tw[0], sl_w, replace_with_nans=True)
+    beta_x, *_ = get_only_statistically_relevant_slices(
+        sl_tw[1], sl_w, replace_with_nans=True)
     sl_tw, *_ = bd.slice_twiss_parameters(
         z, y, py, pz, w=q, n_slices=n_slices, len_slice=len_slice)
-    alpha_y = sl_tw[0]
-    beta_y = sl_tw[1]
+    alpha_y, *_ = get_only_statistically_relevant_slices(
+        sl_tw[0], sl_w, replace_with_nans=True)
+    beta_y, *_ = get_only_statistically_relevant_slices(
+        sl_tw[1], sl_w, replace_with_nans=True)
     slice_em_x, *_ = bd.normalized_transverse_rms_slice_emittance(
         z, x, px, w=q, n_slices=n_slices, len_slice=len_slice)
     slice_em_y, *_ = bd.normalized_transverse_rms_slice_emittance(
@@ -146,6 +153,8 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
     peak_current = max(current_prof)
     len_fwhm *= 1e15/ct.c  # fs
     slice_ene *= ct.m_e*ct.c**2/ct.e * 1e-9  # GeV
+    ene_spec_edgs = ene_spec_edgs[:-1] + (ene_spec_edgs[1]-ene_spec_edgs[0])/2
+    ene_spec_edgs *= ct.m_e*ct.c**2/ct.e * 1e-9  # GeV
     slice_ene_sp *= 1e2  # %
     ene_sp_tot *= 1e2  # %
     slice_em_x *= 1e6  # micron
@@ -161,6 +170,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
     if max_ene <= 1:
         ene_units = 'MeV'
         ene *= 1e3
+        ene_spec_edgs *= 1e3
     else:
         ene_units = 'GeV'
     ene_mean = np.average(ene, weights=q)
@@ -169,12 +179,13 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
     if include_twiss:
         nrows = 3
         hr = [2.5, 1, 1]
-        fh = 3.5
+        fh = 3.3
     else:
         nrows = 2
         hr = [2.5, 1]
-        fh = 2.7
-    fig = plt.figure(figsize=(4, fh))
+        fh = 2.5
+    if fig is None:
+        fig = plt.figure(figsize=(4, fh))
     gs = gridspec.GridSpec(nrows, 2, height_ratios=hr,
                            width_ratios=[1, 0.02], hspace=0.1, wspace=0.05,
                            figure=fig, left=left, right=right,
@@ -195,23 +206,27 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
                        + '{:0.1f}$ kA\n'.format(peak_current)
                        + '$\\tau_\\mathrm{FWHM}='
                        + '{:0.1f}$ fs'.format(len_fwhm))
-        plt.text(0.95, 0.95, params_text, transform=ax_or.transAxes,
+        plt.text(0.98, 0.95, params_text, transform=ax_or.transAxes,
                  fontsize=6, horizontalalignment='right',
                  verticalalignment='top')
         if add_labels:
             plt.text(0.03, 0.05, '(a)', transform=ax_or.transAxes, fontsize=6,
                      horizontalalignment='left', verticalalignment='bottom')
 
+        xlim = list(plt.xlim())
+        xlim[0] -= (xlim[1] - xlim[0])/8
+        xlim[1] += (xlim[1] - xlim[0])/3
+        plt.xlim(xlim)
+
         ylim = list(plt.ylim())
         ylim[0] -= (ylim[1] - ylim[0])/3
         plt.ylim(ylim)
-
+        
+        # current profile plot
         z_or = ax_or.get_zorder()
         pos = list(ax_or.get_position().bounds)
         pos[3] /= 5
         ax_or.patch.set_alpha(0)
-        xlim = plt.xlim()
-
         ax = fig.add_axes(pos)
         ax.set_zorder(z_or-1)
         plt.plot(slice_z, current_prof, c='k', lw=0.5, alpha=0.5)
@@ -232,9 +247,22 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
         plt.xlim(xlim)
         plt.ylabel('I [kA]', color='tab:gray', fontsize=6)
 
+        # energy profile plot
+        pos = list(ax_or.get_position().bounds)
+        pos[2] /= 8
+        ax = fig.add_axes(pos)
+        ax.set_zorder(z_or-1)
+        plt.plot(ene_spectrum, ene_spec_edgs, c='k', lw=0.5, alpha=0.5)
+        plt.fill_betweenx(ene_spec_edgs, ene_spectrum, facecolor='tab:gray',
+                         alpha=0.3)
+        plt.gca().axis('off')
+        plt.ylim(ylim)
+
+        # colorbar
         ax = plt.subplot(gs[1])
         matplotlib.colorbar.Colorbar(ax, pscatt, label='Q [fC]')
 
+        # slice parameters plot
         plt.subplot(gs[2])
         l1 = plt.plot(slice_z, slice_ene_sp, lw=1, c='tab:green',
                       label='$\\sigma_\\gamma/\\gamma$')
@@ -244,9 +272,10 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
         else:
             plt.xlabel('$\\Delta z \\ [\\mathrm{\\mu m}]$')
         # make room for legend
-        ylim = list(plt.ylim())
-        ylim[1] += (ylim[1] - ylim[0]) * leg_frac
-        plt.ylim(ylim)
+        #ylim = list(plt.ylim())
+        #ylim[1] += (ylim[1] - ylim[0]) * leg_frac
+        plt.xlim(xlim)
+        #plt.ylim(ylim)
 
         ax = plt.twinx()
         l2 = plt.plot(slice_z, slice_em_x, lw=1, c='tab:blue',
@@ -255,17 +284,17 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
                       label='$\\epsilon_{n,y}$')
         plt.ylabel('$\\epsilon_{n} \\ [\\mathrm{\\mu m}]$')
         # make room for legend
-        ylim = list(plt.ylim())
-        ylim[1] += (ylim[1] - ylim[0]) * leg_frac
-        plt.ylim(ylim)
+        #ylim = list(plt.ylim())
+        #ylim[1] += (ylim[1] - ylim[0]) * leg_frac
+        #plt.ylim(ylim)
         lines = l1 + l2 + l3
         labels = [l.get_label() for l in lines]
-        plt.legend(lines, labels, fontsize=6, ncol=3, frameon=False,
-                   loc='upper right', borderaxespad=0)
+        plt.legend(lines, labels, fontsize=6, frameon=False,
+                   loc='upper right', borderaxespad=0.3)
         if add_labels:
-            plt.text(0.03, 0.95, '(b)', transform=plt.gca().transAxes,
+            plt.text(0.03, 0.05, '(b)', transform=plt.gca().transAxes,
                      fontsize=6, horizontalalignment='left',
-                     verticalalignment='top')
+                     verticalalignment='bottom')
 
         if include_twiss:
             plt.subplot(gs[4])
@@ -279,6 +308,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
             ylim = list(plt.ylim())
             ylim[1] += (ylim[1] - ylim[0]) * leg_frac
             plt.ylim(ylim)
+            plt.xlim(xlim)
             plt.twinx()
             l3 = plt.plot(slice_z, alpha_x, lw=1, c='tab:blue', ls='--',
                           label='$\\alpha_x$')
@@ -287,15 +317,15 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
             lines = l1 + l2 + l3 + l4
             labels = [l.get_label() for l in lines]
             # make room for legend
-            ylim = list(plt.ylim())
-            ylim[1] += (ylim[1] - ylim[0]) * leg_frac
-            plt.ylim(ylim)
-            plt.legend(lines, labels, fontsize=6, ncol=4, frameon=False,
-                       loc='upper right', borderaxespad=0)
+            #ylim = list(plt.ylim())
+            #ylim[1] += (ylim[1] - ylim[0]) * leg_frac
+            #plt.ylim(ylim)
+            plt.legend(lines, labels, fontsize=6, ncol=1, frameon=False,
+                       loc='upper right', borderaxespad=0.3, labelspacing=0.20)
             if add_labels:
-                plt.text(0.03, 0.95, '(c)', transform=plt.gca().transAxes,
+                plt.text(0.03, 0.05, '(c)', transform=plt.gca().transAxes,
                          fontsize=6, horizontalalignment='left',
-                         verticalalignment='top')
+                         verticalalignment='bottom')
             plt.ylabel('$\\alpha$')
 
     plt.show()
