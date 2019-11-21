@@ -1,6 +1,7 @@
 """This module contains methods needed by other modules"""
 
 import numpy as np
+from copy import copy
 
 
 def create_beam_slices(z, n_slices=10, len_slice=None):
@@ -181,3 +182,65 @@ def filter_nans(data, data_weights):
     data_weights_f = data_weights[filter_idx]
     data_f = data[filter_idx]
     return data_f, data_weights_f
+
+
+def determine_statistically_relevant_slices(slice_weights, min_fraction=1e-4):
+    """
+    Determines which beam slices have a statistically relevant weight
+
+    Parameters
+    ----------
+    slice_weights: array
+        Array containing the statistical weight of each slice.
+
+    min_fraction: float
+        Minimum fraction of the total weight of the particle distribution that
+        a slice needs to have to be considered statistically relevant.
+
+    Returns
+    -------
+    A boolean array of the same dimensions as slice_weights.
+    """
+    total_weight = np.sum(slice_weights)
+    slice_weights_rel = slice_weights / total_weight
+    return slice_weights_rel > min_fraction
+
+
+def get_only_statistically_relevant_slices(slice_param, slice_weights,
+                                           min_fraction=1e-4,
+                                           replace_with_nans=False):
+    """
+    Get the slice parameters only of slices which have a statistically
+    relevant weight.
+
+    Parameters
+    ----------
+    slice_weights: array
+        Array containing the values of the slice parameter.
+
+    slice_weights: array
+        Array containing the statistical weight of each slice.
+
+    min_fraction: float
+        Minimum fraction of the total weight of the particle distribution that
+        a slice needs to have to be considered statistically relevant.
+
+    replace_with_nans: bool
+        If True, the slice parameters and weights of non-relevant slices are
+        replaced by NaN instead of being removed.
+
+    Returns
+    -------
+    A boolean array of the same dimensions as slice_weights.
+    """
+    filter = determine_statistically_relevant_slices(slice_weights,
+                                                     min_fraction)
+    if replace_with_nans:
+        inv_filter = np.logical_not(filter)
+        slice_param = copy(slice_param)
+        slice_weights = copy(slice_weights)
+        slice_param[inv_filter] = np.nan
+        slice_weights[inv_filter] = np.nan
+        return slice_param, slice_weights
+    else:
+        return slice_param[filter], slice_weights[filter]
