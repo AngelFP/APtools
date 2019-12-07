@@ -6,6 +6,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import scipy.constants as ct
+from matplotlib import rc
+rc("savefig", dpi=400)
 
 import aptools.data_analysis.beam_diagnostics as bd
 from aptools.data_handling.reading import read_beam
@@ -114,7 +116,8 @@ def phase_space_overview(x, y, z, px, py, pz, q):
 
 def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
                    ene_bins=50, left=0.125, right=0.875, top=0.98, bottom=0.13,
-                   add_labels=False, include_twiss=False, fig=None):
+                   add_labels=False, include_twiss=False, fig=None,
+                   rasterized_scatter=None):
     # analyze beam
     current_prof, z_edges = bd.current_profile(z, q, n_slices=n_slices,
                                                len_slice=len_slice)
@@ -195,7 +198,8 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
     with plt.rc_context(aptools_rc_params):
         ax_or = plt.subplot(gs[0])
         pscatt = scatter_histogram((z-z_center)*1e6, ene, bins=300,
-                                   weights=np.abs(q)*1e15)
+                                   weights=np.abs(q)*1e15,
+                                   rasterized=rasterized_scatter)
         plt.ylabel('Energy [{}]'.format(ene_units))
         plt.tick_params(axis='x', which='both', labelbottom=False)
         params_text = ('$\\langle E \\rangle = '
