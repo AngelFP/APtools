@@ -6,8 +6,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import scipy.constants as ct
-from matplotlib import rc
-rc("savefig", dpi=400)
 
 import aptools.data_analysis.beam_diagnostics as bd
 from aptools.data_handling.reading import read_beam
