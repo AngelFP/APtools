@@ -1120,7 +1120,8 @@ def energy_spectrum(px, py, pz, w=None, bins=10):
     return ene_hist, bin_edges
 
 
-def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6):
+def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6,
+                     print_params=False):
     """Quick method to analyze the most relevant beam parameters at once.
 
     Parameters
@@ -1154,14 +1155,18 @@ def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6):
     len_slice : array
         Length of the longitudinal slices.
 
+    print_params : bool
+        If True, the parameters of the analyzed distribution will also be
+        printed.
+
     Returns
     -------
     A tuple containing the centroid position, pointing angle, Twiss parameters,
     bunch length, divergence, energy and the total and slice emittance and
     energy spread.
     """
-    ax, bx, gx = twiss_parameters(x, px, pz, py, w=q)
-    ay, by, gy = twiss_parameters(y, py, pz, px, w=q)
+    a_x, b_x, g_x = twiss_parameters(x, px, pz, py, w=q)
+    a_y, b_y, g_y = twiss_parameters(y, py, pz, px, w=q)
     ene = mean_energy(px, py, pz, w=q)
     ene_sp = relative_rms_energy_spread(px, py, pz, w=q)
     enespls, sl_w, sl_lim, ene_sp_sl = relative_rms_slice_energy_spread(
@@ -1172,6 +1177,8 @@ def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6):
         z, x, px, py, pz, w=q, len_slice=len_slice)
     emsy, sl_w, sl_lim, em_sl_y = normalized_transverse_rms_slice_emittance(
         z, y, py, px, pz, w=q, len_slice=len_slice)
+    i_peak = peak_current(z, q, len_slice=len_slice)
+    z_fwhm = fwhm_length(z, q, len_slice=len_slice)
     s_z = rms_length(z, w=q)
     s_x = rms_size(x, w=q)
     s_y = rms_size(y, w=q)
@@ -1184,6 +1191,31 @@ def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6):
     py_centroid = np.average(py, weights=q)
     theta_x = px_centroid/ene
     theta_y = py_centroid/ene
+
+    if print_params:
+        print('Parametes of particle distribution:')
+        print('-'*80)
+        print('number of particles = {}'.format(len(x)))
+        print('alpha_x = {:1.2e}, alpha_y = {:1.2e}'.format(a_x, a_y))
+        print('beta_x = {:1.2e} m, beta_y = {:1.2e} m'.format(b_x, b_y))
+        print('sigma_x = {:1.2e} m, sigma_y = {:1.2e} m'.format(s_x, s_y))
+        print('sigma_z = {:1.2e} m (sigma_t = {:1.2e} s)'.format(
+            s_z, s_z/ct.c))
+        print('z_fwhm = {:1.2e} m (t_fwhm = {:1.2e} s)'.format(
+            z_fwhm, z_fwhm/ct.c))
+        print('i_peak = {:1.2e} kA'.format(i_peak*1e-3))
+        print('norm_emitt_x = {:1.2e} m, norm_emitt_y = {:1.2e} m'.format(
+            em_x, em_y))
+        print(('norm_emitt_x_sl = {:1.2e} m, '
+               + 'norm_emitt_y_sl = {:1.2e} m').format(em_sl_x, em_sl_y))
+        print('gamma_avg = {:1.2e} (ene_avg = {:1.2e} MeV)'.format(
+            ene, ene*ct.m_e*ct.c**2/ct.e*1e-6))
+        print('gamma_spread = {:1.2e} ({:1.2e} %)'.format(ene_sp, ene_sp*100))
+        print('gamma_spread_sl = {:1.2e} ({:1.2e} %)'.format(
+            ene_sp_sl, ene_sp_sl*100))
+        print('-'*80)
+
     return (x_centroid, y_centroid, z_centroid, theta_x, theta_y,
-            bx, by, ax, ay, gx, gy, s_x, s_y, s_z, s_px, s_py,
-            em_x, em_y, ene, ene_sp, em_sl_x, em_sl_y, ene_sp_sl)
+            b_x, b_y, a_x, a_y, g_x, g_y, s_x, s_y, s_z, s_px, s_py,
+            em_x, em_y, ene, ene_sp, em_sl_x, em_sl_y, ene_sp_sl, i_peak,
+            z_fwhm)
