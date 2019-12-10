@@ -141,7 +141,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
         z, x, px, w=q, n_slices=n_slices, len_slice=len_slice)
     slice_em_y, *_ = bd.normalized_transverse_rms_slice_emittance(
         z, y, py, w=q, n_slices=n_slices, len_slice=len_slice)
-    s_z = rms_length(z, w=q)
+    s_z = bd.rms_length(z, w=q)
     len_fwhm = bd.fwhm_length(z, q, n_slices=n_slices, len_slice=len_slice)
     ene_sp_tot = bd.relative_rms_energy_spread(px, py, pz, w=q)
 
