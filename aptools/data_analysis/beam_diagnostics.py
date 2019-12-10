@@ -1165,6 +1165,7 @@ def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6,
     bunch length, divergence, energy and the total and slice emittance and
     energy spread.
     """
+    q_tot = np.sum(q)
     a_x, b_x, g_x = twiss_parameters(x, px, pz, py, w=q)
     a_y, b_y, g_y = twiss_parameters(y, py, pz, px, w=q)
     ene = mean_energy(px, py, pz, w=q)
@@ -1196,6 +1197,7 @@ def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6,
         print('Parametes of particle distribution:')
         print('-'*80)
         print('number of particles = {}'.format(len(x)))
+        print('q_tot = {:1.2e} C'.format(q_tot))
         print('alpha_x = {:1.2e}, alpha_y = {:1.2e}'.format(a_x, a_y))
         print('beta_x = {:1.2e} m, beta_y = {:1.2e} m'.format(b_x, b_y))
         print('sigma_x = {:1.2e} m, sigma_y = {:1.2e} m'.format(s_x, s_y))
