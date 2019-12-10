@@ -141,6 +141,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
         z, x, px, w=q, n_slices=n_slices, len_slice=len_slice)
     slice_em_y, *_ = bd.normalized_transverse_rms_slice_emittance(
         z, y, py, w=q, n_slices=n_slices, len_slice=len_slice)
+    s_z = rms_length(z, w=q)
     len_fwhm = bd.fwhm_length(z, q, n_slices=n_slices, len_slice=len_slice)
     ene_sp_tot = bd.relative_rms_energy_spread(px, py, pz, w=q)
 
@@ -152,6 +153,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
     slice_z = (z_edges[1:] - dz/2 - z_center) * 1e6  # micron
     current_prof = np.abs(current_prof) * 1e-3  # kA
     peak_current = np.nanmax(current_prof)
+    s_t = s_z * 1e15/ct.c
     len_fwhm *= 1e15/ct.c  # fs
     slice_ene *= ct.m_e*ct.c**2/ct.e * 1e-9  # GeV
     ene_spec_edgs = ene_spec_edgs[:-1] + (ene_spec_edgs[1]-ene_spec_edgs[0])/2
@@ -206,8 +208,8 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
                        + '{:0.1f}$ %\n'.format(ene_sp_tot)
                        + '$I_\\mathrm{peak}='
                        + '{:0.1f}$ kA\n'.format(peak_current)
-                       + '$\\tau_\\mathrm{FWHM}='
-                       + '{:0.1f}$ fs'.format(len_fwhm))
+                       + '$\\sigma_t='
+                       + '{:0.1f}$ fs'.format(s_t))
         plt.text(0.98, 0.95, params_text, transform=ax_or.transAxes,
                  fontsize=6, horizontalalignment='right',
                  verticalalignment='top')
