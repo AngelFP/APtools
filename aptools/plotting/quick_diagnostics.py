@@ -115,7 +115,7 @@ def phase_space_overview(x, y, z, px, py, pz, q):
 def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
                    ene_bins=50, left=0.125, right=0.875, top=0.98, bottom=0.13,
                    add_labels=False, include_twiss=False, fig=None,
-                   rasterized_scatter=None):
+                   rasterized_scatter=None, show=True):
     # analyze beam
     current_prof, z_edges = bd.current_profile(z, q, n_slices=n_slices,
                                                len_slice=len_slice)
@@ -332,5 +332,5 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
                          fontsize=6, horizontalalignment='left',
                          verticalalignment='bottom')
             plt.ylabel('$\\alpha$')
-
-    plt.show()
+    if show:
+        plt.show()
