@@ -249,6 +249,9 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
             label.set_horizontalalignment('left')
             label.set_verticalalignment('bottom')
         plt.xlim(xlim)
+        ylim_c = list(plt.ylim())
+        ylim_c[0] = 0
+        plt.ylim(ylim_c)
         plt.ylabel('I [kA]', color='tab:gray', fontsize=6)
 
         # energy profile plot
@@ -261,6 +264,9 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
                           alpha=0.3)
         plt.gca().axis('off')
         plt.ylim(ylim)
+        xlim_e = list(plt.xlim())
+        xlim_e[0] = 0
+        plt.xlim(xlim_e)
 
         # colorbar
         ax = plt.subplot(gs[1])
