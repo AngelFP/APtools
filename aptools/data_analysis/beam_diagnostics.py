@@ -1193,6 +1193,35 @@ def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6,
     theta_x = px_centroid/ene
     theta_y = py_centroid/ene
 
+    params_dict = {
+        'x_avg': x_centroid,
+        'y_avg': y_centroid,
+        'z_avg': z_centroid,
+        'theta_x': theta_x,
+        'theta_y': theta_y,
+        'sigma_x': s_x,
+        'sigma_y': s_y,
+        'sigma_z': s_z,
+        'z_fwhm': z_fwhm,
+        'sigma_px': s_px,
+        'sigma_py': s_py,
+        'alpha_x': a_x,
+        'alpha_y': a_y,
+        'beta_x': b_x,
+        'beta_y': b_y,
+        'gamma_x': g_x,
+        'gamma_y': g_y,
+        'emitt_nx': em_x,
+        'emitt_ny': em_y,
+        'emitt_nx_sl': em_sl_x,
+        'emitt_ny_sl': em_sl_y,
+        'ene_avg': ene,
+        'rel_ene_sp': ene_sp,
+        'rel_ene_sp_sl': ene_sp_sl,
+        'i_peak': i_peak,
+        'q': q_tot
+    }
+
     if print_params:
         print('Parametes of particle distribution:')
         print('-'*80)
@@ -1217,7 +1246,4 @@ def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6,
             ene_sp_sl, ene_sp_sl*100))
         print('-'*80)
 
-    return (x_centroid, y_centroid, z_centroid, theta_x, theta_y,
-            b_x, b_y, a_x, a_y, g_x, g_y, s_x, s_y, s_z, s_px, s_py,
-            em_x, em_y, ene, ene_sp, em_sl_x, em_sl_y, ene_sp_sl, i_peak,
-            z_fwhm)
+    return params_dict
