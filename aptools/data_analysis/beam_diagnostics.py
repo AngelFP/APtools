@@ -452,7 +452,7 @@ def normalized_transverse_rms_emittance(x, px, py=None, pz=None, w=None,
             dgamma = (gamma - gamma_avg)/gamma_avg
             x = remove_correlation(dgamma, x, w, corr_order)
         cov_x = np.cov(x, px, aweights=np.abs(w))
-        em_x = np.sqrt(np.linalg.det(cov_x))
+        em_x = np.sqrt(np.linalg.det(cov_x.astype(np.float32, copy=False)))
     else:
         em_x = 0
     return em_x
@@ -586,7 +586,7 @@ def transverse_trace_space_rms_emittance(x, px, py=None, pz=None, w=None,
             # remove xp-gamma correlation
             xp = remove_correlation(dgamma, xp, w, corr_order)
         cov_x = np.cov(x, xp, aweights=np.abs(w))
-        em_x = np.sqrt(np.linalg.det(cov_x))
+        em_x = np.sqrt(np.linalg.det(cov_x.astype(np.float32, copy=False)))
     else:
         em_x = 0
     return em_x
@@ -622,7 +622,7 @@ def longitudinal_rms_emittance(z, px, py, pz, w=None):
     """
     g = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
     cov_l = np.cov(z, g, aweights=np.abs(w))
-    em_l = np.sqrt(np.linalg.det(cov_l))
+    em_l = np.sqrt(np.linalg.det(cov_l.astype(np.float32, copy=False)))
     return em_l
 
 
@@ -1120,7 +1120,7 @@ def energy_spectrum(px, py, pz, w=None, bins=10):
     return ene_hist, bin_edges
 
 
-def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6,
+def general_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
                      print_params=False):
     """Quick method to analyze the most relevant beam parameters at once.
 
@@ -1171,15 +1171,15 @@ def general_analysis(x, y, z, px, py, pz, q, len_slice=0.1e-6,
     ene = mean_energy(px, py, pz, w=q)
     ene_sp = relative_rms_energy_spread(px, py, pz, w=q)
     enespls, sl_w, sl_lim, ene_sp_sl = relative_rms_slice_energy_spread(
-        z, px, py, pz, w=q, len_slice=len_slice)
+        z, px, py, pz, w=q, n_slices=n_slices, len_slice=len_slice)
     em_x = normalized_transverse_rms_emittance(x, px, py, pz, w=q)
     em_y = normalized_transverse_rms_emittance(y, py, px, pz, w=q)
     emsx, sl_w,  sl_lim, em_sl_x = normalized_transverse_rms_slice_emittance(
-        z, x, px, py, pz, w=q, len_slice=len_slice)
+        z, x, px, py, pz, w=q, n_slices=n_slices, len_slice=len_slice)
     emsy, sl_w, sl_lim, em_sl_y = normalized_transverse_rms_slice_emittance(
-        z, y, py, px, pz, w=q, len_slice=len_slice)
-    i_peak = peak_current(z, q, len_slice=len_slice)
-    z_fwhm = fwhm_length(z, q, len_slice=len_slice)
+        z, y, py, px, pz, w=q, n_slices=n_slices, len_slice=len_slice)
+    i_peak = peak_current(z, q, n_slices=n_slices, len_slice=len_slice)
+    z_fwhm = fwhm_length(z, q, n_slices=n_slices, len_slice=len_slice)
     s_z = rms_length(z, w=q)
     s_x = rms_size(x, w=q)
     s_y = rms_size(y, w=q)
