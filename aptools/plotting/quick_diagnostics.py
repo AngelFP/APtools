@@ -298,7 +298,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
         # ylim[1] += (ylim[1] - ylim[0]) * leg_frac
         # plt.ylim(ylim)
         lines = l1 + l2 + l3
-        labels = [l.get_label() for l in lines]
+        labels = [line.get_label() for line in lines]
         plt.legend(lines, labels, fontsize=6, frameon=False,
                    loc='center right', borderaxespad=0.3)
         if add_labels:
@@ -325,7 +325,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
             l4 = plt.plot(slice_z, alpha_y, lw=1, c='tab:orange', ls='--',
                           label='$\\alpha_y$')
             lines = l1 + l2 + l3 + l4
-            labels = [l.get_label() for l in lines]
+            labels = [line.get_label() for line in lines]
             # make room for legend
             # ylim = list(plt.ylim())
             # ylim[1] += (ylim[1] - ylim[0]) * leg_frac
