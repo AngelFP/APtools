@@ -1229,6 +1229,7 @@ def general_analysis(x, y, z, px, py, pz, q, n_slices=10, len_slice=None,
         print('q_tot = {:1.2e} C'.format(q_tot))
         print('alpha_x = {:1.2e}, alpha_y = {:1.2e}'.format(a_x, a_y))
         print('beta_x = {:1.2e} m, beta_y = {:1.2e} m'.format(b_x, b_y))
+        print('gamma_x = {:1.2e} 1/m, gamma_y = {:1.2e} 1/m'.format(g_x, g_y))
         print('sigma_x = {:1.2e} m, sigma_y = {:1.2e} m'.format(s_x, s_y))
         print('sigma_z = {:1.2e} m (sigma_t = {:1.2e} s)'.format(
             s_z, s_z/ct.c))
