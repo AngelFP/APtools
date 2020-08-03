@@ -85,7 +85,7 @@ def remove_correlation(x, y, w=None, order=1):
 
     Parameters
     ----------
-    y: array
+    x: array
         Contains the x values
 
     y: array
