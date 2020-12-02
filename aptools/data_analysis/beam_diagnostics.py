@@ -285,8 +285,7 @@ def fwhm_energy_spread(z, px, py, pz, w=None, n_slices=10, len_slice=None):
     """
     part_ene = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
     slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
-    sl_len = slice_lims[1] - slice_lims[0]
-    gamma_hist, z_edges = np.histogram(part_ene, bins=n_slices, weights=q)
+    gamma_hist, z_edges = np.histogram(part_ene, bins=n_slices, weights=w)
     slice_pos = z_edges[1:] - abs(z_edges[1]-z_edges[0])/2
     peak = max(gamma_hist)
     slices_in_fwhm = slice_pos[np.where(gamma_hist >= peak/2)]
