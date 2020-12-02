@@ -257,6 +257,76 @@ def rms_energy_spread(px, py, pz, w=None):
     return ene_std
 
 
+def fwhm_energy_spread(z, px, py, pz, w=None, n_slices=10, len_slice=None):
+    """Calculate the absolute FWHM energy spread of the provided particle
+    distribution
+
+    Parameters
+    ----------
+    px : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+
+    py : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+
+    pz : array
+        Contains the longitudonal momentum of the beam particles in
+        non-dimmensional units (beta*gamma)
+
+    w : array or single value
+        Statistical weight of the particles.
+
+    Returns
+    -------
+    A float with the energy spread value in non-dimmensional units,
+    i.e. [1/(m_e c**2)]
+    """
+    part_ene = np.sqrt(1 + np.square(px) + np.square(py) + np.square(pz))
+    slice_lims, n_slices = create_beam_slices(z, n_slices, len_slice)
+    sl_len = slice_lims[1] - slice_lims[0]
+    gamma_hist, z_edges = np.histogram(part_ene, bins=n_slices, weights=q)
+    slice_pos = z_edges[1:] - abs(z_edges[1]-z_edges[0])/2
+    peak = max(gamma_hist)
+    slices_in_fwhm = slice_pos[np.where(gamma_hist >= peak/2)]
+    fwhm = max(slices_in_fwhm) - min(slices_in_fwhm)
+    return fwhm
+
+
+def relative_fwhm_energy_spread(z, px, py, pz, w=None, n_slices=10,
+                                len_slice=None):
+    """Calculate the relative RMS energy spread of the provided particle
+    distribution
+
+    Parameters
+    ----------
+    px : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+
+    py : array
+        Contains the transverse momentum in the x direction of the
+        beam particles in non-dimmensional units (beta*gamma)
+
+    pz : array
+        Contains the longitudonal momentum of the beam particles in
+        non-dimmensional units (beta*gamma)
+
+    w : array or single value
+        Statistical weight of the particles.
+
+    Returns
+    -------
+    A float with the relative energy spread value.
+    """
+    abs_spread = fwhm_energy_spread(z, px, py, pz, w=w, n_slices=n_slices,
+                                    len_slice=len_slice)
+    mean_ene = mean_energy(px, py, pz, w)
+    rel_spread = abs_spread/mean_ene
+    return rel_spread
+
+
 def relative_rms_energy_spread(px, py, pz, w=None):
     """Calculate the relative RMS energy spread of the provided particle
     distribution
