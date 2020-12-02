@@ -385,7 +385,6 @@ def lon_phase_space(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
                            width_ratios=[1, 0.02], hspace=0.1, wspace=0.05,
                            figure=fig, left=left, right=right,
                            top=top, bottom=bottom)
-    leg_frac = 0.25  # space to reserve for legend
 
     with plt.rc_context(aptools_rc_params):
         ax_or = plt.subplot(gs[0])
@@ -468,6 +467,5 @@ def lon_phase_space(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
         ax = plt.subplot(gs[1])
         matplotlib.colorbar.Colorbar(ax, pscatt, label='Q [fC]')
 
-        
     if show:
         plt.show()
