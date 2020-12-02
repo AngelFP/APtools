@@ -340,3 +340,133 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
             plt.ylabel('$\\alpha$')
     if show:
         plt.show()
+
+
+def lon_phase_space(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
+                    ene_bins=50, xlim=None, ylim=None, show_text=True,
+                    left=0.125, right=0.875, top=0.98, bottom=0.13,
+                    fig=None, rasterized_scatter=None, show=True):
+    # analyze beam
+    current_prof, z_edges = bd.current_profile(z, q, n_slices=n_slices,
+                                               len_slice=len_slice)
+    ene_spectrum, ene_spec_edgs = bd.energy_spectrum(px, py, pz, w=q,
+                                                     bins=ene_bins)
+    s_z = bd.rms_length(z, w=q)
+    len_fwhm = bd.fwhm_length(z, q, n_slices=n_slices, len_slice=len_slice)
+    ene_sp_tot = bd.relative_rms_energy_spread(px, py, pz, w=q)
+
+    # perform operations
+    gamma = np.sqrt(1 + px**2 + py**2 + pz**2)
+    ene = gamma * ct.m_e*ct.c**2/ct.e * 1e-9  # GeV
+    z_center = np.average(z, weights=q)
+    dz = z_edges[1] - z_edges[0]
+    slice_z = (z_edges[1:] - dz/2 - z_center) * 1e6  # micron
+    current_prof = np.abs(current_prof) * 1e-3  # kA
+    peak_current = np.nanmax(current_prof)
+    s_t = s_z * 1e15/ct.c
+    len_fwhm *= 1e15/ct.c  # fs
+    ene_spec_edgs = ene_spec_edgs[:-1] + (ene_spec_edgs[1]-ene_spec_edgs[0])/2
+    ene_spec_edgs *= ct.m_e*ct.c**2/ct.e * 1e-9  # GeV
+    ene_sp_tot *= 1e2  # %
+    max_ene = np.nanmax(ene)
+    if max_ene <= 1:
+        ene_units = 'MeV'
+        ene *= 1e3
+        ene_spec_edgs *= 1e3
+    else:
+        ene_units = 'GeV'
+    ene_mean = np.average(ene, weights=q)
+
+    # make plot
+    if fig is None:
+        fig = plt.figure(figsize=(4, 2.5))
+    gs = gridspec.GridSpec(1, 2,
+                           width_ratios=[1, 0.02], hspace=0.1, wspace=0.05,
+                           figure=fig, left=left, right=right,
+                           top=top, bottom=bottom)
+    leg_frac = 0.25  # space to reserve for legend
+
+    with plt.rc_context(aptools_rc_params):
+        ax_or = plt.subplot(gs[0])
+        pscatt = scatter_histogram((z-z_center)*1e6, ene, bins=300,
+                                   weights=np.abs(q)*1e15,
+                                   rasterized=rasterized_scatter)
+        plt.xlabel('$\\Delta z \\ [\\mathrm{\\mu m}]$')
+        plt.ylabel('Energy [{}]'.format(ene_units))
+        if show_text:
+            params_text = ('$\\langle E \\rangle = '
+                           + '{:0.1f}$ {}\n'.format(ene_mean, ene_units)
+                           + '$\\sigma_\\mathrm{E,rel}='
+                           + '{:0.1f}$ %\n'.format(ene_sp_tot)
+                           + '$I_\\mathrm{peak}='
+                           + '{:0.1f}$ kA\n'.format(peak_current)
+                           + '$\\sigma_t='
+                           + '{:0.1f}$ fs'.format(s_t))
+            plt.text(0.98, 0.95, params_text, transform=ax_or.transAxes,
+                     fontsize=6, horizontalalignment='right',
+                     verticalalignment='top')
+
+        if xlim is not None:
+            plt.xlim(xlim)
+        else:
+            xlim = list(plt.xlim())
+            xlim[0] -= (xlim[1] - xlim[0])/8
+            if show_text:
+                xlim[1] += (xlim[1] - xlim[0])/3
+            plt.xlim(xlim)
+        if ylim is not None:
+            plt.ylim(ylim)
+        else:
+            ylim = list(plt.ylim())
+            ylim[0] -= (ylim[1] - ylim[0])/3
+            plt.ylim(ylim)
+
+        # current profile plot
+        z_or = ax_or.get_zorder()
+        pos = list(ax_or.get_position().bounds)
+        pos[3] /= 5
+        ax_or.patch.set_alpha(0)
+        ax = fig.add_axes(pos)
+        ax.set_zorder(z_or-1)
+        plt.plot(slice_z, current_prof, c='k', lw=0.5, alpha=0.5)
+        plt.fill_between(slice_z, current_prof, facecolor='tab:gray',
+                         alpha=0.3)
+        ax.spines['left'].set_position('zero')
+        ax.spines['left'].set_color('tab:grey')
+        ax.tick_params(axis='y', colors='tab:grey', labelsize=6,
+                       direction="in", pad=-4)
+        ax.spines['right'].set_color('none')
+        ax.spines['top'].set_color('none')
+        ax.yaxis.set_ticks_position('left')
+        ax.xaxis.set_ticks_position('bottom')
+        plt.tick_params(axis='x', which='both', labelbottom=False)
+        for label in ax.yaxis.get_ticklabels():
+            label.set_horizontalalignment('left')
+            label.set_verticalalignment('bottom')
+        plt.xlim(xlim)
+        ylim_c = list(plt.ylim())
+        ylim_c[0] = 0
+        plt.ylim(ylim_c)
+        plt.ylabel('I [kA]', color='tab:gray', fontsize=6)
+
+        # energy profile plot
+        pos = list(ax_or.get_position().bounds)
+        pos[2] /= 8
+        ax = fig.add_axes(pos)
+        ax.set_zorder(z_or-1)
+        plt.plot(ene_spectrum, ene_spec_edgs, c='k', lw=0.5, alpha=0.5)
+        plt.fill_betweenx(ene_spec_edgs, ene_spectrum, facecolor='tab:gray',
+                          alpha=0.3)
+        plt.gca().axis('off')
+        plt.ylim(ylim)
+        xlim_e = list(plt.xlim())
+        xlim_e[0] = 0
+        plt.xlim(xlim_e)
+
+        # colorbar
+        ax = plt.subplot(gs[1])
+        matplotlib.colorbar.Colorbar(ax, pscatt, label='Q [fC]')
+
+        
+    if show:
+        plt.show()
