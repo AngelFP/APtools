@@ -5,7 +5,7 @@ import numpy as np
 
 
 def scatter_histogram(x, y, bins=[300, 300], range=None, weights=None,
-                      cmap='plasma', s=1, edgecolor='none', **kwargs):
+                      cmap='plasma', s=1, edgecolor='none', ax=None, **kwargs):
     """
     Does a scatter plot from the histogram of a particle distribution.
     """
@@ -18,16 +18,24 @@ def scatter_histogram(x, y, bins=[300, 300], range=None, weights=None,
     X = X.flatten()
     Y = Y.flatten()
     # filter out empty areas
-    filt = np.where(counts > 0)
+    filt = np.where(np.abs(counts) > 0)
     counts = counts[filt]
     # determine order in which the scatter dots will be drawn so that higher
     # values appear on top
-    draw_order = np.argsort(counts)
+    draw_order = np.argsort(np.abs(counts))
     counts = counts[draw_order]
     # normalize counts
     # counts /= np.max(counts)
     # apply filter and draw order to X and Y arrays
     X = X[filt][draw_order]
     Y = Y[filt][draw_order]
-    return plt.scatter(X, Y, c=counts, s=s, cmap=cmap, edgecolor=edgecolor,
-                       **kwargs)
+    if ax is None:
+        sc = plt.scatter(X, Y, c=counts, s=s, cmap=cmap, edgecolor=edgecolor,
+                         **kwargs)
+        ax = plt.gca()
+    else:
+        sc = ax.scatter(X, Y, c=counts, s=s, cmap=cmap, edgecolor=edgecolor,
+                        **kwargs)
+    ax.set_xlim((np.min(xedges), np.max(xedges)))
+    ax.set_ylim((np.min(yedges), np.max(yedges)))
+    return sc
