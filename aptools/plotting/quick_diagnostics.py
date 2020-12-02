@@ -33,7 +33,7 @@ def phase_space_overview_from_file(code_name, file_path, **kwargs):
     phase_space_overview(x, y, z, px, py, pz, q)
 
 
-def phase_space_overview(x, y, z, px, py, pz, q):
+def phase_space_overview(x, y, z, px, py, pz, q, show=True):
     em_x = bd.normalized_transverse_rms_emittance(x, px, w=q) * 1e6
     em_y = bd.normalized_transverse_rms_emittance(y, py, w=q) * 1e6
     a_x, b_x, g_x = bd.twiss_parameters(x, px, pz, w=q)
@@ -109,7 +109,8 @@ def phase_space_overview(x, y, z, px, py, pz, q):
                  + '{}'.format(np.around(c_peak, 2)) + ' kA',
                  transform=ax_3.transAxes, fontsize=8)
         plt.tight_layout()
-    plt.show()
+    if show:
+        plt.show()
 
 
 def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
