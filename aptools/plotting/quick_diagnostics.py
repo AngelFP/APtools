@@ -115,8 +115,8 @@ def phase_space_overview(x, y, z, px, py, pz, q, show=True):
 
 def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
                    ene_bins=50, left=0.125, right=0.875, top=0.98, bottom=0.13,
-                   add_labels=False, include_twiss=False, fig=None,
-                   rasterized_scatter=None, show=True):
+                   xlim=None, ylim=None, add_labels=False, include_twiss=False,
+                   fig=None, rasterized_scatter=None, show=True):
     # analyze beam
     current_prof, z_edges = bd.current_profile(z, q, n_slices=n_slices,
                                                len_slice=len_slice)
@@ -218,13 +218,15 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
             plt.text(0.03, 0.05, '(a)', transform=ax_or.transAxes, fontsize=6,
                      horizontalalignment='left', verticalalignment='bottom')
 
-        xlim = list(plt.xlim())
-        xlim[0] -= (xlim[1] - xlim[0])/8
-        xlim[1] += (xlim[1] - xlim[0])/3
+        if xlim is None:
+            xlim = list(plt.xlim())
+            xlim[0] -= (xlim[1] - xlim[0])/8
+            xlim[1] += (xlim[1] - xlim[0])/3
         plt.xlim(xlim)
 
-        ylim = list(plt.ylim())
-        ylim[0] -= (ylim[1] - ylim[0])/3
+        if ylim is None:
+            ylim = list(plt.ylim())
+            ylim[0] -= (ylim[1] - ylim[0])/3
         plt.ylim(ylim)
 
         # current profile plot
