@@ -8,7 +8,7 @@ import scipy.constants as ct
 from openpmd_api import (Series, Access, Dataset, Mesh_Record_Component,
                          Unit_Dimension)
 
-from aptools.helper_functions import reposition_bunch
+from aptools.helper_functions import reposition_bunch, get_particle_subset
 from aptools.__version__ import __version__
 
 
@@ -109,6 +109,11 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
     if reposition:
         reposition_bunch(beam_data, avg_pos+avg_mom)
 
+    # Create subset of n_part
+    if n_part is not None:
+        beam_data = get_particle_subset(
+            beam_data, n_part, preserve_charge=True)
+
     # Get beam data
     x_orig = beam_data[0]
     y_orig = beam_data[1]
@@ -117,20 +122,6 @@ def save_for_csrtrack_fmt1(beam_data, folder_path, file_name, reposition=False,
     py_orig = beam_data[4]*ct.m_e*ct.c**2/ct.e
     pz_orig = beam_data[5]*ct.m_e*ct.c**2/ct.e
     q_orig = beam_data[6]
-
-    # Create subset of n_part
-    if (n_part is not None and n_part < len(q_orig)):
-        q_tot = np.sum(q_orig)
-        q_part = q_tot/n_part
-        i = np.arange(len(q_orig))
-        i = np.random.choice(i, size=int(n_part))
-        x_orig = x_orig[i]
-        y_orig = y_orig[i]
-        xi_orig = xi_orig[i]
-        px_orig = px_orig[i]
-        py_orig = py_orig[i]
-        pz_orig = pz_orig[i]
-        q_orig = np.ones(x_orig.size)*q_part
 
     # Create arrays
     x = np.zeros(q_orig.size+2)
@@ -208,6 +199,11 @@ def save_for_astra(beam_data, folder_path, file_name, reposition=False,
     if reposition:
         reposition_bunch(beam_data, avg_pos+avg_mom)
 
+    # Create subset of n_part
+    if n_part is not None:
+        beam_data = get_particle_subset(
+            beam_data, n_part, preserve_charge=True)
+
     # Get beam data
     x_orig = beam_data[0]
     y_orig = beam_data[1]
@@ -216,20 +212,6 @@ def save_for_astra(beam_data, folder_path, file_name, reposition=False,
     py_orig = beam_data[4]*ct.m_e*ct.c**2/ct.e
     pz_orig = beam_data[5]*ct.m_e*ct.c**2/ct.e
     q_orig = beam_data[6]*1e9  # nC
-
-    # Create subset of n_part
-    if (n_part is not None and n_part < len(q_orig)):
-        q_tot = np.sum(q_orig)
-        q_part = q_tot/n_part
-        i = np.arange(len(q_orig))
-        i = np.random.choice(i, size=int(n_part))
-        x_orig = x_orig[i]
-        y_orig = y_orig[i]
-        xi_orig = xi_orig[i]
-        px_orig = px_orig[i]
-        py_orig = py_orig[i]
-        pz_orig = pz_orig[i]
-        q_orig = np.ones(x_orig.size)*q_part
 
     # Create arrays
     x = np.zeros(q_orig.size+1)
@@ -314,6 +296,11 @@ def save_for_fbpic(beam_data, folder_path, file_name, reposition=False,
     if reposition:
         reposition_bunch(beam_data, avg_pos+avg_mom)
 
+    # Create subset of n_part
+    if n_part is not None:
+        beam_data = get_particle_subset(
+            beam_data, n_part, preserve_charge=True)
+
     # Get beam data
     x = beam_data[0]
     y = beam_data[1]
@@ -321,21 +308,6 @@ def save_for_fbpic(beam_data, folder_path, file_name, reposition=False,
     px = beam_data[3]
     py = beam_data[4]
     pz = beam_data[5]
-    q = beam_data[6]
-
-    # Create subset of n_part
-    if (n_part is not None and n_part < len(q)):
-        q_tot = np.sum(q)
-        q_part = q_tot/n_part
-        i = np.arange(len(q))
-        i = np.random.choice(i, size=int(n_part))
-        x = x[i]
-        y = y[i]
-        xi = xi[i]
-        px = px[i]
-        py = py[i]
-        pz = pz[i]
-        q = np.ones(x.size)*q_part
 
     # Save to file
     data = np.column_stack((x, y, xi, px, py, pz))
@@ -394,6 +366,11 @@ def save_to_openpmd_file(
     if reposition:
         reposition_bunch(beam_data, avg_pos+avg_mom)
 
+    # Create subset of n_part
+    if n_part is not None:
+        beam_data = get_particle_subset(
+            beam_data, n_part, preserve_charge=True)
+
     # Get beam data
     x = np.ascontiguousarray(beam_data[0])
     y = np.ascontiguousarray(beam_data[1])
@@ -402,20 +379,6 @@ def save_to_openpmd_file(
     py = np.ascontiguousarray(beam_data[4])
     pz = np.ascontiguousarray(beam_data[5])
     q = np.ascontiguousarray(beam_data[6])
-
-    # Create subset of n_part
-    if (n_part is not None and n_part < len(q)):
-        q_tot = np.sum(q)
-        q_part = q_tot/n_part
-        i = np.arange(len(q))
-        i = np.random.choice(i, size=int(n_part))
-        x = x[i]
-        y = y[i]
-        z = z[i]
-        px = px[i]
-        py = py[i]
-        pz = pz[i]
-        q = np.ones(x.size)*q_part
 
     # Save to file
     file_path = path.join(folder_path, file_name)
