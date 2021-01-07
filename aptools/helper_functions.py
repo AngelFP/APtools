@@ -117,6 +117,52 @@ def reposition_bunch(beam_data, avg_pos):
             beam_data[i] += new_avg - current_avg
 
 
+def get_particle_subset(beam_data, subset_size, preserve_charge=True):
+    """
+    Get a random subsample of the particles in a distribution.
+
+    Parameters:
+    -----------
+    beam_data : list
+        Contains the beam data as [x, y, z, px, py, pz, q].
+
+    subset_size : int
+        Number of particles which the subset should have.
+
+    preserve_charge : bool
+        Whether the total charge of the distribution should be preserved.
+        If True, the charge of the output particles will be increased so that
+        the total charge remains the same.
+
+    """
+    x = beam_data[0]
+    y = beam_data[1]
+    z = beam_data[2]
+    px = beam_data[3]
+    py = beam_data[4]
+    pz = beam_data[5]
+    q = beam_data[6]
+    if subset_size < len(q):
+        i = np.arange(len(q))
+        i = np.random.choice(i, size=int(subset_size))
+        x = x[i]
+        y = y[i]
+        z = z[i]
+        px = px[i]
+        py = py[i]
+        pz = pz[i]
+        if preserve_charge:
+            q_tot = np.sum(q)
+            q_part = q_tot/subset_size
+            q = np.ones(subset_size)*q_part
+        else:
+            q = q[i]
+    else:
+        print('Subset size is larger than original number of particles. '
+              'No operation performed.')
+    return [x, y, z, px, py, pz, q]
+
+
 def join_infile_path(*paths):
     """
     Join path components using '/' as separator.
