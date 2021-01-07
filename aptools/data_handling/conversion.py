@@ -7,7 +7,8 @@ from aptools.data_handling.saving import save_beam
 
 def convert_beam(orig_code, final_code, orig_path, final_path, final_file_name,
                  reposition=False, avg_pos=[None, None, None],
-                 avg_mom=[None, None, None], n_part=None, **kwargs):
+                 avg_mom=[None, None, None], n_part=None, read_kwargs={},
+                 save_kwargs={}):
     """Converts particle data from one code to another.
 
     Parameters
@@ -18,7 +19,7 @@ def convert_beam(orig_code, final_code, orig_path, final_path, final_file_name,
 
     final_code : str
         Name of the tracking or PIC code in which to convert the data. Possible
-        values are 'csrtrack', 'astra' and 'fbpic'
+        values are 'csrtrack', 'astra', 'fbpic' and 'openpmd'
 
     orig_path : str
         Path of the file containing the original data
@@ -57,7 +58,7 @@ def convert_beam(orig_code, final_code, orig_path, final_path, final_file_name,
         for some data readers. Currenlty, the only parameter is 'species_name',
         for reading data from PIC codes.
     """
-    x, y, z, px, py, pz, q = read_beam(orig_code, orig_path, **kwargs)
+    x, y, z, px, py, pz, q = read_beam(orig_code, orig_path, **read_kwargs)
     beam_data = [x, y, z, px, py, pz, q]
     save_beam(final_code, beam_data, final_path, final_file_name, reposition,
-              avg_pos, avg_mom, n_part)
+              avg_pos, avg_mom, n_part, **save_kwargs)
