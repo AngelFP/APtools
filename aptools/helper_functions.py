@@ -135,6 +135,9 @@ def get_particle_subset(beam_data, subset_size, preserve_charge=True):
         the total charge remains the same.
 
     """
+    # Make sure subset size is an int.
+    subset_size = int(subset_size)
+
     x = beam_data[0]
     y = beam_data[1]
     z = beam_data[2]
