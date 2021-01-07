@@ -389,7 +389,7 @@ def save_to_openpmd_file(
         Optional. Name under which the particle species should be stored.
 
     """
-    
+
     # Perform repositioning of original distribution
     if reposition:
         reposition_bunch(beam_data, avg_pos+avg_mom)
