@@ -461,6 +461,7 @@ def lon_phase_space(
             z_or = ax_or.get_zorder()
             pos = list(ax_or.get_position().bounds)
             pos[2] /= 8
+            ax_or.patch.set_alpha(0)
             ax = fig.add_axes(pos)
             ax.set_zorder(z_or-1)
             plt.plot(ene_spectrum, ene_spec_edgs, c='k', lw=0.5, alpha=0.5)
