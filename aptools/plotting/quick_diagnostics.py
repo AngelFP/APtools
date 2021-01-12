@@ -348,7 +348,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
 def lon_phase_space(
         x, y, z, px, py, pz, q, n_slices=50, len_slice=None, ene_bins=50,
         xlim=None, ylim=None, show_text=True, x_proj=True, y_proj=True,
-        left=0.125, right=0.875, top=0.98, bottom=0.13, fig=None,
+        cbar=True, left=0.125, right=0.875, top=0.98, bottom=0.13, fig=None,
         rasterized_scatter=None, show=True):
     # analyze beam
     current_prof, z_edges = bd.current_profile(z, q, n_slices=n_slices,
@@ -384,11 +384,13 @@ def lon_phase_space(
     # make plot
     if fig is None:
         fig = plt.figure(figsize=(4, 2.5))
-    gs = gridspec.GridSpec(1, 2,
-                           width_ratios=[1, 0.02], hspace=0.1, wspace=0.05,
-                           figure=fig, left=left, right=right,
-                           top=top, bottom=bottom)
-
+    if cbar:
+        gs = gridspec.GridSpec(
+            1, 2, width_ratios=[1, 0.02], hspace=0.1, wspace=0.05,
+            figure=fig, left=left, right=right, top=top, bottom=bottom)
+    else:
+        gs = gridspec.GridSpec(
+            1, 1, figure=fig, left=left, right=right, top=top, bottom=bottom)
     with plt.rc_context(aptools_rc_params):
         ax_or = plt.subplot(gs[0])
         pscatt = scatter_histogram((z-z_center)*1e6, ene, bins=300,
@@ -474,8 +476,9 @@ def lon_phase_space(
             plt.xlim(xlim_e)
 
         # colorbar
-        ax = plt.subplot(gs[1])
-        matplotlib.colorbar.Colorbar(ax, pscatt, label='Q [fC]')
+        if cbar:
+            ax = plt.subplot(gs[1])
+            matplotlib.colorbar.Colorbar(ax, pscatt, label='Q [fC]')
 
     if show:
         plt.show()
