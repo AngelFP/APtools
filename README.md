@@ -1,3 +1,5 @@
+
+[![tests badge](https://github.com/AngelFP/APtools/actions/workflows/test-package.yml/badge.svg)](https://github.com/AngelFP/APtools/actions)
 [![CodeFactor](https://www.codefactor.io/repository/github/angelfp/aptools/badge/master)](https://www.codefactor.io/repository/github/angelfp/aptools/overview/master)
 [![PyPI](https://img.shields.io/pypi/v/aptools.svg)](https://pypi.org/project/APtools/)
 [![License](https://img.shields.io/github/license/AngelFP/APtools)](https://github.com/AngelFP/APtools/blob/master/LICENSE)
