@@ -348,8 +348,8 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
 def lon_phase_space(
         x, y, z, px, py, pz, q, n_slices=50, len_slice=None, ene_bins=50,
         xlim=None, ylim=None, show_text=True, x_proj=True, y_proj=True,
-        cbar=True, left=0.125, right=0.875, top=0.98, bottom=0.13, fig=None,
-        rasterized_scatter=None, show=True):
+        cbar=True, cbar_width=0.02, left=0.125, right=0.875, top=0.98,
+        bottom=0.13, fig=None, rasterized_scatter=None, show=True):
     # analyze beam
     current_prof, z_edges = bd.current_profile(z, q, n_slices=n_slices,
                                                len_slice=len_slice)
@@ -386,7 +386,7 @@ def lon_phase_space(
         fig = plt.figure(figsize=(4, 2.5))
     if cbar:
         gs = gridspec.GridSpec(
-            1, 2, width_ratios=[1, 0.02], hspace=0.1, wspace=0.05,
+            1, 2, width_ratios=[1, cbar_width], hspace=0.1, wspace=0.05,
             figure=fig, left=left, right=right, top=top, bottom=bottom)
     else:
         gs = gridspec.GridSpec(
