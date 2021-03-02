@@ -9,7 +9,7 @@ from openpmd_api import (Series, Access, Dataset, Mesh_Record_Component,
                          Unit_Dimension)
 
 from aptools.helper_functions import reposition_bunch, get_particle_subset
-from aptools.__version__ import __version__
+from aptools import __version__
 
 
 SCALAR = Mesh_Record_Component.SCALAR
