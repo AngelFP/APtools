@@ -125,7 +125,7 @@ def dispersion(x, px, py, pz, gamma_ref=None, w=None):
     if gamma_ref is None:
         gamma_ref = np.average(gamma, weights=w)
     dgamma = (gamma - gamma_ref)/gamma_ref
-    fit_coefs = np.polyfit(x, dgamma, 1, w=w)
+    fit_coefs = np.polyfit(dgamma, x, 1, w=w)
     disp = fit_coefs[0]
     return disp
 
