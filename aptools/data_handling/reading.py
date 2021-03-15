@@ -90,7 +90,7 @@ def read_csrtrack_data_fmt1(file_path):
     return x, y, z, px, py, pz, q
 
 
-def read_astra_data(file_path):
+def read_astra_data(file_path, remove_non_standard=True):
     """Reads particle data from ASTRA and returns it in the unis used by
     APtools.
 
@@ -99,12 +99,19 @@ def read_astra_data(file_path):
     file_path : str
         Path to the file with particle data
 
+    remove_non_standard : bool
+        Determines whether non-standard particles (those with a status flag
+        other than 5) should be removed from the read data.
+
     Returns
     -------
     A tuple with 7 arrays containing the 6D phase space and charge of the
     particles.
     """
     data = np.genfromtxt(file_path)
+    status_flag = data[:, 9]
+    if remove_non_standard:
+        data = data[np.where(status_flag == 5)]
     x = data[:, 0]
     y = data[:, 1]
     z = data[:, 2]
