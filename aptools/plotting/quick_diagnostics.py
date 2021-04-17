@@ -28,12 +28,16 @@ aptools_rc_params = {'axes.linewidth': 0.5,
                      'legend.borderaxespad': 1}
 
 
-def phase_space_overview_from_file(code_name, file_path, **kwargs):
+def phase_space_overview_from_file(
+        code_name, file_path, rasterized_scatter=None, show=True, **kwargs):
     x, y, z, px, py, pz, q = read_beam(code_name, file_path, **kwargs)
-    phase_space_overview(x, y, z, px, py, pz, q)
+    phase_space_overview(x, y, z, px, py, pz, q,
+                         rasterized_scatter=rasterized_scatter,
+                         show=show)
 
 
-def phase_space_overview(x, y, z, px, py, pz, q, show=True):
+def phase_space_overview(x, y, z, px, py, pz, q, rasterized_scatter=None,
+                         show=True):
     em_x = bd.normalized_transverse_rms_emittance(x, px, w=q) * 1e6
     em_y = bd.normalized_transverse_rms_emittance(y, py, w=q) * 1e6
     a_x, b_x, g_x = bd.twiss_parameters(x, px, pz, w=q)
@@ -55,7 +59,7 @@ def phase_space_overview(x, y, z, px, py, pz, q, show=True):
     with plt.rc_context(aptools_rc_params):
         # x - px
         ax_1 = plt.subplot(131)
-        scatter_histogram(x*1e6, px)
+        scatter_histogram(x*1e6, px, rasterized=rasterized_scatter)
         plt.xlabel("x [$\\mu m$]")
         plt.ylabel("$p_x \\ \\mathrm{[m_ec^2/e]}$")
         plt.text(0.1, 0.9, '$\\epsilon_{n,x} = $'
@@ -72,7 +76,7 @@ def phase_space_overview(x, y, z, px, py, pz, q, show=True):
                  fontsize=8)
         # y - py
         ax_2 = plt.subplot(132)
-        scatter_histogram(y * 1e6, py)
+        scatter_histogram(y * 1e6, py, rasterized=rasterized_scatter)
         plt.xlabel("y [$\\mu m$]")
         plt.ylabel("$p_y \\ \\mathrm{[m_ec^2/e]}$")
         plt.text(0.1, 0.9, '$\\epsilon_{n,y} = $'
@@ -89,7 +93,7 @@ def phase_space_overview(x, y, z, px, py, pz, q, show=True):
                  fontsize=8)
         # z - pz
         ax_3 = plt.subplot(133)
-        scatter_histogram(dz / ct.c * 1e15, pz)
+        scatter_histogram(dz / ct.c * 1e15, pz, rasterized=rasterized_scatter)
         plt.xlabel("$\\Delta z$ [fs]")
         plt.ylabel("$p_z \\ \\mathrm{[m_ec^2/e]}$")
         plt.text(0.1, 0.9, '$\\epsilon_{L} = $'
