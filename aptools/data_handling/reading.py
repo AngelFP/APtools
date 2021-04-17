@@ -7,10 +7,13 @@ from h5py import File as H5File
 
 from aptools.helper_functions import join_infile_path, reposition_bunch
 from aptools.plasma_accel.general_equations import plasma_skin_depth
+from aptools.data_processing.beam_filtering import filter_beam
 
 
 def read_beam(code_name, file_path, reposition=False,
               avg_pos=[None, None, None], avg_mom=[None, None, None],
+              filter_min=[None, None, None, None, None, None, None],
+              filter_max=[None, None, None, None, None, None, None],
               **kwargs):
     """Reads particle data from the specified code.
 
@@ -40,6 +43,12 @@ def read_beam(code_name, file_path, reposition=False,
         as [px_avg, py_avg, pz_avg] in non-dimmesional units (beta*gamma).
         Setting a component as None prevents repositioning in that coordinate.
 
+    filter_min, filter_max : list
+        List of length 7 with the minimum and maximum value for each particle
+        component, ordered as [x, y, z, pz, py, pz, q]. Particles outside the
+        given range will be filtered out. For values which are 'None', no
+        filtering is performed.
+
     Other Parameters
     ----------------
     **kwargs
@@ -56,6 +65,9 @@ def read_beam(code_name, file_path, reposition=False,
     x, y, z, px, py, pz, q = read_beam_from[code_name](file_path, **kwargs)
     if reposition:
         reposition_bunch([x, y, z, px, py, pz, q], avg_pos+avg_mom)
+    if any(filter_min + filter_max):
+        x, y, z, px, py, pz, q = filter_beam(
+            np.array([x, y, z, px, py, pz, q]), filter_min, filter_max)
     return x, y, z, px, py, pz, q
 
 
