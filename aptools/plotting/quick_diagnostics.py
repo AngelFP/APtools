@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+import matplotlib.patheffects as path_effects
 import scipy.constants as ct
 
 import aptools.data_analysis.beam_diagnostics as bd
@@ -56,62 +57,78 @@ def phase_space_overview(x, y, z, px, py, pz, q, rasterized_scatter=None,
 
     # make plot
     plt.figure(figsize=(8, 3))
+    text_labels = []
     with plt.rc_context(aptools_rc_params):
         # x - px
         ax_1 = plt.subplot(131)
         scatter_histogram(x*1e6, px, rasterized=rasterized_scatter)
         plt.xlabel("x [$\\mu m$]")
-        plt.ylabel("$p_x \\ \\mathrm{[m_ec^2/e]}$")
-        plt.text(0.1, 0.9, '$\\epsilon_{n,x} = $'
-                 + '{}'.format(np.around(em_x, 3))
-                 + '$\\ \\mathrm{\\pi \\ \\mu m \\ rad}$',
-                 transform=ax_1.transAxes, fontsize=8)
-        plt.text(0.1, 0.8, '$\\beta_{x} = $' + '{}'.format(np.around(b_x, 3))
-                 + 'm', transform=ax_1.transAxes, fontsize=8)
-        plt.text(0.1, 0.7, '$\\alpha_{x} = $' + '{}'.format(np.around(a_x, 3)),
-                 transform=ax_1.transAxes, fontsize=8)
-        plt.text(0.1, 0.6, '$\\sigma_{x} = $'
-                 + '{}'.format(np.around(s_x*1e6, 3))
-                 + '$\\ \\mathrm{\\mu m}$', transform=ax_1.transAxes,
-                 fontsize=8)
+        plt.ylabel("$p_x \\ \\mathrm{[m_e c]}$")
+        text_labels += [
+            plt.text(0.1, 0.9, '$\\epsilon_{n,x} = $'
+                     + '{}'.format(np.around(em_x, 3))
+                     + '$\\ \\mathrm{\\mu m \\ rad}$',
+                     transform=ax_1.transAxes, fontsize=8),
+            plt.text(0.1, 0.8,
+                     '$\\beta_{x} = $' + '{}'.format(np.around(b_x, 3))
+                     + 'm', transform=ax_1.transAxes, fontsize=8),
+            plt.text(0.1, 0.7,
+                     '$\\alpha_{x} = $' + '{}'.format(np.around(a_x, 3)),
+                     transform=ax_1.transAxes, fontsize=8),
+            plt.text(0.1, 0.6, '$\\sigma_{x} = $'
+                     + '{}'.format(np.around(s_x*1e6, 3))
+                     + '$\\ \\mathrm{\\mu m}$', transform=ax_1.transAxes,
+                     fontsize=8),
+        ]
         # y - py
         ax_2 = plt.subplot(132)
         scatter_histogram(y * 1e6, py, rasterized=rasterized_scatter)
         plt.xlabel("y [$\\mu m$]")
-        plt.ylabel("$p_y \\ \\mathrm{[m_ec^2/e]}$")
-        plt.text(0.1, 0.9, '$\\epsilon_{n,y} = $'
-                 + '{}'.format(np.around(em_y, 3))
-                 + '$\\ \\mathrm{\\pi \\ \\mu m \\ rad}$',
-                 transform=ax_2.transAxes, fontsize=8)
-        plt.text(0.1, 0.8, '$\\beta_{y} = $' + '{}'.format(np.around(b_y, 3))
-                 + 'm', transform=ax_2.transAxes, fontsize=8)
-        plt.text(0.1, 0.7, '$\\alpha_{y} = $' + '{}'.format(np.around(a_y, 3)),
-                 transform=ax_2.transAxes, fontsize=8)
-        plt.text(0.1, 0.6, '$\\sigma_{y} = $'
-                 + '{}'.format(np.around(s_y*1e6, 3))
-                 + '$\\ \\mathrm{\\mu m}$', transform=ax_2.transAxes,
-                 fontsize=8)
+        plt.ylabel("$p_y \\ \\mathrm{[m_e c]}$")
+        text_labels += [
+            plt.text(0.1, 0.9, '$\\epsilon_{n,y} = $'
+                     + '{}'.format(np.around(em_y, 3))
+                     + '$\\ \\mathrm{\\mu m \\ rad}$',
+                     transform=ax_2.transAxes, fontsize=8),
+            plt.text(0.1, 0.8,
+                     '$\\beta_{y} = $' + '{}'.format(np.around(b_y, 3))
+                     + 'm', transform=ax_2.transAxes, fontsize=8),
+            plt.text(0.1, 0.7,
+                     '$\\alpha_{y} = $' + '{}'.format(np.around(a_y, 3)),
+                     transform=ax_2.transAxes, fontsize=8),
+            plt.text(0.1, 0.6, '$\\sigma_{y} = $'
+                     + '{}'.format(np.around(s_y*1e6, 3))
+                     + '$\\ \\mathrm{\\mu m}$', transform=ax_2.transAxes,
+                     fontsize=8)
+        ]
         # z - pz
         ax_3 = plt.subplot(133)
         scatter_histogram(dz / ct.c * 1e15, pz, rasterized=rasterized_scatter)
         plt.xlabel("$\\Delta z$ [fs]")
-        plt.ylabel("$p_z \\ \\mathrm{[m_ec^2/e]}$")
-        plt.text(0.1, 0.9, '$\\epsilon_{L} = $'
-                 + '{}'.format(np.around(em_l, 3))
-                 + '$\\ \\mathrm{\\pi \\ \\mu m}$', transform=ax_3.transAxes,
-                 fontsize=8)
-        plt.text(0.1, 0.8, '$\\sigma_\\gamma/\\gamma=$'
-                 + '{}'.format(np.around(s_g*1e2, 3)) + '$\\%$',
-                 transform=ax_3.transAxes, fontsize=8)
-        plt.text(0.1, 0.7, '$\\sigma^s_\\gamma/\\gamma=$'
-                 + '{}'.format(np.around(s_g_sl_av*1e2, 3)) + '$\\%$',
-                 transform=ax_3.transAxes, fontsize=8)
-        plt.text(0.1, 0.6, '$\\sigma_z=$'
-                 + '{}'.format(np.around(s_z/ct.c*1e15, 3)) + ' fs',
-                 transform=ax_3.transAxes, fontsize=8)
-        plt.text(0.1, 0.5, '$I_{peak}=$'
-                 + '{}'.format(np.around(c_peak, 2)) + ' kA',
-                 transform=ax_3.transAxes, fontsize=8)
+        plt.ylabel("$p_z \\ \\mathrm{[m_e c]}$")
+        text_labels += [
+            plt.text(0.1, 0.9, '$\\epsilon_{L} = $'
+                     + '{}'.format(np.around(em_l, 3))
+                     + '$\\ \\mathrm{\\mu m}$', transform=ax_3.transAxes,
+                     fontsize=8),
+            plt.text(0.1, 0.8, '$\\sigma_\\gamma/\\gamma=$'
+                     + '{}'.format(np.around(s_g*1e2, 3)) + '$\\%$',
+                     transform=ax_3.transAxes, fontsize=8),
+            plt.text(0.1, 0.7, '$\\sigma^s_\\gamma/\\gamma=$'
+                     + '{}'.format(np.around(s_g_sl_av*1e2, 3)) + '$\\%$',
+                     transform=ax_3.transAxes, fontsize=8),
+            plt.text(0.1, 0.6, '$\\sigma_z=$'
+                     + '{}'.format(np.around(s_z/ct.c*1e15, 3)) + ' fs',
+                     transform=ax_3.transAxes, fontsize=8),
+            plt.text(0.1, 0.5, '$I_{peak}=$'
+                     + '{}'.format(np.around(c_peak, 2)) + ' kA',
+                     transform=ax_3.transAxes, fontsize=8)
+        ]
+
+        for label in text_labels:
+            label.set_path_effects(
+                [path_effects.Stroke(linewidth=1, foreground='white'),
+                 path_effects.Normal()])
         plt.tight_layout()
     if show:
         plt.show()
