@@ -67,7 +67,7 @@ def phase_space_overview(x, y, z, px, py, pz, q, rasterized_scatter=None,
         text_labels += [
             plt.text(0.1, 0.9, '$\\epsilon_{n,x} = $'
                      + '{}'.format(np.around(em_x, 3))
-                     + '$\\ \\mathrm{\\mu m \\ rad}$',
+                     + '$\\ \\mathrm{\\mu m}$',
                      transform=ax_1.transAxes, fontsize=8),
             plt.text(0.1, 0.8,
                      '$\\beta_{x} = $' + '{}'.format(np.around(b_x, 3))
@@ -88,7 +88,7 @@ def phase_space_overview(x, y, z, px, py, pz, q, rasterized_scatter=None,
         text_labels += [
             plt.text(0.1, 0.9, '$\\epsilon_{n,y} = $'
                      + '{}'.format(np.around(em_y, 3))
-                     + '$\\ \\mathrm{\\mu m \\ rad}$',
+                     + '$\\ \\mathrm{\\mu m}$',
                      transform=ax_2.transAxes, fontsize=8),
             plt.text(0.1, 0.8,
                      '$\\beta_{y} = $' + '{}'.format(np.around(b_y, 3))
