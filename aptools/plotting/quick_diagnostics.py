@@ -11,22 +11,11 @@ import scipy.constants as ct
 import aptools.data_analysis.beam_diagnostics as bd
 from aptools.data_handling.reading import read_beam
 from aptools.plotting.plot_types import scatter_histogram
+from aptools.plotting.rc_params import rc_params
 from aptools.helper_functions import get_only_statistically_relevant_slices
 
 
-aptools_rc_params = {'axes.linewidth': 0.5,
-                     'axes.labelsize': 8,
-                     'xtick.major.size': 2,
-                     'ytick.major.size': 2,
-                     'xtick.major.width': 0.5,
-                     'ytick.major.width': 0.5,
-                     'xtick.labelsize': 8,
-                     'ytick.labelsize': 8,
-                     'xtick.direction': 'in',
-                     'ytick.direction': 'in',
-                     'xtick.top': True,
-                     'ytick.right': True,
-                     'legend.borderaxespad': 1}
+
 
 
 def phase_space_overview_from_file(
@@ -58,7 +47,7 @@ def phase_space_overview(x, y, z, px, py, pz, q, rasterized_scatter=None,
     # make plot
     plt.figure(figsize=(8, 3))
     text_labels = []
-    with plt.rc_context(aptools_rc_params):
+    with plt.rc_context(rc_params):
         # x - px
         ax_1 = plt.subplot(131)
         scatter_histogram(x*1e6, px, rasterized=rasterized_scatter)
@@ -217,7 +206,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
                            top=top, bottom=bottom)
     leg_frac = 0.25  # space to reserve for legend
 
-    with plt.rc_context(aptools_rc_params):
+    with plt.rc_context(rc_params):
         ax_or = plt.subplot(gs[0])
         pscatt = scatter_histogram((z-z_center)*1e6, ene, bins=300,
                                    weights=np.abs(q)*1e15,
@@ -412,7 +401,7 @@ def lon_phase_space(
     else:
         gs = gridspec.GridSpec(
             1, 1, figure=fig, left=left, right=right, top=top, bottom=bottom)
-    with plt.rc_context(aptools_rc_params):
+    with plt.rc_context(rc_params):
         ax_or = plt.subplot(gs[0])
         pscatt = scatter_histogram((z-z_center)*1e6, ene, bins=300,
                                    weights=np.abs(q)*1e15,
