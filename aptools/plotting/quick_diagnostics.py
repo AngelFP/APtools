@@ -15,9 +15,6 @@ from aptools.plotting.rc_params import rc_params
 from aptools.helper_functions import get_only_statistically_relevant_slices
 
 
-
-
-
 def phase_space_overview_from_file(
         code_name, file_path, rasterized_scatter=None, show=True, **kwargs):
     x, y, z, px, py, pz, q = read_beam(code_name, file_path, **kwargs)
