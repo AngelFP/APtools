@@ -1,3 +1,5 @@
+""" This module contains the definition of custom APtools rc params """
+
 from matplotlib import rcParamsDefault
 
 
