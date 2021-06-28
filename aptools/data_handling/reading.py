@@ -163,17 +163,22 @@ def read_openpmd_beam(file_path, species_name):
     beam_species = file_content[
         join_infile_path(base_path, particles_path, species_name)]
     # get data
-    m = beam_species['mass'].attrs['value']
-    q = beam_species['charge'].attrs['value']
-    x = (beam_species['position/x'][:]
-         + beam_species['positionOffset/x'].attrs['value'])
-    y = (beam_species['position/y'][:]
-         + beam_species['positionOffset/y'].attrs['value'])
-    z = (beam_species['position/z'][:]
-         + beam_species['positionOffset/z'].attrs['value'])
-    px = beam_species['momentum/x'][:] / (m*ct.c)
-    py = beam_species['momentum/y'][:] / (m*ct.c)
-    pz = beam_species['momentum/z'][:] / (m*ct.c)
+    mass = beam_species['mass']
+    charge = beam_species['charge']
+    position = beam_species['position']
+    position_off = beam_species['positionOffset']
+    momentum = beam_species['momentum']
+    m = mass.attrs['value'] * mass.attrs['unitSI']
+    q = charge.attrs['value'] * charge.attrs['unitSI']
+    x = (position['x'][:] * position['x'].attrs['unitSI'] +
+         position_off['x'].attrs['value'] * position_off['x'].attrs['unitSI'])
+    y = (position['y'][:] * position['y'].attrs['unitSI'] +
+         position_off['y'].attrs['value'] * position_off['y'].attrs['unitSI'])
+    z = (position['z'][:] * position['z'].attrs['unitSI'] +
+         position_off['z'].attrs['value'] * position_off['z'].attrs['unitSI'])
+    px = momentum['x'][:] * momentum['x'].attrs['unitSI'] / (m*ct.c)
+    py = momentum['y'][:] * momentum['y'].attrs['unitSI'] / (m*ct.c)
+    pz = momentum['z'][:] * momentum['z'].attrs['unitSI'] / (m*ct.c)
     w = beam_species['weighting'][:]
     q *= w
     return x, y, z, px, py, pz, q
