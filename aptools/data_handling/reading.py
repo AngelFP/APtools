@@ -153,7 +153,7 @@ def read_openpmd_beam(file_path, species_name):
     A tuple with 7 arrays containing the 6D phase space and charge of the
     particles.
     """
-    file_content = H5File(file_path)
+    file_content = H5File(file_path, mode='r')
     # get base path in file
     iteration = list(file_content['/data'].keys())[0]
     base_path = '/data/{}'.format(iteration)
@@ -203,7 +203,7 @@ def read_hipace_beam(file_path, plasma_dens):
     particles.
     """
     s_d = plasma_skin_depth(plasma_dens)
-    file_content = H5File(file_path)
+    file_content = H5File(file_path, mode='r')
     # sim parameters
     n_cells = file_content.attrs['NX']
     sim_size = (file_content.attrs['XMAX'] - file_content.attrs['XMIN'])
@@ -239,7 +239,7 @@ def read_osiris_beam(file_path, plasma_dens):
     particles.
     """
     s_d = plasma_skin_depth(plasma_dens)
-    file_content = H5File(file_path)
+    file_content = H5File(file_path, mode='r')
     # get data
     q = np.array(file_content.get('q')) * ct.e
     x = np.array(file_content.get('x2')) * s_d
