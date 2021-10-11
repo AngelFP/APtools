@@ -25,8 +25,7 @@ def add_projection(
 
     if orientation == 'horizontal':
         ax_p.plot(x_pos, x_proj, c='k', lw=0.5, alpha=0.5)
-        ax_p.fill_between(x_pos, x_proj, facecolor='tab:gray',
-                            alpha=0.3)
+        ax_p.fill_between(x_pos, x_proj, facecolor='tab:gray', alpha=0.3)
         xlim = main_ax.get_xlim()
         ax_p.set_xlim(xlim)
         ylim = list(ax_p.get_ylim())
@@ -34,8 +33,7 @@ def add_projection(
         ax_p.set_ylim(ylim)
     elif orientation == 'vertical':
         ax_p.plot(x_proj, x_pos, c='k', lw=0.5, alpha=0.5)
-        ax_p.fill_betweenx(x_pos, x_proj, facecolor='tab:gray',
-                            alpha=0.3)
+        ax_p.fill_betweenx(x_pos, x_proj, facecolor='tab:gray', alpha=0.3)
         ylim = main_ax.get_ylim()
         ax_p.set_ylim(ylim)
         xlim = list(ax_p.get_xlim())

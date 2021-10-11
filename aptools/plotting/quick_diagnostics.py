@@ -12,8 +12,10 @@ import aptools.data_analysis.beam_diagnostics as bd
 from aptools.data_handling.reading import read_beam
 from aptools.plotting.plot_types import scatter_histogram
 from aptools.plotting.rc_params import rc_params
-from aptools.plotting.utils import add_projection, create_vertical_colorbars, add_text
-from aptools.helper_functions import get_only_statistically_relevant_slices, weighted_std
+from aptools.plotting.utils import (
+    add_projection, create_vertical_colorbars, add_text)
+from aptools.helper_functions import (
+    get_only_statistically_relevant_slices, weighted_std)
 
 
 def phase_space_overview_from_file(
@@ -511,9 +513,9 @@ def lon_phase_space(
     if beam_info:
         # analyze beam
         if type(bins) in [tuple, list]:
-            bins_x, bins_y = bins
+            bins_x = bins[0]
         else:
-            bins_x = bins_y = bins
+            bins_x = bins
         i_peak = bd.peak_current(z, q, n_slices=bins_x) * 1e-3  # kA
         tau_fwhm = bd.fwhm_length(z, q, n_slices=bins_x) * 1e15/ct.c  # fs
         s_t = bd.rms_length(z, w=q) * 1e15/ct.c  # fs
@@ -660,7 +662,7 @@ def phase_space_plot(
     else:
         n_cols = 1
         width_ratios = None
-        figsize=(4, 4)
+        figsize = (4, 4)
 
     with plt.rc_context(rc_params):
         if fig is None:
@@ -729,7 +731,7 @@ def phase_space_plot(
     if tight_layout:
         try:
             grid.tight_layout(fig)
-        except:
+        except Exception:
             fig.tight_layout()
 
     if show:
