@@ -12,7 +12,8 @@ import aptools.data_analysis.beam_diagnostics as bd
 from aptools.data_handling.reading import read_beam
 from aptools.plotting.plot_types import scatter_histogram
 from aptools.plotting.rc_params import rc_params
-from aptools.helper_functions import get_only_statistically_relevant_slices
+from aptools.plotting.utils import add_projection, create_vertical_colorbars, add_text
+from aptools.helper_functions import get_only_statistically_relevant_slices, weighted_std
 
 
 def phase_space_overview_from_file(
@@ -352,8 +353,8 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
         plt.show()
 
 
-def lon_phase_space(
-        x, y, z, px, py, pz, q, n_slices=50, len_slice=None, ene_bins=50,
+def energy_vs_z(
+        z, px, py, pz, q, n_slices=50, len_slice=None, ene_bins=50,
         xlim=None, ylim=None, show_text=True, x_proj=True, y_proj=True,
         cbar=True, cbar_width=0.02, left=0.125, right=0.875, top=0.98,
         bottom=0.13, fig=None, rasterized_scatter=None, show=True):
@@ -486,6 +487,250 @@ def lon_phase_space(
         if cbar:
             ax = plt.subplot(gs[1])
             matplotlib.colorbar.Colorbar(ax, pscatt, label='Q [fC]')
+
+    if show:
+        plt.show()
+
+
+def full_phase_space(x, y, z, px, py, pz, q, show=True, **kwargs):
+    fig = plt.figure(figsize=(12, 3))
+    grid = gridspec.GridSpec(1, 3, figure=fig, wspace=0.55)
+    hor_phase_space(
+        x, px, q, pz, subplot_spec=grid[0], fig=fig, show=False, **kwargs)
+    ver_phase_space(
+        y, py, q, pz, subplot_spec=grid[1], fig=fig, show=False, **kwargs)
+    lon_phase_space(
+        z, pz, q, subplot_spec=grid[2], fig=fig, show=False, **kwargs)
+    if show:
+        plt.show()
+
+
+def lon_phase_space(
+        z, pz, q, beam_info=True, bins=300, **kwargs):
+
+    if beam_info:
+        # analyze beam
+        if type(bins) in [tuple, list]:
+            bins_x, bins_y = bins
+        else:
+            bins_x = bins_y = bins
+        i_peak = bd.peak_current(z, q, n_slices=bins_x) * 1e-3  # kA
+        tau_fwhm = bd.fwhm_length(z, q, n_slices=bins_x) * 1e15/ct.c  # fs
+        s_t = bd.rms_length(z, w=q) * 1e15/ct.c  # fs
+        pz_avg = np.average(pz, weights=q)
+        s_pz = weighted_std(pz, weights=q) / pz_avg * 100  # %
+        pz_avg *= ct.m_e*ct.c**2/ct.e * 1e-9  # GeV
+        if pz_avg < 0.1:
+            pz_units = 'MeV/c'
+            pz_avg *= 1e3
+        else:
+            pz_units = 'GeV/c'
+
+        text = (
+            '$\\bar{p_z} = $' + '{:0.2f}'.format(np.around(pz_avg, 3))
+            + pz_units + '\n'
+            + '$\\sigma_{p_z} = $' + '{}'.format(np.around(s_pz, 3))
+            + '$\\%$\n'
+            + '$I_\\mathrm{peak}=' + '{:0.2f}$ kA\n'.format(i_peak)
+            + '$\\sigma_t=' + '{:0.1f}$ fs\n'.format(s_t)
+            + '$\\tau_{FWHM}=' + '{:0.1f}$ fs'.format(tau_fwhm)
+        )
+
+    # Center in z.
+    z_avg = np.average(z, weights=q)
+    delta_z = z - z_avg
+
+    phase_space_plot(
+        x=delta_z * 1e6,
+        y=pz,
+        w=np.abs(q),
+        x_name='\\Delta z',
+        y_name='p_z',
+        w_name='Q',
+        x_units='µm',
+        y_units='m_e c',
+        w_units='C',
+        text=text,
+        bins=bins,
+        **kwargs
+    )
+
+
+def hor_phase_space(x, px, q, pz=None, beam_info=True, **kwargs):
+
+    if beam_info:
+        em_x = bd.normalized_transverse_rms_emittance(x, px, w=q) * 1e6
+        s_x = bd.rms_size(x, w=q)
+
+        text = (
+            '$\\epsilon_{n,x} = $' + '{}'.format(np.around(em_x, 3))
+            + '$\\ \\mathrm{\\mu m}$\n'
+            + '$\\sigma_{x} = $' + '{}'.format(np.around(s_x*1e6, 3))
+            + '$\\ \\mathrm{\\mu m}$'
+        )
+
+        if pz is not None:
+            a_x, b_x, g_x = bd.twiss_parameters(x, px, pz, w=q)
+            if b_x <= 0.1:
+                beta_units = 'mm'
+                b_x *= 1e3
+            else:
+                beta_units = 'm'
+            text += (
+                '\n'
+                + '$\\beta_{x} = $' + '{}'.format(np.around(b_x, 3))
+                + beta_units + '\n'
+                + '$\\alpha_{x} = $' + '{}'.format(np.around(a_x, 3))
+            )
+    else:
+        text = None
+
+    phase_space_plot(
+        x=x * 1e6,
+        y=px,
+        w=np.abs(q),
+        x_name='x',
+        y_name='p_x',
+        w_name='Q',
+        x_units='µm',
+        y_units='m_e c',
+        w_units='C',
+        text=text,
+        **kwargs
+    )
+
+
+def ver_phase_space(y, py, q, pz=None, beam_info=True, **kwargs):
+
+    if beam_info:
+        em_y = bd.normalized_transverse_rms_emittance(y, py, w=q) * 1e6
+        s_y = bd.rms_size(y, w=q)
+
+        text = (
+            '$\\epsilon_{n,y} = $' + '{}'.format(np.around(em_y, 3))
+            + '$\\ \\mathrm{\\mu m}$\n'
+            + '$\\sigma_{y} = $' + '{}'.format(np.around(s_y*1e6, 3))
+            + '$\\ \\mathrm{\\mu m}$'
+        )
+
+        if pz is not None:
+            a_y, b_y, g_y = bd.twiss_parameters(y, py, pz, w=q)
+            if b_y <= 0.1:
+                beta_units = 'mm'
+                b_y *= 1e3
+            else:
+                beta_units = 'm'
+            text += (
+                '\n'
+                + '$\\beta_{y} = $' + '{}'.format(np.around(b_y, 3))
+                + beta_units + '\n'
+                + '$\\alpha_{y} = $' + '{}'.format(np.around(a_y, 3))
+            )
+    else:
+        text = None
+
+    phase_space_plot(
+        x=y * 1e6,
+        y=py,
+        w=np.abs(q),
+        x_name='y',
+        y_name='p_y',
+        w_name='Q',
+        x_units='µm',
+        y_units='m_e c',
+        w_units='C',
+        text=text,
+        **kwargs
+    )
+
+
+def phase_space_plot(
+        x, y, w=None, x_name='', y_name='', w_name='',
+        x_units='', y_units='', w_units='', x_lim=None, y_lim=None,
+        x_projection=True, y_projection=True, projection_space=True,
+        bins=300, rasterized=False,
+        s=1, cmap='plasma', center_lines=False,
+        text=None, cbar=True, cbar_ticks=3, cbar_width=0.05,
+        subplot_spec=None, fig=None, tight_layout=False, show=True):
+
+    if cbar:
+        n_cols = 2
+        width_ratios = [1, cbar_width]
+        figsize = (4 * (1 + cbar_width), 4)
+    else:
+        n_cols = 1
+        width_ratios = None
+        figsize=(4, 4)
+
+    with plt.rc_context(rc_params):
+        if fig is None:
+            fig = plt.figure(figsize=figsize)
+        if subplot_spec is None:
+            grid = gridspec.GridSpec(
+                1, n_cols, width_ratios=width_ratios, figure=fig, wspace=0.05)
+        else:
+            grid = gridspec.GridSpecFromSubplotSpec(
+                1, n_cols, subplot_spec, width_ratios=width_ratios,
+                wspace=0.05)
+
+        ax = fig.add_subplot(grid[0])
+        img = scatter_histogram(
+                x, y, bins=bins, weights=w, range=[x_lim, y_lim], s=s,
+                cmap=cmap, rasterized=rasterized, ax=ax)
+
+        if center_lines:
+            ax.axvline(np.average(x, weights=w), ls='--', lw=0.5, c='k')
+            ax.axhline(np.average(y, weights=w), ls='--', lw=0.5, c='k')
+
+        x_label = ''
+        if len(x_name) > 0:
+            x_label += '${}$'.format(x_name)
+            if len(x_units) > 0:
+                x_label += ' [${}$]'.format(x_units)
+        y_label = ''
+        if len(y_name) > 0:
+            y_label += '${}$'.format(y_name)
+            if len(y_units) > 0:
+                y_label += ' [${}$]'.format(y_units)
+        ax.set_xlabel(x_label)
+        ax.set_ylabel(y_label)
+
+        if projection_space:
+            if x_projection:
+                ylim = list(ax.get_ylim())
+                ylim[0] -= (ylim[1] - ylim[0])/5
+                ax.set_ylim(ylim)
+            if y_projection:
+                xlim = list(ax.get_xlim())
+                xlim[0] -= (xlim[1] - xlim[0])/5
+                ax.set_xlim(xlim)
+        if type(bins) in [tuple, list]:
+            bins_x, bins_y = bins
+        else:
+            bins_x = bins_y = bins
+        if x_projection:
+            add_projection(x, bins_x, ax, grid[0], fig)
+        if y_projection:
+            add_projection(y, bins_y, ax, grid[0], fig, orientation='vertical')
+
+        if text is not None:
+            add_text(ax, 0.05, 0.05, text, va='bottom', ha='left')
+
+        # generate colorbar
+        if w is not None and cbar:
+            cbar_label = ''
+            if len(w_name) > 0:
+                cbar_label += '${}$'.format(w_name)
+                if len(w_units) > 0:
+                    cbar_label += ' [${}$]'.format(w_units)
+            create_vertical_colorbars(
+                img, cbar_label, grid[1], fig, n_ticks=cbar_ticks)
+
+    if tight_layout:
+        try:
+            grid.tight_layout(fig)
+        except:
+            fig.tight_layout()
 
     if show:
         plt.show()
