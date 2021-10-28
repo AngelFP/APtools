@@ -245,6 +245,8 @@ def generate_from_file_modifying_twiss(
 def _create_gaussian_longitudinal_profile(z_c, s_z, n_part, sigma_trunc_lon,
                                           min_len_scale_noise):
     """ Creates a Gaussian longitudinal profile """
+    # Make sure number of particles is an integer
+    n_part = int(n_part)
     if min_len_scale_noise is None:
         if sigma_trunc_lon is not None:
             z = truncnorm.rvs(-sigma_trunc_lon, sigma_trunc_lon, loc=z_c,
@@ -268,6 +270,8 @@ def _create_gaussian_longitudinal_profile(z_c, s_z, n_part, sigma_trunc_lon,
 def _create_flattop_longitudinal_profile(z_c, length, n_part,
                                          min_len_scale_noise):
     """ Creates a flattop longitudinal profile """
+    # Make sure number of particles is an integer
+    n_part = int(n_part)
     if min_len_scale_noise is None:
         z = np.random.uniform(z_c-length/2, z_c+length/2, n_part)
     else:
