@@ -11,7 +11,7 @@ import aptools.data_processing.beam_operations as bo
 
 
 def generate_gaussian_bunch_from_twiss(
-        a_x, a_y, b_x, b_y, en_x, en_y, ene, ene_sp, s_t, q_tot, n_part, x_c=0,
+        a_x, a_y, b_x, b_y, en_x, en_y, ene, ene_sp, s_t, q_tot, n_part, head_current, x_c=0,
         y_c=0, z_c=0, lon_profile='gauss', min_len_scale_noise=None,
         sigma_trunc_lon=None, smooth_sigma=None, smooth_trunc=None,
         save_to_file=False, save_to_code='astra',
@@ -56,6 +56,10 @@ def generate_gaussian_bunch_from_twiss(
 
     n_part: int
         Total number of particles in the bunch.
+    
+    head_current: float
+        takes a value between 0 and 1.
+        if it is 1 all the current is in the head, if it 0 all the current is in the tail, and if it is 0.5 both head and tail have the same current.
 
     x_c: float
         Central bunch position in the x-plane in units of m.
@@ -142,6 +146,10 @@ def generate_gaussian_bunch_from_twiss(
     elif lon_profile == 'flattop_smoothed':
         z = _create_flattop_longitudinal_profile_with_smoothing(
             z_c, s_z, n_part, min_len_scale_noise, smooth_sigma, smooth_trunc)
+    elif lon_profile == 'rectan_trapezoidal':
+        z = _create_rectan_trapezoidal_longitudinal_profile(z_c, s_z, n_part,head_current,
+                                         min_len_scale_noise)
+
     # Define again n_part in case it changed when crealing long. profile
     n_part = len(z)
     pz = np.random.normal(ene, ene_sp_abs, n_part)
@@ -307,6 +315,76 @@ def _create_flattop_longitudinal_profile_with_smoothing(z_c, length, n_part,
     # Center distribution around desired position
     z = z - length/2 + z_c
     return z
+
+def _create_rectan_trapezoidal_longitudinal_profile(z_c, length, n_part, head_current,
+                                         min_len_scale_noise):
+    """ Creates a rectangular trapezoidal longitudinal profile """
+    
+    # Make sure number of particles is an integer
+    n_part = int(n_part)
+    if min_len_scale_noise is None:
+        z = rectan_trapezoid(n_part,a=z_c-length/2,b=z_c+length/2,h1=head_current)
+    else:
+        raise NotImplementedError('Noise reduction not implemented for `trapezoidal` profile.')
+    return z
+
+
+def rectan_trapezoid(n_part,a=0.,b=1.,h1=0.2):
+    
+    """
+    Creates a longitudinal rectangular trapezoid particle bunch with the specified
+    parameters.
+    Parameters
+    ----------
+    n_part : float
+        Number of particles in the beam
+       
+             __       
+          __/  |
+       __/     |
+     /         |
+    |          |
+    |          | 
+    |__________|
+    a          b
+    
+    a : float
+        start position of the trapezoid
+    b : float
+        end position of the trapezoid
+    h1 : float
+        % from the maximum height
+    h2 : float
+        second height
+    plot : bool
+        If True, then plot histogram of the distribution,
+    
+    ----------
+    Returns
+    
+    x : array with size [n_part]
+        distribution of random variables with rectangular trapezoidal shape
+        
+    """
+
+    n_part = int(n_part)
+    y = np.random.uniform(0,1,n_part)
+    
+    h1 = h1 * 2/(b-a)
+    
+    # Find h2 by condition of S = 1 (whole area is equal to 1, because it is probability)
+    h2 = 2/(b-a) - h1
+
+    x = np.zeros(len(y))
+    
+    for i in range(len(y)):
+        if y[i] >= 0 and y[i] <= 1:
+            n = h1
+            m = (h2-h1)/(2*(b-a))
+            D = n**2 + 4 * m * y[i]
+            x[i] = (-n+np.sqrt(D))/(2*m) + a
+    
+    return x
 
 
 def _create_smooth_z_array(part_per_slice, slice_edges):
