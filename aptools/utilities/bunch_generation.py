@@ -377,11 +377,11 @@ def rectan_trapezoid(n_part,a=0.,b=1.,h1=0.2):
 
     x = np.zeros(len(y))
     
-    for i in range(len(y)):
-        if y[i] >= 0 and y[i] <= 1:
+    for i, y_i in enumerate(y):
+        if y_i >= 0 and y_i <= 1:
             n = h1
             m = (h2-h1)/(2*(b-a))
-            D = n**2 + 4 * m * y[i]
+            D = n**2 + 4 * m * y_i
             x[i] = (-n+np.sqrt(D))/(2*m) + a
     
     return x
