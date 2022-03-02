@@ -149,6 +149,10 @@ def generate_gaussian_bunch_from_twiss(
     elif lon_profile == 'rectan_trapezoidal':
         z = _create_rectan_trapezoidal_longitudinal_profile(z_c, s_z, n_part,head_current,
                                          min_len_scale_noise)
+    elif lon_profile == 'rectan_trapezoidal_smoothed':
+        z = _create_rectan_trapezoidal_longitudinal_profile_smoothed(z_c, s_z, n_part,
+                                                                           head_current,
+                                                                           min_len_scale_noise)
 
     # Define again n_part in case it changed when crealing long. profile
     n_part = len(z)
@@ -323,14 +327,43 @@ def _create_rectan_trapezoidal_longitudinal_profile(z_c, length, n_part, head_cu
     # Make sure number of particles is an integer
     n_part = int(n_part)
     if min_len_scale_noise is None:
-        z = rectan_trapezoid(n_part,a=z_c-length/2,b=z_c+length/2,h1=head_current)
+        a = z_c-length/2
+        b = z_c+length/2
+        
+        if head_current == 0.5:
+            head_current += 1e-12
+
+        hmax = 2/(b-a)
+        h1 = head_current * hmax
+
+        h2 = 2/(b-a) - h1
+        if h2 < 0:
+            raise ValueError("h2 = 2/(b-a) - h1 < 0!")
+
+        z = rectan_trapezoid(n_part,a=a,b=b,h1=h1,h2=h2)
     else:
         raise NotImplementedError('Noise reduction not implemented for `trapezoidal` profile.')
     return z
 
 
-def rectan_trapezoid(n_part,a=0.,b=1.,h1=0.2):
+def _create_rectan_trapezoidal_longitudinal_profile_smoothed(z_c, length, n_part, head_current,
+                                                             min_len_scale_noise,
+                                                             left_weight=0.05,right_weight=0.05):
     
+    """ Creates a rectangular trapezoidal smoothed longitudinal profile """
+    
+    # Make sure number of particles is an integer
+    n_part = int(n_part)
+    if min_len_scale_noise is None:
+        z = rectan_trapezoid_smoothed(n_part=n_part,a=z_c-length/2,b=z_c+length/2,
+                                      h1=head_current,left_weight=left_weight,
+                                     right_weight=right_weight)
+    else:
+        raise NotImplementedError('Noise reduction not implemented for `trapezoidal` profile.')
+    return z
+    
+
+def rectan_trapezoid(n_part,a,b,h1,h2,plot=False):
     """
     Creates a longitudinal rectangular trapezoid particle bunch with the specified
     parameters.
@@ -344,7 +377,7 @@ def rectan_trapezoid(n_part,a=0.,b=1.,h1=0.2):
        __/     |
      /         |
     |          |
-    |          | 
+    |h1        |h2 
     |__________|
     a          b
     
@@ -353,12 +386,11 @@ def rectan_trapezoid(n_part,a=0.,b=1.,h1=0.2):
     b : float
         end position of the trapezoid
     h1 : float
-        % from the maximum height
+        first height. h1 can only have a value between 0 and maximum height: 2/(b-a)
     h2 : float
         second height
-    plot : bool
-        If True, then plot histogram of the distribution,
-    
+    plot: bool
+        if True, then plot PDF
     ----------
     Returns
     
@@ -366,23 +398,148 @@ def rectan_trapezoid(n_part,a=0.,b=1.,h1=0.2):
         distribution of random variables with rectangular trapezoidal shape
         
     """
-
     n_part = int(n_part)
     y = np.random.uniform(0,1,n_part)
     
-    h1 = h1 * 2/(b-a)
-    
-    # Find h2 by condition of S = 1 (whole area is equal to 1, because it is probability)
-    h2 = 2/(b-a) - h1
-
     x = np.zeros(len(y))
     
-    for i, y_i in enumerate(y):
-        if y_i >= 0 and y_i <= 1:
+    for i in range(len(y)):
+        if y[i] >= 0 and y[i] <= 1:
             n = h1
             m = (h2-h1)/(2*(b-a))
-            D = n**2 + 4 * m * y_i
+            D = n**2 + 4 * m * y[i]
             x[i] = (-n+np.sqrt(D))/(2*m) + a
+    
+    if plot:
+        plt.hist(x,density=True,histtype='stepfilled',bins=50, alpha=0.2);
+        plt.grid()
+        # plt.ylim(0.,1.);
+    
+    return x
+
+
+def half_gaussian(n_part, mu, peak, part):
+    """ 
+    Creates half gaussian distribution 
+    
+                                 
+                           /|     peak|\
+              left -----> / |         | \ <---- right gaussian distribution
+          gaussian       /  |         |  \
+      distribution      /   |         |   \
+                                    mu
+    
+    n_part : float
+        Number of particles in the distribution
+    mu : float
+        Mean of the distribution, if it would be whole gaussian distribution
+    peak : float
+        Height of the distribution
+    part : string
+        it can be only "left" or "right".
+        indicates which part of gaussian distribution you want to create.
+    ----------
+    Returns
+    
+    x : array with size [n_part]
+        distribution of random variables with half gaussian shape
+    
+    """
+
+    if peak == 0:
+        peak += 1e-12
+    
+    # Since we use all the particles and translate them either to the left or to the right, 
+    # if the number doubles on the left/right, 
+    # then the height is halved (or sigma is doubled)
+    
+    sigma = 1 / (peak / 2 * np.sqrt(2 * np.pi))
+    
+    x = np.random.normal(loc=mu, scale=sigma, size=n_part)
+    if part == 'right':
+        idx = x < mu
+    elif part == 'left':
+        idx = x > mu
+    else:
+        raise ValueError('Wrong part')
+    x[idx] = 2 * mu - x[idx]
+    return x
+
+def rectan_trapezoid_smoothed(n_part,a,b,h1,left_weight,right_weight,plot=False):
+    """
+    Creates a longitudinal rectangular trapezoid particle bunch with smoothed sides.
+    Parameters
+    ----------
+    n_part : float
+        Number of particles in the beam
+       
+                             ______       
+                          __/      |\
+                      ___/         | \
+   gaussian         /|             |  \
+   distribution    / |  trapezoial |   \  gaussian distribution
+  0.05% n_part--> /  |distribution |    \ <--0.05% n_part
+                 /__ |__0.9n_part__|_____\
+                    a              b
+
+    a : float
+        start position of the trapezoid
+    b : float
+        end position of the trapezoid
+    h1 : float
+        first height
+        % of the maximum height
+    h2 : float
+        second height
+        
+    left_weight : float
+        % from the whole area which goes to the left half-gaussian distribution
+    
+    right_weight : float
+        % from the whole area which goes to the right half-gaussian distribution
+        
+    plot: bool
+        if True, then plot PDF
+    ----------
+    Returns
+    
+    x : array with size [n_part]
+        distribution of random variables with rectangular trapezoidal smoothed shape
+        
+    """
+    
+    trapez_weight = 1 - (left_weight + right_weight)
+    n_part = int(n_part)
+    
+    if h1 == 0.5:
+        h1 += 1e-12
+    elif h1 < 0.01 or h1 > 0.99:
+        raise ValueError('Please, put head_current in range [0.01,0.99]')
+
+    hmax = 2/(b-a) * trapez_weight
+    h1 = h1 * hmax 
+
+    h2 = hmax - h1
+    if h2 < 0:
+        raise ValueError("h2 = 2/(b-a) - h1 < 0!")
+        
+    p = np.random.rand(n_part)
+    x = np.zeros_like(p)
+    
+    idx_left = p < left_weight
+    idx_right = p > (1 - right_weight)
+    idx = np.logical_not(np.logical_or(idx_left, idx_right))
+    
+    if trapez_weight != 0:
+        x[idx] = rectan_trapezoid(np.count_nonzero(idx), a, b, h1 / trapez_weight, h2 / trapez_weight,plot=False)
+    if left_weight != 0:
+        x[idx_left] = half_gaussian(np.count_nonzero(idx_left), mu=a, peak=h1 / left_weight, part='left')
+    if right_weight != 0:
+        x[idx_right] = half_gaussian(np.count_nonzero(idx_right), mu=b, peak=h2 / right_weight, part='right')
+    
+    if plot:
+        plt.hist(x,histtype='stepfilled', bins=100, alpha=1., density=True)
+        plt.grid()
     
     return x
 
