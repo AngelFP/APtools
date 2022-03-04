@@ -11,8 +11,8 @@ import aptools.data_processing.beam_operations as bo
 
 
 def generate_gaussian_bunch_from_twiss(
-        a_x, a_y, b_x, b_y, en_x, en_y, ene, ene_sp, s_t, q_tot, n_part, head_current, x_c=0,
-        y_c=0, z_c=0, lon_profile='gauss', min_len_scale_noise=None,
+        a_x, a_y, b_x, b_y, en_x, en_y, ene, ene_sp, s_t, q_tot, n_part, head_current, 
+        x_c=0, y_c=0, z_c=0, lon_profile='gauss', min_len_scale_noise=None,
         sigma_trunc_lon=None, smooth_sigma=None, smooth_trunc=None,
         save_to_file=False, save_to_code='astra',
         save_to_path=None, file_name=None, perform_checks=False):
@@ -59,7 +59,8 @@ def generate_gaussian_bunch_from_twiss(
     
     head_current: float
         takes a value between 0 and 1.
-        if it is 1 all the current is in the head, if it 0 all the current is in the tail, and if it is 0.5 both head and tail have the same current.
+        if it is 1 all the current is in the head, if it 0 all the current is 
+        in the tail, and if it is 0.5 both head and tail have the same current.
 
     x_c: float
         Central bunch position in the x-plane in units of m.
@@ -147,12 +148,15 @@ def generate_gaussian_bunch_from_twiss(
         z = _create_flattop_longitudinal_profile_with_smoothing(
             z_c, s_z, n_part, min_len_scale_noise, smooth_sigma, smooth_trunc)
     elif lon_profile == 'rectan_trapezoidal':
-        z = _create_rectan_trapezoidal_longitudinal_profile(z_c, s_z, n_part,head_current,
-                                         min_len_scale_noise)
+        z = _create_rectan_trapezoidal_longitudinal_profile(z_c, s_z, n_part,
+                                                            head_current,
+                                                            min_len_scale_noise)
     elif lon_profile == 'rectan_trapezoidal_smoothed':
-        z = _create_rectan_trapezoidal_longitudinal_profile_smoothed(z_c, s_z, n_part,
-                                                                           head_current,
-                                                                           min_len_scale_noise)
+        z = _create_rectan_trapezoidal_longitudinal_profile_smoothed(z_c, 
+                                                                     s_z, 
+                                                                     n_part,
+                                                                     head_current,
+                                                                     min_len_scale_noise)
 
     # Define again n_part in case it changed when crealing long. profile
     n_part = len(z)
@@ -204,7 +208,6 @@ def generate_from_file_modifying_twiss(
 
     read_kwargs: dict
         Dictionary containing optional parameters for the read_beam function.
-
 
     save_to_file: bool
         Whether to save the generated distribution to a file.
@@ -320,8 +323,10 @@ def _create_flattop_longitudinal_profile_with_smoothing(z_c, length, n_part,
     z = z - length/2 + z_c
     return z
 
-def _create_rectan_trapezoidal_longitudinal_profile(z_c, length, n_part, head_current,
-                                         min_len_scale_noise):
+
+def _create_rectan_trapezoidal_longitudinal_profile(z_c, length, n_part, 
+                                                    head_current,
+                                                    min_len_scale_noise):
     """ Creates a rectangular trapezoidal longitudinal profile """
     
     # Make sure number of particles is an integer
@@ -346,9 +351,11 @@ def _create_rectan_trapezoidal_longitudinal_profile(z_c, length, n_part, head_cu
     return z
 
 
-def _create_rectan_trapezoidal_longitudinal_profile_smoothed(z_c, length, n_part, head_current,
+def _create_rectan_trapezoidal_longitudinal_profile_smoothed(z_c, length, 
+                                                             n_part, head_current,
                                                              min_len_scale_noise,
-                                                             left_weight=0.05,right_weight=0.05):
+                                                             left_weight=0.05, 
+                                                             right_weight=0.05):
     
     """ Creates a rectangular trapezoidal smoothed longitudinal profile """
     
@@ -363,7 +370,7 @@ def _create_rectan_trapezoidal_longitudinal_profile_smoothed(z_c, length, n_part
     return z
     
 
-def rectan_trapezoid(n_part,a,b,h1,h2,plot=False):
+def rectan_trapezoid(n_part, a, b, h1, h2):
     """
     Creates a longitudinal rectangular trapezoid particle bunch with the specified
     parameters.
@@ -389,8 +396,7 @@ def rectan_trapezoid(n_part,a,b,h1,h2,plot=False):
         first height. h1 can only have a value between 0 and maximum height: 2/(b-a)
     h2 : float
         second height
-    plot: bool
-        if True, then plot PDF
+
     ----------
     Returns
     
@@ -409,12 +415,6 @@ def rectan_trapezoid(n_part,a,b,h1,h2,plot=False):
             m = (h2-h1)/(2*(b-a))
             D = n**2 + 4 * m * y[i]
             x[i] = (-n+np.sqrt(D))/(2*m) + a
-    
-    if plot:
-        plt.hist(x,density=True,histtype='stepfilled',bins=50, alpha=0.2);
-        plt.grid()
-        # plt.ylim(0.,1.);
-    
     return x
 
 
@@ -465,7 +465,8 @@ def half_gaussian(n_part, mu, peak, part):
     x[idx] = 2 * mu - x[idx]
     return x
 
-def rectan_trapezoid_smoothed(n_part,a,b,h1,left_weight,right_weight,plot=False):
+
+def rectan_trapezoid_smoothed(n_part, a, b, h1, left_weight, right_weight):
     """
     Creates a longitudinal rectangular trapezoid particle bunch with smoothed sides.
     Parameters
@@ -504,8 +505,7 @@ def rectan_trapezoid_smoothed(n_part,a,b,h1,left_weight,right_weight,plot=False)
     Returns
     
     x : array with size [n_part]
-        distribution of random variables with rectangular trapezoidal smoothed shape
-        
+        distribution of random variables with rectangular trapezoidal smoothed shape 
     """
     
     trapez_weight = 1 - (left_weight + right_weight)
@@ -531,16 +531,15 @@ def rectan_trapezoid_smoothed(n_part,a,b,h1,left_weight,right_weight,plot=False)
     idx = np.logical_not(np.logical_or(idx_left, idx_right))
     
     if trapez_weight != 0:
-        x[idx] = rectan_trapezoid(np.count_nonzero(idx), a, b, h1 / trapez_weight, h2 / trapez_weight,plot=False)
+        x[idx] = rectan_trapezoid(np.count_nonzero(idx), a, b, 
+                                  h1 / trapez_weight, 
+                                  h2 / trapez_weight,plot=False)
     if left_weight != 0:
-        x[idx_left] = half_gaussian(np.count_nonzero(idx_left), mu=a, peak=h1 / left_weight, part='left')
+        x[idx_left] = half_gaussian(np.count_nonzero(idx_left), mu=a, 
+                                    peak=h1 / left_weight, part='left')
     if right_weight != 0:
-        x[idx_right] = half_gaussian(np.count_nonzero(idx_right), mu=b, peak=h2 / right_weight, part='right')
-    
-    if plot:
-        plt.hist(x,histtype='stepfilled', bins=100, alpha=1., density=True)
-        plt.grid()
-    
+        x[idx_right] = half_gaussian(np.count_nonzero(idx_right), mu=b, 
+                                     peak=h2 / right_weight, part='right')
     return x
 
 
