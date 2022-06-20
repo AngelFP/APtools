@@ -136,7 +136,7 @@ def read_astra_data(file_path, remove_non_standard=True):
     return x, y, z, px, py, pz, q
 
 
-def read_openpmd_beam(file_path, species_name):
+def read_openpmd_beam(file_path, species_name=None):
     """Reads particle data from a h5 file following the openPMD standard and
     returns it in the unis used by APtools.
 
@@ -145,8 +145,9 @@ def read_openpmd_beam(file_path, species_name):
     file_path : str
         Path to the file with particle data
 
-    species_name : str
-        Name of the particle species
+    species_name : str, Optional
+        Name of the particle species. Optional if only one particle species
+        is available in the openpmd file.
 
     Returns
     -------
@@ -159,6 +160,17 @@ def read_openpmd_beam(file_path, species_name):
     base_path = '/data/{}'.format(iteration)
     # get path under which particle data is stored
     particles_path = file_content.attrs['particlesPath'].decode()
+    # list available species
+    available_species = list(
+        file_content[join_infile_path(base_path, particles_path)])
+    if species_name is None:
+        if len(available_species) == 1:
+            species_name = available_species[0]
+        else:
+            raise ValueError(
+                'More than one particle species is available. '
+                'Please specify a `species_name`. '
+                'Available species are: ' + str(available_species))
     # get species
     beam_species = file_content[
         join_infile_path(base_path, particles_path, species_name)]
