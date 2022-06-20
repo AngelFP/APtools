@@ -16,6 +16,7 @@ def get_available_species(file_path):
         A list of strings with the names of the available species.
     """
     series = io.Series(file_path, io.Access.read_only)
-    it = series.iterations[0]
+    i = list(series.iterations)[0]
+    iteration = series.iterations[i]
 
-    return list(it.particles)
+    return list(iteration.particles)
