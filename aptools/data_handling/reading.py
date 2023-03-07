@@ -4,12 +4,14 @@ tracking and PIC codes"""
 import numpy as np
 import scipy.constants as ct
 from h5py import File as H5File
+from deprecated import deprecated
 
 from aptools.helper_functions import join_infile_path, reposition_bunch
 from aptools.plasma_accel.general_equations import plasma_skin_depth
 from aptools.data_processing.beam_filtering import filter_beam
 
 
+@deprecated(reason="Use methods from `particle_distributions.read` module.")
 def read_beam(code_name, file_path, reposition=False,
               avg_pos=[None, None, None], avg_mom=[None, None, None],
               filter_min=[None, None, None, None, None, None, None],

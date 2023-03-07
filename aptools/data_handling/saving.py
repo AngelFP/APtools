@@ -7,6 +7,7 @@ import numpy as np
 import scipy.constants as ct
 from openpmd_api import (Series, Access, Dataset, Mesh_Record_Component,
                          Unit_Dimension)
+from deprecated import deprecated
 
 from aptools.helper_functions import reposition_bunch, get_particle_subset
 from aptools import __version__
@@ -15,6 +16,7 @@ from aptools import __version__
 SCALAR = Mesh_Record_Component.SCALAR
 
 
+@deprecated(reason="Use methods from `particle_distributions.save` module.")
 def save_beam(code_name, beam_data, folder_path, file_name, reposition=False,
               avg_pos=[None, None, None], avg_mom=[None, None, None],
               n_part=None, **kwargs):
