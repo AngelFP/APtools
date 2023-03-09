@@ -16,7 +16,11 @@ from aptools import __version__
 SCALAR = Mesh_Record_Component.SCALAR
 
 
-@deprecated(reason="Use methods from `particle_distributions.save` module.")
+@deprecated(
+    version="0.2.0",
+    reason=("This method is replaced by those in the new "
+            "`particle_distributions.save` module.")
+)
 def save_beam(code_name, beam_data, folder_path, file_name, reposition=False,
               avg_pos=[None, None, None], avg_mom=[None, None, None],
               n_part=None, **kwargs):
