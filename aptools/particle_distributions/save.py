@@ -17,7 +17,8 @@ SCALAR = Mesh_Record_Component.SCALAR
 def save_distribution(
     distribution: ParticleDistribution,
     file_path: str,
-    data_format: str
+    data_format: str,
+    **kwargs
 ) -> None:
     """Save particle distribution to file in the specified format.
 
@@ -30,8 +31,13 @@ def save_distribution(
     data_format : str
         Internal format of the data.  Possible values
         are 'astra', 'csrtrack' and 'openpmd'.
+
+    Other Parameters
+    ----------------
+    **kwargs
+        Additional parameters to be passed to the particle savers.
     """
-    _savers[data_format](distribution, file_path)
+    _savers[data_format](distribution, file_path, **kwargs)
 
 
 def save_to_astra(
@@ -52,11 +58,11 @@ def save_to_astra(
     m_species = distribution.m_species
     q_species = distribution.q_species
     x_orig = distribution.x
-    y_orig = distribution.x
-    z_orig = distribution.x
-    px_orig = distribution.x * m_species * ct.c**2 / ct.e  # eV/c
-    py_orig = distribution.x * m_species * ct.c**2 / ct.e  # eV/c
-    pz_orig = distribution.x * m_species * ct.c**2 / ct.e  # eV/c
+    y_orig = distribution.y
+    z_orig = distribution.z
+    px_orig = distribution.px * m_species * ct.c**2 / ct.e  # eV/c
+    py_orig = distribution.py * m_species * ct.c**2 / ct.e  # eV/c
+    pz_orig = distribution.pz * m_species * ct.c**2 / ct.e  # eV/c
     q_orig = distribution.q * 1e9  # nC
     w = distribution.w
 
