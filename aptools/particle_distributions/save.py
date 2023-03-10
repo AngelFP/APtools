@@ -67,10 +67,16 @@ def save_to_astra(
     w = distribution.w
 
     # Determine particle index (type of species).
-    if m_species == ct.m_e:
-        index = 1 if q_species == -ct.e else 2
-    if m_species == ct.m_p:
-        index == 3
+    if m_species == ct.m_e and q_species == -ct.e:
+        index = 1
+    elif m_species == ct.m_e and q_species == ct.e:
+        index = 2
+    elif m_species == ct.m_p and q_species == ct.e:
+        index = 3
+    else:
+        raise ValueError(
+            'Only electrons, positrons and protons are supported when saving '
+            'to ASTRA.')
 
     # Create arrays
     x = np.zeros(q_orig.size + 1)
