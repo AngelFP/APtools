@@ -2,10 +2,6 @@
 diagnostics"""
 
 import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-import matplotlib.patheffects as path_effects
 import scipy.constants as ct
 
 import aptools.data_analysis.beam_diagnostics as bd
@@ -28,6 +24,8 @@ def phase_space_overview_from_file(
 
 def phase_space_overview(x, y, z, px, py, pz, q, rasterized_scatter=None,
                          show=True):
+    import matplotlib.pyplot as plt
+    import matplotlib.patheffects as path_effects
     em_x = bd.normalized_transverse_rms_emittance(x, px, w=q) * 1e6
     em_y = bd.normalized_transverse_rms_emittance(y, py, w=q) * 1e6
     a_x, b_x, g_x = bd.twiss_parameters(x, px, pz, w=q)
@@ -127,6 +125,9 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
                    ene_bins=50, left=0.125, right=0.875, top=0.98, bottom=0.13,
                    xlim=None, ylim=None, add_labels=False, include_twiss=False,
                    fig=None, rasterized_scatter=None, show=True):
+    import matplotlib.pyplot as plt
+    import matplotlib.gridspec as gridspec
+    from matplotlib.colorbar import Colorbar
     # analyze beam
     current_prof, z_edges = bd.current_profile(z, q, n_slices=n_slices,
                                                len_slice=len_slice)
@@ -283,7 +284,7 @@ def slice_analysis(x, y, z, px, py, pz, q, n_slices=50, len_slice=None,
 
         # colorbar
         ax = plt.subplot(gs[1])
-        matplotlib.colorbar.Colorbar(ax, pscatt, label='Q [fC]')
+        Colorbar(ax, pscatt, label='Q [fC]')
 
         # slice parameters plot
         plt.subplot(gs[2])
@@ -360,6 +361,9 @@ def energy_vs_z(
         xlim=None, ylim=None, show_text=True, x_proj=True, y_proj=True,
         cbar=True, cbar_width=0.02, left=0.125, right=0.875, top=0.98,
         bottom=0.13, fig=None, rasterized_scatter=None, show=True):
+    import matplotlib.pyplot as plt
+    import matplotlib.gridspec as gridspec
+    from matplotlib.colorbar import Colorbar
     # analyze beam
     current_prof, z_edges = bd.current_profile(z, q, n_slices=n_slices,
                                                len_slice=len_slice)
@@ -488,13 +492,16 @@ def energy_vs_z(
         # colorbar
         if cbar:
             ax = plt.subplot(gs[1])
-            matplotlib.colorbar.Colorbar(ax, pscatt, label='Q [fC]')
+            Colorbar(ax, pscatt, label='Q [fC]')
 
     if show:
         plt.show()
 
 
 def full_phase_space(x, y, z, px, py, pz, q, show=True, **kwargs):
+    import matplotlib.pyplot as plt
+    import matplotlib.gridspec as gridspec
+
     fig = plt.figure(figsize=(12, 3))
     grid = gridspec.GridSpec(1, 3, figure=fig, wspace=0.55)
     hor_phase_space(
@@ -654,6 +661,8 @@ def phase_space_plot(
         s=1, cmap='plasma', center_lines=False,
         text=None, cbar=True, cbar_ticks=3, cbar_width=0.05,
         subplot_spec=None, fig=None, tight_layout=False, show=True):
+    import matplotlib.pyplot as plt
+    import matplotlib.gridspec as gridspec
 
     if cbar:
         n_cols = 2
