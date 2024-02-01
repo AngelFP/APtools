@@ -1,14 +1,9 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gs
-from matplotlib import ticker
-from matplotlib.colorbar import Colorbar
-import matplotlib.patheffects as path_effects
-from matplotlib import colors
 
 
 def add_projection(
         x, bins, main_ax, subplot_spec, fig, orientation='horizontal'):
+    import matplotlib.gridspec as gs
     x_proj, x_bins = np.histogram(x, bins=bins)
     x_pos = x_bins[1:] - (x_bins[1]-x_bins[0])
 
@@ -44,6 +39,10 @@ def add_projection(
 
 def create_vertical_colorbars(
         images, labels, subplot_spec, fig=None, n_ticks=3, **kwargs):
+    import matplotlib.pyplot as plt
+    import matplotlib.gridspec as gs
+    from matplotlib import ticker
+    from matplotlib.colorbar import Colorbar
     if not isinstance(images, list):
         images = [images]
     if not isinstance(labels, list):
@@ -60,6 +59,8 @@ def create_vertical_colorbars(
 
 
 def add_text(ax, x, y, text, **kwargs):
+    import matplotlib.patheffects as path_effects
+    from matplotlib import colors
     fc = colors.to_rgba('white')
     # fc[:-1] + (0.7,)
     ec = colors.to_rgba('tab:gray')

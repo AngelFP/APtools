@@ -1,6 +1,5 @@
 """ Contains methods for making different types of plots """
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -9,6 +8,7 @@ def scatter_histogram(x, y, bins=[300, 300], range=None, weights=None,
     """
     Does a scatter plot from the histogram of a particle distribution.
     """
+    import matplotlib.pyplot as plt
     counts, xedges, yedges = np.histogram2d(x, y, bins=bins, range=range,
                                             weights=weights)
     x_grid = xedges[1:] - np.abs(xedges[1]-xedges[0])/2
